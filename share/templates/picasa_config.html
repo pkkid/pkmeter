@@ -1,0 +1,42 @@
+<vframe>
+  <!-- Enable -->
+  <vframe id='controlgroup_enabled' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Enabled:'/>
+      <toggleswitch id='enabled'/>
+      <stretch/>
+    </hframe>
+  </vframe>
+  <!-- Update Interval -->
+  <vframe id='controlgroup_interval' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Interval:'/>
+      <QLineEdit id='interval' name='input_small'/>
+      <label id='status_interval' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_interval' name='help' wrap='true' text='Seconds between plugin updates.'/>
+  </vframe>
+  <!-- Username -->
+  <vframe id='controlgroup_username' name='controlgroup'>
+    <hframe>
+      <label name='label' text='username:'/>
+      <QLineEdit id='username' name='input_large'/>
+      <label id='status_username' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_username' name='help' wrap='true'
+      text='Your plex webalbums username (without @gmail).'/>
+  </vframe>
+  <!-- Ignores -->
+  <vframe id='controlgroup_ignores' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Ignores:'/>
+      <textedit id='ignores' name='input_large'/>
+      <label id='status_ignores' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_ignores' name='help' wrap='true' text='Albums to ignore (one per line).'/>
+  </vframe>
+  <stretch/>
+</vframe>

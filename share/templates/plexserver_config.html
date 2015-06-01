@@ -1,0 +1,51 @@
+<vframe>
+  <!-- Enable -->
+  <vframe id='controlgroup_enabled' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Enabled:'/>
+      <toggleswitch id='enabled'/>
+      <stretch/>
+    </hframe>
+  </vframe>
+  <!-- Update Interval -->
+  <vframe id='controlgroup_interval' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Interval:'/>
+      <QLineEdit id='interval' name='input_small'/>
+      <label id='status_interval' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_interval' name='help' wrap='true' text='Seconds between plugin updates.'/>
+  </vframe>
+  <!-- Username -->
+  <vframe id='controlgroup_username' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Username:'/>
+      <QLineEdit id='username' name='input_xlarge'/>
+      <label id='status_username' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_username' name='help' wrap='true' text='Plex server username.'/>
+  </vframe>
+  <!-- Password -->
+  <vframe id='controlgroup_password' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Password:'/>
+      <QLineEdit id='password' name='input_xlarge' echo='passwordechoonedit'/>
+      <label id='status_password' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_password' name='help' wrap='true' text='Plex server password.'/>
+  </vframe>
+  <!-- Server Name -->
+  <vframe id='controlgroup_host' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Plex Server:'/>
+      <QLineEdit id='host' name='input_xxlarge'/>
+      <label id='status_host' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_host' name='help' wrap='true' text='Plex server name or host:port of webserver.'/>
+  </vframe>
+  <stretch/>
+</vframe>

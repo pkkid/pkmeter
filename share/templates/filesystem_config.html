@@ -1,0 +1,32 @@
+<vframe>
+  <!-- Enable -->
+  <vframe id='controlgroup_enabled' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Enabled:'/>
+      <toggleswitch id='enabled'/>
+      <stretch/>
+    </hframe>
+  </vframe>
+  <!-- Update Interval -->
+  <vframe id='controlgroup_interval' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Interval:'/>
+      <QLineEdit id='interval' name='input_small'/>
+      <label id='status_interval' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_interval' name='help' wrap='true' text='Seconds between plugin updates.'/>
+  </vframe>
+  <!-- FS Types -->
+  <vframe id='controlgroup_fstypes' name='controlgroup'>
+    <hframe>
+      <label name='label' text='FS Types:'/>
+      <QLineEdit id='fstypes' name='input_xxlarge'/>
+      <label id='status_fstypes' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_fstypes' name='help' wrap='true'
+      text='Space delimited list of fs types to display.'/>
+  </vframe>
+  <stretch/>
+</vframe>

@@ -1,0 +1,23 @@
+<widget name='config' initsize='600,480'>
+  <vframe>
+    <hframe>
+      <vframe name='plugins' bgimage='img:logo.png' bgsize='23,23' bgpos='left,top'>
+        <label name='title' text='PKMeter'/><spacing size='5'/>
+        <label name='h2' text='Plugins:'/><spacing size='2'/>
+        <QListWidget id='list'/>
+      </vframe><spacing size='5'/>
+      <vframe>
+        <spacing size='5'/>
+        <QTabBar id='tabbar'/><spacing size='10'/>
+        <vframe id='contents' name='contents'/>
+      </vframe>
+    </hframe>
+    <spacing size='10'/>
+    <hframe>
+      <pushbutton text='Reset' click='btn_reset'/><stretch/>
+      <pushbutton text='Close' click='hide'/><spacing size='5'/>
+      <pushbutton text='Apply' click='btn_apply'/><spacing size='5'/>
+      <pushbutton text='Save' click='btn_save'/>
+    </hframe>
+  </vframe>
+</widget>

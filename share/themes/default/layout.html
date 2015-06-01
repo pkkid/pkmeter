@@ -1,0 +1,374 @@
+<widget name='widget' initsize='190,-1'>
+  <vframe name='container'>
+
+    <!-- Clock -->
+    <hframe name='clock' showif='clock.enabled'>
+      <stretch/>
+      <label name='clock_bignum' text='{{clock.datetime|format_date:"%-d"}}' align='right'/>
+      <vframe name='clock_smallnums'>
+        <label text='{{clock.datetime|format_date:"%b %Y"}}'/>
+        <label text='{{clock.datetime|format_date:"%A"}}'/>
+        <label text='{{clock.datetime|format_date:"%-I:%M:%S %p"|lower}}'/>
+      </vframe>
+      <stretch/>
+    </hframe>
+
+    <!-- Weather Underground -->
+    <vframe name='weather' showif='wunderground.enabled and wunderground.current_observation'>
+      <hframe name='weather_today' bgimage='img:weather/colorful/{{wunderground.current_observation.icon|wunderground_iconcode}}.png' bgsize='fit' bgpos='center,center'
+        dblclick='plugins.wunderground.open_wunderground'
+        tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}Today{/span}: {{wunderground.current_observation.weather}}
+          {div style="white-space:pre;"}Temp: {{wunderground.current_observation.temp_f|to_int}}°F ({{wunderground.current_observation.temp_c|to_int}}°C){/div}
+          {div style="white-space:pre;"}Wind: {{wunderground.current_observation.wind_mph}} mph {{wunderground.current_observation.wind_dir}}{/div}
+          {div style="white-space:pre;"}Visibility: {{wunderground.current_observation.visibility_mi}} mi{/div}
+          {div style="white-space:pre;"}Humidity: {{wunderground.current_observation.relative_humidity}}{/div}
+          {div style="white-space:pre;"}Pressure: {{wunderground.current_observation.pressure_in}}{{wunderground.current_observation.pressure_trend}} in{/div}
+          {div style="white-space:pre;"}Sunrise: {{wunderground.moon_phase.sunrise.hour}}:{{wunderground.moon_phase.sunrise.minute}} AM{/div}
+          {div style="white-space:pre;"}Sunset: {{wunderground.moon_phase.sunset.hour|mod_12}}:{{wunderground.moon_phase.sunset.minute}} PM{/div}
+          {div style="white-space:pre;"}Updated: {{wunderground.current_observation.local_epoch|format_timestamp:"%b %-d %-I:%M %p"}}{/div}'>
+        <vframe>
+          <label name='weather_location' text='{{wunderground.current_observation.display_location.city}}'/>
+          <label name='weather_description' text='{{wunderground.current_observation.weather}}'/>
+        </vframe>
+        <vframe>
+          <label name='weather_temp' align='right' text='{{wunderground.current_observation.temp_f|to_int}}°F'/>
+          <label name='weather_feelslike' align='right' text='Feels: {{wunderground.current_observation.feelslike_f|to_int}}°'/>
+        </vframe>
+      </hframe>
+      <vframe name='body'>
+        <hframe name='forecast' iter='wunderground.forecast.simpleforecast.forecastday' itermax='4'>
+          <vframe name='forecast_day'
+            tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}{{this.date.weekday}}{/span}: {{this.conditions}}
+              {div style="white-space:pre;"}Temp: {{this.high.fahrenheit}}°/{{this.low.fahrenheit}}°F{/div}
+              {div style="white-space:pre;"}Wind: {{this.avewind.mph}} mph {{this.avewind.dir}}{/div}
+              {div style="white-space:pre;"}Humidity: {{this.avehumidity}}%{/div}
+              {div style="white-space:pre;"}Updated: {{wunderground.current_observation.local_epoch|format_timestamp:"%b %-d %-I:%M %p"}}{/div}'>
+            <vframe name='forecast_icon' bgimage='img:weather/colorful/{{this.icon|wunderground_iconcode}}.png' bgsize='30,30' bgpos='center,center'/>
+            <label name='forecast_weekday' text='{{this.date.weekday_short}}' align='center'/>
+            <label name='forecast_highlow' text='{{this.high.fahrenheit}}°/{{this.low.fahrenheit}}°' align='center'/>
+          </vframe>
+        </hframe>
+      </vframe>
+    </vframe>
+
+    <!-- Yahoo! Weather -->
+    <vframe name='weather' showif='yweather.enabled and yweather.location'>
+      <hframe name='weather_today' bgimage='img:weather/colorful/{{yweather.item.condition.code}}.png' bgsize='fit' bgpos='center,center'
+        tooltip='Wind: {{yweather.wind.speed}} {{yweather.units.speed}} {{yweather.wind.direction|degrees_to_direction}}\n
+          Visibility: {{yweather.atmosphere.visibility}} {{yweather.units.distance}}\n
+          Humidity: {{yweather.atmosphere.humidity}}%\n
+          Pressure: {{yweather.atmosphere.pressure}} {{yweather.units.pressure}}\n
+          Updated: {{yweather.lastBuildDate|yweather_updated}}'>
+        <vframe>
+          <label name='weather_location' text='{{yweather.location.city}}'/>
+          <label name='weather_description' text='{{yweather.item.condition.text}}'/>
+        </vframe>
+        <vframe>
+          <label name='weather_temp' align='right' text='{{yweather.item.condition.temp}}°{{yweather.units.temperature}}'/>
+          <label name='weather_feelslike' align='right' text='Feels: {{yweather.wind.chill}}°'/>
+        </vframe>
+      </hframe>
+      <vframe name='body'>
+        <hframe name='forecast' iter='yweather.item.forecast' itermax='4'>
+          <vframe name='forecast_day' tooltip='{{this.day}}\n{{this.text}}'>
+            <vframe name='forecast_icon' bgimage='img:weather/colorful/{{this.code}}.png' bgsize='30,30' bgpos='center,center'/>
+            <label name='forecast_weekday' text='{{this.day}}' align='center'/>
+            <label name='forecast_highlow' text='{{this.high}}°/{{this.low}}°' align='center'/>
+          </vframe>
+        </hframe>
+      </vframe>
+    </vframe>
+
+    <!-- Picasa Webalbums -->
+    <vframe name='picasa' showif='picasa.enabled'>
+      <vframe name='header' dblclick='plugins.picasa.open_albums'>
+        <label name='header_title' text='Photoalbum'/>
+        <label name='header_subtitle' text='{{picasa.albums|length}} albums'/>
+      </vframe>
+      <vframe name='body' dblclick='plugins.picasa.open_current_image'
+        tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}Photo Details{/span}
+          {div style="white-space:pre;"}Date Taken: {{picasa.photo.timestamp|format_timestamp}}{/div}
+          {div style="white-space:pre;"}Dimensions: {{picasa.photo.width}} x {{picasa.photo.height}}{/div}
+          {div style="white-space:pre;"}File name: {{picasa.photo.title}}{/div}
+          {div style="white-space:pre;"}File size: {{picasa.photo.size|bytes_to_str}}{/div}
+          {div style="white-space:pre;"}Camera: {{picasa.photo.model}}{/div}
+          {div style="white-space:pre;"}Focal Length: {{picasa.photo.focallength}}{/div}
+          {div style="white-space:pre;"}Exposure: {{picasa.photo.exposure|to_fraction}}{/div}
+          {div style="white-space:pre;"}F Number: f/{{picasa.photo.fstop}}{/div}
+          {div style="white-space:pre;"}ISO: {{picasa.photo.iso}}{/div}
+          {div style="white-space:pre;"}Flash: {{picasa.photo.flash}}{/div}'>
+        <vframe name='picasa_image'>
+          <vframe bgimage='{{picasa.photo.url}}' bgpos='center,center' bgsize='fit' bgfade='1'/>
+        </vframe>
+        <vframe name='picasa_title'>
+          <label name='body_value' text='{{picasa.album.title|default:" "}}' align='center'/>
+          <label name='body_label' text='{{picasa.album.date|default:" "}}' align='center'/>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- System -->
+    <vframe name='system' showif='system.enabled'>
+      <hframe name='header' dblclick='plugins.system.open_system_monitor'>
+        <vframe>
+          <label name='header_title' text='System'/>
+          <label name='header_subtitle' text='{{system.hostname}}'/>
+        </vframe>
+        <vframe name='header_chartwrap'>
+          <linechart name='header_chart' values='{{system.cpu_percent}}' minmax='50' colors='#e7b21f'/>
+        </vframe>
+      </hframe>
+      <vframe name='body'
+        tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}{{system.hostname}}{/span}
+          {div style="white-space:pre;"}Processors: {{system.cpu_percents|length}}{/div}
+          {div style="white-space:pre;"}Total Mem: {{system.memory.total|bytes_to_str:1}}{/div}
+          {div style="white-space:pre;"}Used Mem: {{system.memory.used|bytes_to_str:1}}{/div}
+          {div style="white-space:pre;"}Cached Mem: {{system.memory.cached|bytes_to_str:1}}{/div}
+          {div style="white-space:pre;"}Buffered Mem: {{system.memory.buffers|bytes_to_str:1}}{/div}'>
+        <!-- cpu usage and uptime -->
+        <hframe name='body_chartrow'>
+          <vframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='CPU Usage:'/>
+              <label name='body_value' text='{{system.cpu_percent|to_int}}%' align='right'/>
+            </hframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='CPU Uptime:'/>
+              <label name='body_value' text='{{system.uptime|to_int|seconds_to_str}}' align='right'/>
+            </hframe>
+          </vframe>
+          <vframe name='body_chartwrap'>
+            <vbarchart name='header_chart' values='{{system.cpu_percents|join}}' colors='#e7b21f'/>
+          </vframe>
+        </hframe>
+        <!-- mem used and free mem -->
+        <hframe name='body_chartrow'>
+          <vframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='Mem Used:'/>
+              <label name='body_value' text='{{system.memory.percent|to_int}}%' align='right'/>
+            </hframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='Mem Free:'/>
+              <label name='body_value' text='{{system.memory.free|bytes_to_str:1}}' align='right'/>
+            </hframe>
+          </vframe>
+          <vframe name='body_chartwrap'>
+            <piechart name='header_chart' values='{{system.memory.percent|default:0}},{{system.memory.cached_percent|default:0}}' colors='#e7b21f,#ffffff26'/>
+          </vframe>
+        </hframe>
+        <!-- mem used and mem free -->
+      </vframe>
+    </vframe>
+
+    <!-- NVIDIA -->
+    <vframe name='processes' showif='nvidia.enabled'>
+      <vframe name='header'>
+        <label name='header_title' text='NVIDIA'/>
+        <label name='header_subtitle' text='{{nvidia.card}} {{nvidia.nvidiadriverversion|to_int}}'/>
+      </vframe>
+      <vframe name='body'>
+        <!-- gpu usage and temp -->
+        <hframe name='body_chartrow'>
+          <vframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='GPU Usage:'/>
+              <label name='body_value' text='{{nvidia.gpuutilization_graphics}}%' align='right'/>
+            </hframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='GPU Temp:'/>
+              <label name='body_value' text='{{nvidia.gpucoretemp|to_int|celsius_to_fahrenheit}}°F' align='right'/>
+            </hframe>
+          </vframe>
+          <vframe name='body_chartwrap'>
+            <linechart name='header_chart' values='{{nvidia.gpuutilization_graphics}}' minmax='50' colors='#4E9A06'/>
+          </vframe>
+        </hframe>
+        <!-- gpu used and free mem -->
+        <hframe name='body_chartrow'>
+          <vframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='Mem Used:'/>
+              <label name='body_value' text='{{nvidia.percentuseddedicatedgpumemory|to_int}}%' align='right'/>
+            </hframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='Mem Free:'/>
+              <label name='body_value' text='{{nvidia.freededicatedgpumemory|megabytes_to_str:1}}' align='right'/>
+            </hframe>
+          </vframe>
+          <vframe name='body_chartwrap'>
+            <piechart name='header_chart' values='{{nvidia.percentuseddedicatedgpumemory|default:0}}' colors='#4E9A06'/>
+          </vframe>
+        </hframe>
+      </vframe>
+    </vframe>
+
+    <!-- Processes -->
+    <vframe name='processes' showif='processes.enabled'>
+      <vframe name='header' dblclick='plugins.processes.open_system_monitor'>
+        <label name='header_title' text='Processes'/>
+        <label name='header_subtitle' text='{{processes.total}} processes'/>
+      </vframe>
+      <vframe name='body'>
+        <vframe name='body_row' iter='processes.procs' itermax='6'>
+          <hframe tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}{{this.name}}{/span}
+              {div style="white-space:pre;"}PID: {{this.pid}}{/div}
+              {div style="white-space:pre;"}Memory: {{this.memory_rss|bytes_to_str}}{/div}
+              {div style="white-space:pre;"}Runtime: {{this.create_time|timestamp_ago}}{/div}
+              {div style="white-space:pre;"}User: {{this.username}}{/div}
+              {div style="white-space:pre;"}Status: {{this.status}}{/div}'>
+            <label name='body_label' text='{{this.name}}'/>
+            <label name='proc_mem' text='{{this.memory_rss|bytes_to_str}}' align='right' dblclick='plugins.processes.sort_mem'/>
+            <label name='proc_cpu' text='{{this.cpu_percent|round}}%' align='right' dblclick='plugins.processes.sort_cpu'/>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- Network -->
+    <vframe name='network' showif='network.enabled and network.nics'>
+      <hframe name='header'>
+        <vframe>
+          <label name='header_title' text='Network'/>
+          <label name='header_subtitle' text='{{externalip.ip}}'/>
+        </vframe>
+        <vframe name='header_chartwrap'>
+          <linechart name='header_chart' values='{{network.total.bytes_recv_per_sec|default:0}},{{network.total.bytes_sent_per_sec|default:0}}' colors='#4E9A06,#A40000' minmax='100000'/>
+        </vframe>
+      </hframe>
+      <vframe name='network_body'>
+        <vframe iter='network.nics'>
+          <vframe name='network_nic'
+            tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}{{this.iface|network_friendly_iface}}{/span}: {{this.iface}}
+              {div style="white-space:pre;"}Broadcast: {{this.broadcast}}{/div}
+              {div style="white-space:pre;"}Netmask: {{this.netmask}}{/div}'>
+            <hframe name='body_row'>
+              <label name='body_value' text='{{this.iface|network_friendly_iface}}:'/>
+              <label name='body_value' text='{{this.addr}}' align='right'/>
+            </hframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='  Upload:'/>
+              <label name='body_value' text='{{this.bytes_sent_per_sec|bytes_to_str}}/s' align='right'/>
+              <label name='network_upload' text='{{this.bytes_sent|bytes_to_str}} ▴' align='right'/>
+            </hframe>
+            <hframe name='body_row'>
+              <label name='body_label' text='  Download:'/>
+              <label name='body_value' text='{{this.bytes_recv_per_sec|bytes_to_str}}/s' align='right'/>
+              <label name='network_download' text='{{this.bytes_recv|bytes_to_str}} ▾' align='right'/>
+            </hframe>
+          </vframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- Filesystems -->
+    <vframe name='filesystem' showif='filesystem.enabled'>
+      <hframe name='header'>
+        <vframe>
+          <label name='header_title' text='File Systems'/>
+          <label name='header_subtitle' text='IO: {{filesystem.io.io_per_sec|bytes_to_str}}/s'/>
+        </vframe>
+        <vframe name='header_chartwrap'>
+          <linechart name='header_chart' values='{{filesystem.io.io_per_sec}}' colors='#e7b21f' minmax='100000'/>
+        </vframe>
+      </hframe>
+      <vframe name='filesystem_body'>
+        <vframe iter='filesystem.disks'>
+          <hframe name='filesystem_disk'
+            tooltip='{span style="font-size:12px; font-weight:bold; color:#bbb;"}{{this.mountpoint|filesystem_friendly_name}}{/span}: {{this.fstype}}
+              {div style="white-space:pre;"}Path: {{this.mountpoint}}{/div}
+              {div style="white-space:pre;"}Device: {{this.device}}{/div}
+              {div style="white-space:pre;"}Opts: {{this.opts}}{/div}'>
+            <vframe>
+              <hframe name='body_row'>
+                <label name='body_value' text='{{this.mountpoint|filesystem_friendly_name}}:'/>
+                <label name='body_value' text='{{this.used|bytes_to_str:1}} /' align='right'/>
+              </hframe>
+              <hframe name='body_row'>
+                <label name='body_label' text='{{this.percent|to_int}}%'/>
+                <label name='body_value' text='{{this.total|bytes_to_str:1}}' align='right'/>
+              </hframe>
+            </vframe>
+            <vframe name='body_chartwrap'>
+              <piechart name='header_chart' values='{{this.percent}}' colors='#e7b21fdd'/>
+            </vframe>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- Google Calendar -->
+    <vframe name='filesystem' showif='gcal.enabled'>
+      <vframe name='header' dblclick='plugins.gcal.open_gcal'>
+        <label name='header_title' text='Google Calendar'/>
+        <label name='header_subtitle' text='Next Event: {{gcal.next}}'/>
+      </vframe>
+      <vframe name='body'>
+        <vframe name='body_row' iter='gcal.events' itermax='6'>
+          <hframe>
+            <label name='gcal_bullet' text='⚫' style='color:{{this.color}};'/>
+            <label name='body_label' text='{{this.title}}'/>
+            <label name='body_value' text='{{this.start|gcal_dtstr}}' align='right'/>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- Sickbeard -->
+    <vframe name='sickbeard' showif='sickbeard.enabled and sickbeard.shows'>
+      <vframe name='header' dblclick='plugins.sickbeard.open_sickbeard'>
+        <label name='header_title' text='Sickbeard'/>
+        <label name='header_subtitle' text='Coming Soon'/>
+      </vframe>
+      <vframe name='body'>
+        <vframe name='body_row' iter='sickbeard.shows' itermax='6'>
+          <hframe>
+            <label name='body_label' text='{{this.show_name}}'/>
+            <label name='body_value' text='{{this.datestr}}' align='right'/>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- Plex Media -->
+    <vframe name='plexmedia' showif='plexmedia.enabled and plexmedia.videos'>
+      <vframe name='header'>
+        <label name='header_title' text='Plex Media'/>
+        <label name='header_subtitle' text='Recently Added'/>
+      </vframe>
+      <vframe name='body'>
+        <vframe name='body_row' iter='plexmedia.videos' itermax='6'>
+          <hframe>
+            <label name='body_label' text='{{this.title}}'/>
+            <label name='body_value' text='{{this.added|time_ago_short}} ago' align='right'/>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+    <!-- Plex Server -->
+    <vframe name='plexserver' showif='plexserver.enabled and plexserver.videos'>
+      <vframe name='header'>
+        <label name='header_title' text='Plex Server'/>
+        <label name='header_subtitle' text='{{plexserver.videos|length}} stream{{plexserver.videos|length|pluralize}}'/>
+      </vframe>
+      <vframe name='plexserver_body'>
+        <vframe iter='plexserver.videos'>
+          <hframe name='plexserver_item'>
+            <vframe name='plexserver_thumb'>
+              <vframe bgimage='{{this.thumb}}' bgpos='center,center' bgsize='fit'/>
+            </vframe>
+            <vframe>
+              <label name='plexserver_title' text='{{this.title}}'/>
+              <label name='plexserver_position' text='{{this.viewoffset|plexserver_length}} of {{this.duration|plexserver_length}} ({{this.percent}}%)'/>
+              <label name='plexserver_player' text='{{this.player}}'/>
+              <label name='plexserver_user' text='{{this.user}}'/>
+              <stretch/>
+            </vframe>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
+  </vframe>
+</widget>

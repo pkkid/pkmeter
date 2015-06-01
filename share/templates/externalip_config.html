@@ -1,0 +1,31 @@
+<vframe>
+  <!-- Enable -->
+  <vframe id='controlgroup_enabled' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Enabled:'/>
+      <toggleswitch id='enabled'/>
+      <stretch/>
+    </hframe>
+  </vframe>
+  <!-- Update Interval -->
+  <vframe id='controlgroup_interval' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Interval:'/>
+      <QLineEdit id='interval' name='input_small'/>
+      <label id='status_interval' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_interval' name='help' wrap='true' text='Seconds between plugin updates.'/>
+  </vframe>
+  <!-- Update URL -->
+  <vframe id='controlgroup_url' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Update URL:'/>
+      <QLineEdit id='url' name='input_xxlarge'/>
+      <label id='status_url' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_url' name='help' wrap='true' text='URL used to fetch the external IP address.'/>
+  </vframe>
+  <stretch/>
+</vframe>

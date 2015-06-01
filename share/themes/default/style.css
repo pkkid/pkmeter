@@ -1,0 +1,248 @@
+/*---------------------------------------------------------------------
+ * Default Default Theme Styles
+ * http://qt-project.org/doc/qt-5/stylesheet-reference.html
+ *--------------------------------------------------------------------*/
+* {
+  padding: 0px;
+  margin: 0px;
+  border-width: 0px;
+  color: #aaa;
+  font-family: ubuntu;
+  font-weight: 500;
+}
+QMenu {
+  background-color: rgba(0,0,0,0);
+  border: 1px solid #444;
+  border-radius: 2px;
+  color: #aaa;
+}
+QMenu::item {
+  background-color: rgba(50,50,50,0.8);
+}
+QMenu::item:selected {
+  background: #444;
+  color: #ccc;
+}
+QToolTip {
+  background-color: #282828;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #aaa;
+  font-size: 10px;
+}
+#container {
+  background-color: rgba(0,0,0,0.2);
+  min-width: 180px;
+  max-width: 180px;
+}
+
+
+/**
+ * Header
+ **/
+#header {
+  background-color: rgba(0,0,0,0.3);
+}
+#header_title {
+  padding: 3px 0px 0px 2px;
+  max-height: 13px;
+  min-height: 13px;
+}
+#header_subtitle {
+  color: #e7b21f;
+  font-size: 10px;
+  max-height: 12px;
+  min-height: 12px;
+  padding: 0px 0px 3px 3px;
+}
+#header_chartwrap {
+  margin: 3px;
+}
+
+/**
+ * Body
+ **/
+#body {
+  padding: 5px 0px 10px 0px;
+}
+#body_label {
+  color: #888;
+  font-size: 10px;
+  padding: 0px 3px;
+}
+#body_value {
+  color: #aaa;
+  font-size: 10px;
+  padding: 0px 3px;
+}
+#body_chartwrap {
+  min-width: 32px;
+  max-width: 32px;
+  margin: 3px 3px 1px 3px;
+}
+
+
+/**
+ * Clock
+ **/
+#clock {
+  padding: 5px 5px;
+}
+#clock_bignum {
+  font-size: 54px;
+  text-align: right;
+}
+#clock_smallnums {
+  padding: 11px 0px 9px 8px;
+}
+#clock_smallnums > QLabel {
+  max-height: 12px;
+  min-height: 12px;
+}
+
+
+/**
+ * Wunderground
+ **/
+#weather_today {
+  background-color: rgba(0,0,0,0.3);
+}
+#weather_location {
+  color: #ccc;
+  font-size: 11px;
+  height: 13px;
+  padding-top: 17px;
+  padding: 17px 0px 0px 2px;
+}
+#weather_temp {
+  color: #ccc;
+  font-size: 17px;
+  max-height: 17px;
+  padding: 14px 1px 0px 2px;
+}
+#weather_description {
+  color: #e7b21f;
+  font-size: 10px;
+  max-height: 12px;
+  min-height: 12px;
+  padding: 0px 0px 17px 3px;
+}
+#weather_feelslike {
+  color: #888;
+  font-size: 10px;
+  max-height: 12px;
+  min-height: 12px;
+  padding: 0px 3px 17px 0px;
+}
+#forecast_icon {
+  min-height: 25px;
+  max-height: 25px;
+}
+#forecast_weekday,
+#forecast_highlow {
+  font-size: 10px;
+}
+
+/**
+ * Picasa
+ **/
+#picasa_image {
+  margin: 0px 3px 0px 3px;
+  padding: 2px;
+  background-color: rgba(0,0,0,0.3);
+  min-height: 125px;
+  max-height: 125px;
+  min-width: 169px;
+  max-width: 169px;
+}
+#picasa_title {
+  margin: 0px 3px 0px 3px;
+  padding: 2px;
+  background-color: rgba(0,0,0,0.16);
+  min-width: 170px;
+  max-width: 170px;
+}
+
+
+/**
+ * Processes
+ **/
+#proc_mem {
+  color: #aaa;
+  font-size: 10px;
+  padding: 0px 3px 0px 0px;
+}
+#proc_cpu {
+  color: #aaa;
+  font-size: 10px;
+  padding: 0px 3px 0px 0px;
+  min-width: 30px;
+  max-width: 30px;
+}
+
+/**
+ * Network
+ **/
+#network_body {
+  padding: 5px 0px 5px 0px;
+}
+#network_nic {
+  margin-bottom: 5px;
+}
+#network_upload,
+#network_download {
+  color: #aaa;
+  font-size: 10px;
+  padding: 0px 3px;
+  min-width: 45px;
+  max-width: 45px;
+}
+
+/**
+ * FileSystems
+ **/
+#filesystem_body {
+  padding: 5px 0px 5px 0px;
+}
+#filesystem_disk {
+  margin-bottom: 5px;
+}
+
+/**
+ * Gcal
+ **/
+#gcal_bullet {
+  font-size: 10px;
+  padding: 0px 0px 0px 2px;
+  min-width: 10px;
+  max-width: 10px;
+}
+
+/**
+ * PlexServer
+ **/
+#plexserver_body {
+  padding: 5px 0px 5px 0px;
+}
+#plexserver_item {
+  margin-bottom: 5px;
+}
+#plexserver_thumb {
+  margin: 2px 5px 0px 5px;
+  padding: 2px;
+  background-color: rgba(0,0,0,0.3);
+  min-height: 45px;
+  max-height: 45px;
+  min-width: 30px;
+  max-width: 30px;
+}
+#plexserver_title {
+  color: #aaa;
+  font-size: 10px;
+}
+#plexserver_position,
+#plexserver_player,
+#plexserver_user {
+  color: #888;
+  font-size: 10px;
+}
