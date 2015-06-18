@@ -91,21 +91,18 @@ class Config(BaseConfig):
 def fetch_plex_instance(pkmeter, username=None, password=None, host=None):
     username = username or pkmeter.config.get('plexserver', 'username', from_keyring=True)
     password = password or pkmeter.config.get('plexserver', 'password', from_keyring=True)
-    host = (host or pkmeter.config.get('plexserver', 'host', '')).replace('http://', '')
-    addr = host.split(':')[0]
-    port = int(host.split(':')[1]) if ':' in host else 32400
+    host = host or pkmeter.config.get('plexserver', 'host', '')
     if username:
         log.info('Logging into MyPlex with user %s', username)
         user = MyPlexUser.signin(username, password)
-        return user.getServer(addr, port).connect()
-    log.info('Connecting to local Plex server')
-    return PlexServer(addr, port)
+        return user.getResource(host).connect()
+    log.info('Connecting to Plex host: %s', host)
+    return PlexServer(host)
 
 
 def plex_dict(plex):
     data = {}
-    data['address'] = plex.address
-    data['port'] = plex.port
+    data['baseuri'] = plex.baseuri
     data['friendlyName'] = plex.friendlyName
     data['machineIdentifier'] = plex.machineIdentifier
     data['myPlex'] = plex.myPlex

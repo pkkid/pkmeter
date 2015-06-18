@@ -1,0 +1,54 @@
+<vframe>
+  <!-- Enable -->
+  <vframe id='controlgroup_enabled' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Enabled:'/>
+      <toggleswitch id='enabled'/>
+      <stretch/>
+    </hframe>
+  </vframe>
+  <!-- Update Interval -->
+  <vframe id='controlgroup_interval' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Interval:'/>
+      <QLineEdit id='interval' name='input_small'/>
+      <label id='status_interval' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_interval' name='help' wrap='true' text='Seconds between plugin updates.'/>
+  </vframe>
+  <!-- Host -->
+  <vframe id='controlgroup_host' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Host:'/>
+      <QLineEdit id='host' name='input_xxlarge'/>
+      <label id='status_host' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_host' name='help' wrap='true'
+      text='HTTP host of the Sonarr webserver.'/>
+  </vframe>
+  <!-- API Key -->
+  <vframe id='controlgroup_apikey' name='controlgroup'>
+    <hframe>
+      <label name='label' text='API Key:'/>
+      <QLineEdit id='apikey' name='input_xxlarge'/>
+      <label id='status_apikey' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_apikey' name='help' wrap='true'
+      text='Sonarr API Key.'/>
+  </vframe>
+  <!-- Ignores -->
+  <vframe id='controlgroup_ignores' name='controlgroup'>
+    <hframe>
+      <label name='label' text='Ignores:'/>
+      <textedit id='ignores' name='input_large'/>
+      <label id='status_ignores' name='status'/>
+      <stretch/>
+    </hframe>
+    <label id='help_ignores' name='help' wrap='true'
+      text='Shows to ignore (one per line).'/>
+  </vframe>
+  <stretch/>
+</vframe>

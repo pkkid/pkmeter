@@ -330,6 +330,22 @@
       </vframe>
     </vframe>
 
+    <!-- Sonarr -->
+    <vframe name='sonarr' showif='sonarr.enabled and sonarr.shows'>
+      <vframe name='header' dblclick='plugins.sonarr.open_sonarr'>
+        <label name='header_title' text='Sonarr'/>
+        <label name='header_subtitle' text='Coming Soon'/>
+      </vframe>
+      <vframe name='body'>
+        <vframe name='body_row' iter='sonarr.shows' itermax='6'>
+          <hframe>
+            <label name='body_label' text='{{this.series.title}} s{{this.seasonNumber}}e{{this.episodeNumber}}'/>
+            <label name='body_value' text='{{this|sonarr_airtime}}' align='right'/>
+          </hframe>
+        </vframe>
+      </vframe>
+    </vframe>
+
     <!-- Plex Media -->
     <vframe name='plexmedia' showif='plexmedia.enabled and plexmedia.videos'>
       <vframe name='header'>
