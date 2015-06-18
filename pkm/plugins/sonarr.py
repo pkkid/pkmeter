@@ -83,7 +83,6 @@ def sonarr_airtime(show):
     try:
         airdatestr = '%s %s' % (show['airDate'], show['series']['airTime'])
         airdate = datetime.strptime(airdatestr, '%Y-%m-%d %H:%M')
-        print((airdate - datetime.now()).days)
         if (airdate - datetime.now()).days < 7:
             today = datetime.now().strftime('%a')
             datestr = airdate.strftime('%a %-I:%M%p').replace(':00', '')
