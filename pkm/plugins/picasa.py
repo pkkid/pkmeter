@@ -31,7 +31,7 @@ class Plugin(BasePlugin):
 
     @never_raise
     def update(self):
-        if self.last_albums_update <= time.time() - ALBUMS_UPDATE_INTERVAL:
+        if not self.data.get('albums') or self.last_albums_update <= time.time() - ALBUMS_UPDATE_INTERVAL:
             self.update_albums()
         self.data['album'] = self.choose_random_album()
         self.data['photo'] = self.choose_random_photo(self.data['album'])
