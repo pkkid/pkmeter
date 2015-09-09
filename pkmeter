@@ -135,6 +135,7 @@ class PKMeter(QtCore.QObject):
                 action.apply(self.data)
 
     def quit(self, *args):
+        log.info('Quitting..')
         self.config.save()
         QtCore.QCoreApplication.quit()
 

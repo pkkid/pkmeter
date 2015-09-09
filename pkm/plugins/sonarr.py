@@ -40,8 +40,17 @@ class Plugin(BasePlugin):
         response = utils.http_request(update_url).get('response')
         if response:
             content = json.loads(response.read().decode('utf-8'))
-            self.data['shows'] = content
+            log.info('-------------')
+            log.info([e for e in content if not self._is_ignored(utils.rget(e, 'series.title'))])
+            self.data['shows'] = [e for e in content if not self._is_ignored(utils.rget(e, 'series.title'))]
         super(Plugin, self).update()
+
+    def _is_ignored(self, title):
+        if self.ignores:
+            for ignore in self.ignores:
+                if ignore.lower() in title.lower():
+                    return True
+        return False
 
     @never_raise
     def open_sonarr(self, widget):
