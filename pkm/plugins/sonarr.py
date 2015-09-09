@@ -40,8 +40,6 @@ class Plugin(BasePlugin):
         response = utils.http_request(update_url).get('response')
         if response:
             content = json.loads(response.read().decode('utf-8'))
-            log.info('-------------')
-            log.info([e for e in content if not self._is_ignored(utils.rget(e, 'series.title'))])
             self.data['shows'] = [e for e in content if not self._is_ignored(utils.rget(e, 'series.title'))]
         super(Plugin, self).update()
 
