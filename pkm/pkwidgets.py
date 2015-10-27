@@ -46,7 +46,8 @@ class PKDeskWidget(PKWidget, pkmixins.DraggableMixin):
         self.pkmeter = pkmeter
         self.setStyleSheet(style)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint)
+        self.setWindowFlags(Qt.SplashScreen | Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint
+            | Qt.WindowDoesNotAcceptFocus | Qt.NoDropShadowWindowHint | Qt.CustomizeWindowHint)
         self.layout().setContentsMargins(0,0,0,0)
         self.layout().setSpacing(0)
         self._init_menu()
