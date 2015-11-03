@@ -4,7 +4,8 @@ GCal Plugin
 Google Calendar Events
 """
 import datetime, json, os, webbrowser
-from html import parser
+from dateutil import tz
+from icalendar import Calendar
 from PyQt5 import QtWidgets
 from pkm import log, utils, SHAREDIR
 from pkm.decorators import never_raise
@@ -13,9 +14,6 @@ from pkm.plugin import BasePlugin, BaseConfig
 from pkm.filters import register_filter
 
 NAME = 'Google Calendar'
-htmlparser = parser.HTMLParser()
-unescape = htmlparser.unescape
-clean = lambda s: s.replace('<br>', '').replace('<br />', '')
 
 
 class Plugin(BasePlugin):
@@ -25,6 +23,8 @@ class Plugin(BasePlugin):
     @never_raise
     def update(self):
         self.data['events'] = []
+        self.tzutc = tz.tzutc()
+        self.tzlocal = tz.tzlocal()
         urls, colors = [], {}
         for cal in self._iter_calendars():
             urls.append(cal.url)
@@ -32,9 +32,9 @@ class Plugin(BasePlugin):
         for result in utils.iter_responses(urls, timeout=5):
             response = result.get('response')
             if response:
-                content = json.loads(response.read().decode('utf-8'))
+                ical = Calendar.from_ical(response.read().decode('utf-8'))
                 color = colors[result.get('url')]
-                self.data['events'] += self._parse_events(content, color)
+                self.data['events'] += self._parse_events(ical, color)
         self.data['events'] = sorted(self.data['events'], key=lambda e:e['start'])
         # Calculate time to next event
         now = datetime.datetime.now()
@@ -50,41 +50,30 @@ class Plugin(BasePlugin):
             color = self.pkmeter.config.get(self.namespace, 'color%s' % i)
             if baseurl: yield utils.Bunch({'url':url, 'color':color})
 
-    def _parse_events(self, content, color):
+    def _parse_events(self, ical, color):
         events = []
-        calendar = utils.rget(content, 'feed.title.$t')
-        for entry in utils.rget(content, "feed.entry", []):
-            event = {}
-            event['title'] = unescape(utils.rget(entry, 'title.$t', ''))
-            event['calendar'] = calendar
-            event['color'] = color
-            event.update(self._parse_event_content(entry))
-            if event['start']:
-                events.append(event)
+        today = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+        title = ical.get('x-wr-calname', ical.get('version', ''))
+        for event in ical.walk():
+            if event.name == "VEVENT":
+                start = self._fix_event_datetime(event.get('dtstart').dt)
+                if today <= start <= today + datetime.timedelta(days=14):
+                    events.append({
+                        'title': event.get('summary'),
+                        'calendar': title,
+                        'color': color,
+                        'start': start,
+                        'where': event.get('location'),
+                        'status': event.get('description'),
+                    })
         return events
 
-    def _parse_event_content(self, entry):
-        content = {}
-        summary = clean(unescape(utils.rget(entry, 'content.$t', '')))
-        lines = [line for line in summary.split('\n') if line]
-        for i in range(len(lines)):
-            line = lines[i]
-            if line.startswith('When:'):
-                line = line.replace('When: ', '')
-                dtstr = line.split(' to ')[0].split(' - ')[0]
-                content['start'] = self._parse_datetime(dtstr)
-            elif line.startswith('Where:'):
-                content['where'] = line.replace('Where: ', '')
-            elif line.startswith('Event Status:'):
-                content['status'] = line.replace('Event Status: ', '')
-        return content
-
-    def _parse_datetime(self, dtstr):
-        dtformats = ['%a %b %d, %Y', '%a %b %d, %Y %I%p', '%a %b %d, %Y %I:%M%p', '%A %d %B %Y, %I:%M %pxxx']
-        for dtformat in dtformats:
-            try: return datetime.datetime.strptime(dtstr, dtformat)
-            except ValueError: pass
-        return None
+    def _fix_event_datetime(self, dt):
+        if not isinstance(dt, datetime.datetime):
+            return datetime.datetime.combine(dt, datetime.time.min)
+        dt = dt.replace(tzinfo=self.tzutc)
+        dt = dt.astimezone(self.tzlocal)
+        return dt.replace(tzinfo=None)
 
     @never_raise
     def open_gcal(self, widget):
@@ -141,8 +130,8 @@ class Config(BaseConfig):
         response = utils.http_request(url, timeout=2).get('response')
         if not response:
             raise ValidationError('No response from Google.')
-        content = json.loads(response.read().decode('utf-8'))
-        title = utils.rget(content, 'feed.title.$t')
+        ical = Calendar.from_ical(response.read().decode('utf-8'))
+        title = ical.get('x-wr-calname', ical.get('version', ''))
         if not title:
             raise ValidationError('Invalid response from Google.')
         field.help.setText(title)
