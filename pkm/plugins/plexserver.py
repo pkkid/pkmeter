@@ -34,7 +34,7 @@ class Plugin(BasePlugin):
         self.data.update(plex_dict(self.plex))
         self.data['videos'] = []
         for video in self.plex.sessions():
-            self.data['videos'].append({
+            vinfo = {
                 'user': video.user.title,
                 'type': video.type,
                 'title': self._video_title(video),
@@ -45,9 +45,34 @@ class Plugin(BasePlugin):
                 'percent': round((video.viewOffset / video.duration) * 100),
                 'player': video.player.title,
                 'state': video.player.state,
-                #'transcoding': 'TranscodeSession' in vinfo
-            })
+                'transcode': self._transcodeSession(video),
+            }
+            
+            self.data['videos'].append(vinfo)
         super(Plugin, self).update()
+
+    def _transcodeSession(self, video):
+        if video.transcodeSession:
+            transcode = video.transcodeSession
+            return {
+                'key': transcode.key,
+                'throttled': transcode.throttled,
+                'progress': transcode.progress,
+                'speed': transcode.speed,
+                'duration': transcode.duration,
+                'remaining': transcode.remaining,
+                'context': transcode.context,
+                'videoDecision': transcode.videoDecision,
+                'audioDecision': transcode.audioDecision,
+                'protocol': transcode.protocol,
+                'container': transcode.container,
+                'videoCodec': transcode.videoCodec,
+                'audioCodec': transcode.audioCodec,
+                'audioChannels': transcode.audioChannels,
+                'width': transcode.width,
+                'height': transcode.height,
+            }
+        return None
 
     def _plex_address(self):
         return 'http://%s:%s' % (self.plex.address, self.plex.port)
