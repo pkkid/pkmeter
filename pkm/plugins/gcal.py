@@ -3,8 +3,8 @@
 GCal Plugin
 Google Calendar Events
 """
-import datetime, json, os, webbrowser
-from dateutil import tz
+import datetime, os, webbrowser
+from dateutil import relativedelta, tz
 from icalendar import Calendar
 from PyQt5 import QtWidgets
 from pkm import log, utils, SHAREDIR
@@ -14,6 +14,12 @@ from pkm.plugin import BasePlugin, BaseConfig
 from pkm.filters import register_filter
 
 NAME = 'Google Calendar'
+TDELTAS = {
+    'YEARLY': relativedelta.relativedelta(years=1),
+    'MONTHLY': relativedelta.relativedelta(months=1),
+    'WEEKLY': datetime.timedelta(weeks=1),
+    'DAILY': datetime.timedelta(days=1)
+}
 
 
 class Plugin(BasePlugin):
@@ -56,7 +62,7 @@ class Plugin(BasePlugin):
         title = ical.get('x-wr-calname', ical.get('version', ''))
         for event in ical.walk():
             if event.name == "VEVENT":
-                start = self._fix_event_datetime(event.get('dtstart').dt)
+                start = self._event_start(event)
                 if today <= start <= today + datetime.timedelta(days=14):
                     events.append({
                         'title': event.get('summary'),
@@ -68,7 +74,19 @@ class Plugin(BasePlugin):
                     })
         return events
 
-    def _fix_event_datetime(self, dt):
+    def _event_start(self, event):
+        dt = self._fix_dt(event.get('dtstart').dt)
+        recur = utils.rget(event, 'RRULE.FREQ.0')
+        if recur in TDELTAS:
+            today = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+            until = utils.rget(event, 'RRULE.UNTIL')
+            if until:
+                until = self._fix_dt(min(until))
+            while dt < today and (not until or dt < until):
+                dt += TDELTAS[recur]
+        return dt
+
+    def _fix_dt(self, dt):
         if not isinstance(dt, datetime.datetime):
             return datetime.datetime.combine(dt, datetime.time.min)
         dt = dt.replace(tzinfo=self.tzutc)

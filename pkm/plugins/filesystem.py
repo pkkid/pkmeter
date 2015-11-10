@@ -27,12 +27,11 @@ class Plugin(BasePlugin):
         disks = []
         for disk in psutil.disk_partitions(all=True):
             if self._interesting(disk.fstype):
-                disk = disk.__dict__
-                disk.update(psutil.disk_usage(disk['mountpoint']).__dict__)
-                disk['percent_free'] = 100 - disk['percent']
+                disk = self._disk(disk)
+                disk.update(self._disk_usage(disk['mountpoint']))
                 disks.append(disk)
         self.data['disks'] = sorted(disks, key=lambda d:d['mountpoint'].lower())
-        self.data['io'] = self._deltas(self.data.get('io',{}), psutil.disk_io_counters().__dict__)
+        self.data['io'] = self._deltas(self.data.get('io',{}), self._disk_io_counters())
         super(Plugin, self).update()
 
     def _interesting(self, fstype):
@@ -40,6 +39,35 @@ class Plugin(BasePlugin):
             if fstype.startswith(fs):
                 return True
         return False
+
+    def _disk(self, disk):
+        return {
+            'device': disk.device,
+            'mountpoint': disk.mountpoint,
+            'fstype': disk.fstype,
+            'opts': disk.opts,
+        }
+
+    def _disk_usage(self, mountpoint):
+        usage = psutil.disk_usage(mountpoint)
+        return {
+            'total': usage.total,
+            'used': usage.used,
+            'free': usage.free,
+            'percent': usage.percent,
+            'percent_free': 100 - usage.percent,
+        }
+
+    def _disk_io_counters(self):
+        io = psutil.disk_io_counters()
+        return {
+            'read_count': io.read_count,
+            'write_count': io.write_count,
+            'read_bytes': io.read_bytes,
+            'write_bytes': io.write_bytes,
+            'read_time': io.read_time,
+            'write_time': io.write_time,
+        }
 
     def _deltas(self, previo, newrw):
         now = time.time()

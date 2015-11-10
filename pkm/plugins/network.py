@@ -29,7 +29,7 @@ class Plugin(BasePlugin):
             if not iface.startswith('lo'):
                 netinfo = netifaces.ifaddresses(iface)
                 if netinfo.get(netifaces.AF_INET) and not self._is_ignored(iface):
-                    newio = newio.__dict__
+                    newio = self._net_io_counters(newio)
                     newio['iface'] = iface
                     newio.update(netinfo[netifaces.AF_INET][0])
                     self._deltas(self.nics.get(iface,{}), newio)
@@ -37,7 +37,7 @@ class Plugin(BasePlugin):
                 elif iface in self.nics:
                     del self.nics[iface]
         self.data['nics'] = sorted(self.nics.values(), key=lambda n:n['iface'])
-        self.data['total'] = self._deltas(self.data.get('total',{}), psutil.net_io_counters().__dict__)
+        self.data['total'] = self._deltas(self.data.get('total',{}), self._net_io_counters())
         super(Plugin, self).update()
 
     def _is_ignored(self, iface):
@@ -46,6 +46,19 @@ class Plugin(BasePlugin):
                 if iface.startswith(ignore):
                     return True
         return False
+
+    def _net_io_counters(self, io=None):
+        io = io or psutil.net_io_counters()
+        return {
+            'bytes_sent': io.bytes_sent,
+            'bytes_recv': io.bytes_recv,
+            'packets_sent': io.packets_sent,
+            'packets_recv': io.packets_recv,
+            'errin': io.errin,
+            'errout': io.errout,
+            'dropin': io.dropin,
+            'dropout': io.dropout,
+        }
 
     def _deltas(self, previo, newio):
         now = time.time()

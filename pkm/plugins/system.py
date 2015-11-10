@@ -26,11 +26,36 @@ class Plugin(BasePlugin):
     def update(self):
         self.data['cpu_percent'] = psutil.cpu_percent()
         self.data['cpu_percents'] = psutil.cpu_percent(percpu=True)
-        self.data['memory'] = psutil.virtual_memory().__dict__
-        self.data['memory']['cached_percent'] = round((self.data['memory']['cached'] / self.data['memory']['total']) * 100, 1)
-        self.data['swap'] = psutil.swap_memory().__dict__
+        self.data['memory'] = self._virtual_memory()
+        self.data['swap'] = self._swap_memory()
         self.data['uptime'] = int(time.time() - self.data['boot_time'])
         super(Plugin, self).update()
+
+    def _virtual_memory(self):
+        vmem = psutil.virtual_memory()
+        return {
+            'total': vmem.total,
+            'available': vmem.available,
+            'percent': vmem.percent,
+            'used': vmem.used,
+            'free': vmem.free,
+            'active': vmem.active,
+            'inactive': vmem.inactive,
+            'buffers': vmem.buffers,
+            'cached': vmem.cached,
+            'cached_percent': round((vmem.cached / vmem.total) * 100, 1)
+        }
+
+    def _swap_memory(self):
+        swap = psutil.swap_memory()
+        return {
+            'total': swap.total,
+            'used': swap.used,
+            'free': swap.free,
+            'percent': swap.percent,
+            'sin': swap.sin,
+            'sout': swap.sout,
+        }
 
     @never_raise
     def open_system_monitor(self, widget):
