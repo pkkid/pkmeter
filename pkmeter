@@ -15,11 +15,11 @@ from xml.etree import ElementTree
 if os.path.dirname(__file__) not in sys.path:
     sys.path.append(os.path.dirname(__file__))
 
-from pkm import PLUGINDIR, SHAREDIR, THEMEDIR
-from pkm import log, pkwidgets, utils
-from pkm.about import AboutWindow
-from pkm.decorators import threaded_method
-from pkm.pkconfig import PKConfig
+from pkm import PLUGINDIR, SHAREDIR, THEMEDIR  # noqa E402
+from pkm import log, pkwidgets, utils  # noqa E402
+from pkm.about import AboutWindow  # noqa E402
+from pkm.decorators import threaded_method  # noqa E402
+from pkm.pkconfig import PKConfig  # noqa E402
 
 
 class PKMeter(QtCore.QObject):
