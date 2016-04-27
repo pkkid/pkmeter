@@ -15,7 +15,7 @@ def never_raise(func):
     return wrap
 
 
-class threaded_method(object):  # NOQA
+class threaded_method(object):
 
     def __init__(self, func):
         self._func = func
@@ -36,4 +36,7 @@ class threaded_method(object):  # NOQA
     def _thread_loop(self, inst, key):
         while True:
             args = self._queues[key].get()
-            self._func(inst, *args[0], **args[1])
+            try:
+                self._func(inst, *args[0], **args[1])
+            except Exception as err:
+                log.error('Error in threaded func %s: %s' % (key.__name__, err))
