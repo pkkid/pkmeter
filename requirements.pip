@@ -6,10 +6,12 @@
 # sudo pip3 install -U -r requirements.pip
 #---------------------------------------------------------
 
+icalendar
 keyring
 netifaces
 plexapi
 psutil
+python-dateutil
 xmltodict
 
 hg+https://mjs7231@bitbucket.org/gleb_zhulik/py3sensors

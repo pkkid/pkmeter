@@ -34,7 +34,7 @@ class Plugin(BasePlugin):
         self.data['videos'] = []
         videos = self.plex.library.recentlyAdded()
         videos = sorted(videos, key=lambda v:v.addedAt, reverse=True)
-        for video in videos:
+        for video in videos[:10]:
             title = self._video_title(video)
             if self._is_ignored(title):
                 continue
@@ -48,7 +48,8 @@ class Plugin(BasePlugin):
 
     def _video_title(self, video):
         if video.type == Season.TYPE:
-            return '%s s%se%s' % (video.parentTitle, video.index, video.leafCount)
+            episode = video.episodes()[-1]
+            return '%s s%se%s' % (episode.grandparentTitle, episode.parentIndex, video.leafCount)
         return '%s (%s)' % (video.title, video.year)
 
     def _is_ignored(self, title):

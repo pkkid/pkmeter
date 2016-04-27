@@ -6,7 +6,7 @@ Who is watching what?
 import os
 from plexapi.server import PlexServer
 from plexapi.exceptions import NotFound, Unauthorized
-from plexapi.myplex import MyPlexUser
+from plexapi.myplex import MyPlexAccount
 from pkm import log, utils, SHAREDIR
 from pkm.decorators import never_raise, threaded_method
 from pkm.exceptions import ValidationError
@@ -35,7 +35,7 @@ class Plugin(BasePlugin):
         self.data['videos'] = []
         for video in self.plex.sessions():
             vinfo = {
-                'user': video.user.title,
+                'user': video.username,
                 'type': video.type,
                 'title': self._video_title(video),
                 'thumb': video.thumbUrl,
@@ -92,7 +92,7 @@ class Config(BaseConfig):
         if not value:
             return value
         try:
-            MyPlexUser.signin(self.fields.username.value, value)
+            MyPlexAccount.signin(self.fields.username.value, value)
             return value
         except Unauthorized:
             raise ValidationError('Invalid username or password.')
@@ -119,15 +119,15 @@ def fetch_plex_instance(pkmeter, username=None, password=None, host=None):
     host = host or pkmeter.config.get('plexserver', 'host', '')
     if username:
         log.info('Logging into MyPlex with user %s', username)
-        user = MyPlexUser.signin(username, password)
-        return user.getResource(host).connect()
+        user = MyPlexAccount.signin(username, password)
+        return user.resource(host).connect()
     log.info('Connecting to Plex host: %s', host)
     return PlexServer(host)
 
 
 def plex_dict(plex):
     data = {}
-    data['baseuri'] = plex.baseuri
+    data['baseurl'] = plex.baseurl
     data['friendlyName'] = plex.friendlyName
     data['machineIdentifier'] = plex.machineIdentifier
     data['myPlex'] = plex.myPlex
