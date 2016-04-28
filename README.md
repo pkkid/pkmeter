@@ -8,7 +8,7 @@ are what makes this app different from the other solutions out there:
 * Simple HTML template system.
 * Prefrences set in the app (not cmd line scripts).
 
-Current meters include:
+### Current meters include:
 * Clock
 * External IP
 * File System
