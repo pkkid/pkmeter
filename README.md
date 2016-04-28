@@ -25,3 +25,10 @@ Current meters include:
 * System Monitor
 * Weather Underground
 * Yahoo! Weather
+
+### Requirements
+* Python3
+* PyQT5
+* requests
+* python-plexapi
+* lmsensors
