@@ -26,6 +26,15 @@ are what makes this app different from the other solutions out there:
 * Weather Underground
 * Yahoo! Weather
 
+### Installation (Ubuntu,Mint,Debian)
+```bash
+git clone https://github.com/mjs7231/pkmeter.git
+cd python-pkmeter
+sudo apt-get install python3-pip python3-qt5
+sudo pip3 install -r requirements.pip
+./pkmeter
+```
+
 ### Requirements
 * Python3, PyQT5
 * icalendar, keyring, netifaces, plexapi, psutil, python-dateutil, xmltodict
