@@ -8,6 +8,7 @@
 
 icalendar
 keyring
+keyrings.alt
 netifaces
 plexapi
 psutil
