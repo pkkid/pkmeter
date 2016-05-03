@@ -39,3 +39,5 @@ sudo pip3 install -r requirements.pip
 * Python3, PyQT5
 * icalendar, keyring, netifaces, plexapi, psutil, python-dateutil, xmltodict
 * hg+https://mjs7231@bitbucket.org/gleb_zhulik/py3sensors
+
+<img src="media/preferences.png">
