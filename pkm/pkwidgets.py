@@ -47,6 +47,7 @@ class PKDeskWidget(PKWidget, pkmixins.DraggableMixin):
         self.setStyleSheet(style)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(
+            Qt.Tool |
             Qt.FramelessWindowHint |
             Qt.WindowStaysOnBottomHint |
             Qt.NoDropShadowWindowHint |

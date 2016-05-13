@@ -43,8 +43,8 @@ class Plugin(BasePlugin):
                 'duration': video.duration,
                 'viewoffset': video.viewOffset,
                 'percent': round((video.viewOffset / video.duration) * 100),
-                'player': video.player.title,
-                'state': video.player.state,
+                'player': video.player.title if video.player else 'NA',
+                'state': video.player.state if video.player else 'NA',
                 'transcode': self._transcodeSession(video),
             }
             
