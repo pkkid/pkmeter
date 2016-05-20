@@ -51,34 +51,6 @@
       </vframe>
     </vframe>
 
-    <!-- Yahoo! Weather -->
-    <vframe name='weather' showif='yweather.enabled and yweather.location'>
-      <hframe name='weather_today' bgimage='img:weather/colorful/{{yweather.item.condition.code}}.png' bgsize='fit' bgpos='center,center'
-        tooltip='Wind: {{yweather.wind.speed}} {{yweather.units.speed}} {{yweather.wind.direction|degrees_to_direction}}\n
-          Visibility: {{yweather.atmosphere.visibility}} {{yweather.units.distance}}\n
-          Humidity: {{yweather.atmosphere.humidity}}%\n
-          Pressure: {{yweather.atmosphere.pressure}} {{yweather.units.pressure}}\n
-          Updated: {{yweather.lastBuildDate|yweather_updated}}'>
-        <vframe>
-          <label name='weather_location' text='{{yweather.location.city}}'/>
-          <label name='weather_description' text='{{yweather.item.condition.text}}'/>
-        </vframe>
-        <vframe>
-          <label name='weather_temp' align='right' text='{{yweather.item.condition.temp}}°{{yweather.units.temperature}}'/>
-          <label name='weather_feelslike' align='right' text='Feels: {{yweather.wind.chill}}°'/>
-        </vframe>
-      </hframe>
-      <vframe name='body'>
-        <hframe name='forecast' iter='yweather.item.forecast' itermax='4'>
-          <vframe name='forecast_day' tooltip='{{this.day}}\n{{this.text}}'>
-            <vframe name='forecast_icon' bgimage='img:weather/colorful/{{this.code}}.png' bgsize='30,30' bgpos='center,center'/>
-            <label name='forecast_weekday' text='{{this.day}}' align='center'/>
-            <label name='forecast_highlow' text='{{this.high}}°/{{this.low}}°' align='center'/>
-          </vframe>
-        </hframe>
-      </vframe>
-    </vframe>
-
     <!-- Picasa Webalbums -->
     <vframe name='picasa' showif='picasa.enabled'>
       <vframe name='header' dblclick='plugins.picasa.open_albums'>

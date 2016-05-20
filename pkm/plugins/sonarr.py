@@ -29,7 +29,7 @@ class Plugin(BasePlugin):
         if not self.apikey:
             log.warning('Sonarr apikey not specified.')
             return self.disable()
-        self.ignores = self.pkmeter.config.get(self.namespace, 'ignores', '')
+        self.ignores = self.pkmeter.config.get('plexmedia', 'ignores', '')
         self.ignores = list(filter(None, self.ignores.split('\n')))
         super(Plugin, self).enable()
 
@@ -58,7 +58,7 @@ class Plugin(BasePlugin):
 
 class Config(BaseConfig):
     TEMPLATE = os.path.join(SHAREDIR, 'templates', 'sonarr_config.html')
-    FIELDS = utils.Bunch(BaseConfig.FIELDS, host={}, apikey={}, ignores={})
+    FIELDS = utils.Bunch(BaseConfig.FIELDS, host={}, apikey={})
 
     def validate_host(self, field, value):
         if not value:

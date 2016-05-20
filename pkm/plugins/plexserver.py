@@ -79,7 +79,7 @@ class Plugin(BasePlugin):
 
     def _video_title(self, video):
         if video.type == Episode.TYPE:
-            return '%s s%se%s' % (video.grandparentTitle, video.parentIndex, video.index)
+            return '%s s%se%s' % (video.grandparentTitle, video.seasonNumber, video.index)
         return video.title
 
 

@@ -68,6 +68,7 @@ class BasePlugin(threading.Thread):
 class BaseConfig(PKVFrame):
     STATUS_OK = '✔'
     STATUS_ERROR = '✘'
+    STATUS_LOADING = '…'
     TEMPLATE = os.path.join(SHAREDIR, 'templates', 'default_config.html')
     FIELDS = utils.Bunch(
         enabled = {'default':True},
@@ -125,20 +126,20 @@ class BaseConfig(PKVFrame):
         return self.pkconfig.get(self.namespace, field.name, field.default, from_keyring)
 
     def _editing(self, field, text):
-        self._set_field_status(field, '', '')
+        self._set_field_status(field, self.STATUS_LOADING, '')
 
     @threaded_method
     def _validate(self, field, force=False):
         if not field.input:
             return
         try:
+            #self._set_field_status(field, self.STATUS_LOADING, '')
             value = field.input.get_value()
             if field.validator:
                 result = field.validator(field, value)
                 value = value if result is None else result
                 log.info('Validation passed for %s.%s', self.namespace, field.name)
-            status = '' if force else self.STATUS_OK
-            self._set_field_status(field, status, '')
+            self._set_field_status(field, self.STATUS_OK, '')
         except Exception as err:
             log.warn('Validation Error for %s.%s: %s', self.namespace, field.name, err)
             self._set_field_status(field, self.STATUS_ERROR, str(err))

@@ -31,7 +31,7 @@ class Plugin(BasePlugin):
             log.warning('Sickbeard apikey not specified.')
             return self.disable()
         self.update_url = UPDATE_URL % {'host':self.host, 'apikey':apikey}
-        self.ignores = self.pkmeter.config.get(self.namespace, 'ignores', '')
+        self.ignores = self.pkmeter.config.get('plexmedia', 'ignores', '')
         self.ignores = list(filter(None, self.ignores.split('\n')))
         super(Plugin, self).enable()
 
@@ -73,7 +73,7 @@ class Plugin(BasePlugin):
 
 class Config(BaseConfig):
     TEMPLATE = os.path.join(SHAREDIR, 'templates', 'sickbeard_config.html')
-    FIELDS = utils.Bunch(BaseConfig.FIELDS, host={}, apikey={}, ignores={})
+    FIELDS = utils.Bunch(BaseConfig.FIELDS, host={}, apikey={})
 
     def validate_host(self, field, value):
         if not value:
@@ -82,9 +82,8 @@ class Config(BaseConfig):
         response = utils.http_request(url, timeout=2).get('response')
         if not response:
             raise ValidationError('Host not reachable.')
-        content = json.loads(response.read().decode('utf-8'))
-        if 'result' not in content:
-            raise ValidationError('Invalid response from server.')
+        if response.status != 200:
+            raise ValidationError('Invalid response from server: %s' % response.status)
         return value
 
     def validate_apikey(self, field, value):
@@ -97,9 +96,9 @@ class Config(BaseConfig):
         response = utils.http_request(url, timeout=2).get('response')
         if not response:
             raise ValidationError('Host not reachable.')
+        if response.status != 200:
+            raise ValidationError('Invalid response from server: %s' % response.status)
         content = json.loads(response.read().decode('utf-8'))
-        if 'result' not in content:
-            raise ValidationError('Invalid response from server.')
         if content.get('result') != 'success':
             raise ValidationError('Invalid API key specified.')
         return value

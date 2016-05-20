@@ -49,12 +49,16 @@ class PKConfig(PKWidget):
         self.manifest.tabbar.currentChanged.connect(self.load_tab)
         # Init the ListWidget
         listwidget = self.manifest.list
-        for module in sorted(self.pkmeter.modules.values(), key=lambda m:utils.name(m)):
+        for module in sorted(self.pkmeter.modules.values(), key=self._sortKey):
             if getattr(module, 'Plugin', None) or getattr(module, 'Config', None):
                 item = QtWidgets.QListWidgetItem(utils.name(module), parent=listwidget, type=0)
                 item.setData(NAMESPACE_ROLE, utils.namespace(module))
                 listwidget.addItem(item)
         self.manifest.list.itemSelectionChanged.connect(self.load_tab)
+
+    def _sortKey(self, module):
+        name = utils.name(module).lower()
+        return '__pkmeter' if name == 'pkmeter' else name
 
     def _init_datatable(self):
         template = ElementTree.fromstring("""
