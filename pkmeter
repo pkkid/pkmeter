@@ -4,9 +4,10 @@
 PKMeter Desktop System Monitor
 Author: M.Shepanski (Apr 2014)
 """
-import os, pkgutil, signal, sys, threading
+import json, os, pkgutil, signal, sys, threading, time
 from argparse import ArgumentParser
 from collections import defaultdict
+from datetime import datetime
 from PyQt5 import QtCore, QtWidgets
 from xml.etree import ElementTree
 
@@ -15,7 +16,7 @@ from xml.etree import ElementTree
 if os.path.dirname(__file__) not in sys.path:
     sys.path.append(os.path.dirname(__file__))
 
-from pkm import PLUGINDIR, SHAREDIR, THEMEDIR  # noqa E402
+from pkm import PLUGINDIR, SHAREDIR, STATUSFILE, THEMEDIR  # noqa E402
 from pkm import log, pkwidgets, utils  # noqa E402
 from pkm.about import AboutWindow  # noqa E402
 from pkm.decorators import threaded_method  # noqa E402
@@ -113,6 +114,12 @@ class PKMeter(QtCore.QObject):
             widgets.append(widget)
         return widgets
 
+    def _update_status_file(self):
+        ts = lambda d: int(time.mktime(d.timetuple())) if d else 'NA'
+        status = {p:ts(d.get('lastupdate')) for p,d in self.data.items() if p != 'this'}
+        with open(STATUSFILE, 'w') as handle:
+            json.dump(status, handle, indent=2)
+
     def resize_to_min(self):
         for widget in self.widgets:
             widget.resize(widget.minimumSizeHint())
@@ -121,18 +128,26 @@ class PKMeter(QtCore.QObject):
     def reload(self):
         log.info('--- Reloading PKMeter ---')
         for plugin in self.plugins.values():
-            try:
-                plugin.enable()
-            except:
-                log.exception('Error reloading plugin: %s', plugin)
-                plugin.disable()
+            oldenabled = plugin.enabled
+            newenabled = self.config.get(plugin.namespace, 'enabled', True)
+            if oldenabled != newenabled:
+                try:
+                    plugin.enable()
+                except:
+                    log.exception('Error reloading plugin: %s', plugin)
+                    plugin.disable()
+            else:
+                plugin.reload()
 
     def update(self, plugin):
         with self.rlock:
             namespace = utils.namespace(plugin.__module__)
             self.data[namespace] = plugin.data
+            self.data[namespace]['lastupdate'] = datetime.now()
             for action in self.actions[namespace]:
                 action.apply(self.data)
+            if namespace == 'clock' and int(time.time()) % 10 == 0:
+                self._update_status_file()
 
     def quit(self, *args):
         log.info('Quitting..')

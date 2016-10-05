@@ -11,6 +11,7 @@ APPNAME = 'PKMeter'
 VERSION = '0.7'
 CONFIGDIR = os.path.join(os.getenv('HOME'), '.config', 'pkmeter')
 CONFIGPATH = os.path.join(CONFIGDIR, 'config.json')
+STATUSFILE = os.path.join(CONFIGDIR, 'status.json')
 WORKDIR = os.path.dirname(os.path.dirname(__file__))
 PLUGINDIR = os.path.join(WORKDIR, 'pkm', 'plugins')
 SHAREDIR = os.path.join(WORKDIR, 'share')
