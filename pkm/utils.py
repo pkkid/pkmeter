@@ -72,7 +72,7 @@ def addr_to_ip(addr):
         return False
 
 
-def http_request(url, data=None, timeout=10):
+def http_request(url, data=None, timeout=30):
     log.debug("Requesting URL: %s" % url)
     data = urlencode(data).encode('utf8') if data else None
     try:
@@ -83,7 +83,7 @@ def http_request(url, data=None, timeout=10):
         return {'success':False, 'error':err, 'url':url}
 
 
-def iter_responses(urls, data=None, timeout=10):
+def iter_responses(urls, data=None, timeout=30):
     responses = queue.Queue()
     threads = []
     _req = lambda url, data, timeout: responses.put(http_request(url, data, timeout))

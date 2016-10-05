@@ -47,6 +47,10 @@ class BasePlugin(threading.Thread):
         self.pkmeter.plugin_updated.emit(self)
         return False
 
+    def reload(self):
+        log.info('Reloading plugin %s.' % self.name)
+        self.next_update = time.time()
+
     def get_interval(self):
         return float(self.pkmeter.config.get(self.namespace, 'interval', self.DEFAULT_INTERVAL))
 
@@ -60,7 +64,6 @@ class BasePlugin(threading.Thread):
 
     @never_raise
     def update(self):
-        self.data['enabled'] = self.enabled
         self.data['enabled'] = self.enabled
         self.pkmeter.plugin_updated.emit(self)
 

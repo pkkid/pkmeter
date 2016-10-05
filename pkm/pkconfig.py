@@ -110,17 +110,17 @@ class PKConfig(PKWidget):
         for pconfig in self.pconfigs.values():
             for field in pconfig.fields.values():
                 self.set(pconfig.namespace, field.name, field.value)
-        self.pkmeter.reload()
         self.save()
+        self.pkmeter.reload()
 
     def btn_save(self):
         for pconfig in self.pconfigs.values():
             for field in pconfig.fields.values():
                 to_keyring = field.get('save_to_keyring', False)
                 self.set(pconfig.namespace, field.name, field.value, to_keyring)
-        self.pkmeter.reload()
         self.save()
         self.hide()
+        self.pkmeter.reload()
 
     def get(self, namespace, path, default=None, from_keyring=False):
         path = '%s.%s' % (namespace, path)
