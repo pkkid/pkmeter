@@ -2,7 +2,7 @@
 """
 PKMeter Utilites
 """
-import datetime, os, re, socket, struct, xmltodict
+import datetime, os, re, signal, socket, struct, xmltodict
 import shlex, subprocess, threading, queue
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -171,6 +171,13 @@ def rset(obj, attrstr, value, delim='.'):
     if attr not in obj: obj[attr] = {}
     if attrstr: rset(obj[attr], attrstr, value, delim)
     else: obj[attr] = value
+
+
+def safe_kill(p):
+    try:
+        os.kill(p.pid, signal.SIGINT)
+    except:
+        pass
 
 
 def to_int(value, default=None):
