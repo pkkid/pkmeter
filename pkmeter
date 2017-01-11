@@ -107,11 +107,10 @@ class PKMeter(QtCore.QObject):
         with open(layoutpath) as handle:
             etree = ElementTree.fromstring('<root>%s</root>' % handle.read())
         for ewidget in etree:
-            index = len(widgets)
             if ewidget.tag.lower() != 'widget':
                 raise Exception('Top level layout tags must be widget not %s.' % ewidget.tag)
             widget = pkwidgets.PKDeskWidget(ewidget, style, self)
-            widget.setPosition(self.config.get('pkmeter', 'positions.%s' % index, '0,0'))
+            widget.setPosition('4500,0')  # Force starting in top right
             widget.show()
             widgets.append(widget)
         return widgets
@@ -158,7 +157,7 @@ class PKMeter(QtCore.QObject):
 
 
 def start_pkmeter(opts):
-    app = QtWidgets.QApplication([])
+    app = QtWidgets.QApplication(['PKMeter'])
     PKMeter(opts)
     app.exec_()
 
