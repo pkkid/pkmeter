@@ -4,8 +4,8 @@
 PKMeter Desktop System Monitor
 Author: M.Shepanski (Apr 2014)
 """
-import os, pkgutil, signal, sys, threading
-import json, subprocess, time
+import json, os, pkgutil, signal
+import sys, threading, time
 from argparse import ArgumentParser
 from collections import defaultdict
 from datetime import datetime
@@ -17,8 +17,7 @@ from xml.etree import ElementTree
 if os.path.dirname(__file__) not in sys.path:
     sys.path.append(os.path.dirname(__file__))
 
-from pkm import PLUGINDIR, SHAREDIR, THEMEDIR  # noqa E402
-from pkm import CONFIGPATH, STATUSFILE  # noqa E402
+from pkm import PLUGINDIR, SHAREDIR, STATUSFILE, THEMEDIR  # noqa E402
 from pkm import log, pkwidgets, utils  # noqa E402
 from pkm.about import AboutWindow  # noqa E402
 from pkm.decorators import threaded_method  # noqa E402
@@ -162,37 +161,10 @@ def start_pkmeter(opts):
     app.exec_()
 
 
-def start_watch(opts):
-    try:
-        with open(CONFIGPATH, 'r') as handle:
-            config = json.load(handle)
-        intervals = {p:v.get('interval',60) for p,v in config.items()}
-        p = subprocess.Popen(['/usr/bin/python3', __file__])
-        time.sleep(20)
-        while True:
-            time.sleep(10)
-            with open(STATUSFILE, 'r') as handle:
-                status = json.load(handle)
-            for plugin, lastupdate in status.items():
-                timeago = int(time.time() - lastupdate)
-                timeout = int(max(30, intervals.get(plugin,60)*3))
-                if timeago > timeout:
-                    log.info('%s lastupdate %ss ago (timeout=%s), restarting.' % (plugin, timeago, timeout))
-                    utils.safe_kill(p)
-                    time.sleep(2)
-                    break
-            if p.poll() is not None:
-                p = subprocess.Popen(['/usr/bin/python3', __file__])
-                time.sleep(20)
-    except KeyboardInterrupt:
-        log.info('KeyboardInterrupt: Quitting..')
-
-
 if __name__ == '__main__':
     parser = ArgumentParser(description='PKMeter Desktop System Monitor')
     parser.add_argument('--decorated', default=False, action='store_true', help='Decorate main window.')
     parser.add_argument('--theme', default='default', help='Theme name to load.')
     parser.add_argument('--loglevel', default='INFO', help='Set the log level (DEBUG, INFO, WARN, ERROR).')
-    parser.add_argument('--watch', default=False, action='store_true', help='Launch with watchdog')
     opts = parser.parse_args()
-    start_watch(opts) if opts.watch else start_pkmeter(opts)
+    start_pkmeter(opts)
