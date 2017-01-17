@@ -78,7 +78,7 @@ def http_request(url, data=None, timeout=30):
     try:
         response = urlopen(url, data=data, timeout=timeout)
         return {'success':True, 'response':response, 'url':url}
-    except (URLError, socket.timeout) as err:
+    except Exception as err:
         log.error("Error requesting URL: %s; %s" % (url, err))
         return {'success':False, 'error':err, 'url':url}
 
