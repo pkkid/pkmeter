@@ -1,0 +1,12 @@
+[Unit]
+Description=PKMeter
+After=display-manager.service
+
+[Service]
+Environment=DISPLAY=:1
+ExecStart=/usr/bin/python3 /home/mjs7231/Projects/pkmeter/pkwatch
+Type=simple
+User=mjs7231
+Group=mjs7231
+Restart=always
+RestartSec=1
