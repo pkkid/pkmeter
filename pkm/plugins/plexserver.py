@@ -37,18 +37,18 @@ class Plugin(BasePlugin):
             vinfo = {
                 'user': video.username,
                 'type': video.type,
-                'title': self._video_title(video),
                 'thumb': video.thumbUrl,
                 'year': video.year,
                 'duration': video.duration,
                 'viewoffset': video.viewOffset,
                 'percent': round((video.viewOffset / video.duration) * 100),
-                'player': video.player.title if video.player else 'NA',
+                'player': video.player.device if video.player else 'NA',
                 'state': video.player.state if video.player else 'NA',
                 'transcode': self._transcodeSession(video),
+                'title': self._video_title(video),  # keep this last
             }
-            
-            self.data['videos'].append(vinfo)
+            if vinfo['state'] != 'paused':
+                self.data['videos'].append(vinfo)
         super(Plugin, self).update()
 
     def _transcodeSession(self, video):
