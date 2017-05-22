@@ -127,7 +127,7 @@ def fetch_plex_instance(pkmeter, username=None, password=None, host=None):
 
 def plex_dict(plex):
     data = {}
-    data['baseurl'] = plex.baseurl
+    data['baseurl'] = plex._baseurl
     data['friendlyName'] = plex.friendlyName
     data['machineIdentifier'] = plex.machineIdentifier
     data['myPlex'] = plex.myPlex
