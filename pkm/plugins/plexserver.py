@@ -35,44 +35,20 @@ class Plugin(BasePlugin):
         self.data['videos'] = []
         for video in self.plex.sessions():
             vinfo = {
-                'user': video.username,
+                'user': video.usernames[0],
                 'type': video.type,
                 'thumb': video.thumbUrl,
                 'year': video.year,
                 'duration': video.duration,
                 'viewoffset': video.viewOffset,
                 'percent': round((video.viewOffset / video.duration) * 100),
-                'player': video.player.device if video.player else 'NA',
-                'state': video.player.state if video.player else 'NA',
-                'transcode': self._transcodeSession(video),
+                'player': video.players[0].device if video.players else 'NA',
+                'state': video.players[0].state if video.players else 'NA',
                 'title': self._video_title(video),  # keep this last
             }
             if vinfo['state'] != 'paused':
                 self.data['videos'].append(vinfo)
         super(Plugin, self).update()
-
-    def _transcodeSession(self, video):
-        if video.transcodeSession:
-            transcode = video.transcodeSession
-            return {
-                'key': transcode.key,
-                'throttled': transcode.throttled,
-                'progress': transcode.progress,
-                'speed': transcode.speed,
-                'duration': transcode.duration,
-                'remaining': transcode.remaining,
-                'context': transcode.context,
-                'videoDecision': transcode.videoDecision,
-                'audioDecision': transcode.audioDecision,
-                'protocol': transcode.protocol,
-                'container': transcode.container,
-                'videoCodec': transcode.videoCodec,
-                'audioCodec': transcode.audioCodec,
-                'audioChannels': transcode.audioChannels,
-                'width': transcode.width,
-                'height': transcode.height,
-            }
-        return None
 
     def _plex_address(self):
         return 'http://%s:%s' % (self.plex.address, self.plex.port)
