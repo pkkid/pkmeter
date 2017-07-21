@@ -109,7 +109,7 @@ class PKMeter(QtCore.QObject):
             if ewidget.tag.lower() != 'widget':
                 raise Exception('Top level layout tags must be widget not %s.' % ewidget.tag)
             widget = pkwidgets.PKDeskWidget(ewidget, style, self)
-            widget.setPosition('4500,0')  # Force starting in top right
+            widget.setPosition('5500,0')  # Force starting in top right
             widget.show()
             widgets.append(widget)
         return widgets

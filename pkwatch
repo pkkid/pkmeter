@@ -26,19 +26,19 @@ def safe_kill(p):
 
 
 if __name__ == '__main__':
-    try:
-        with open(CONFIGPATH, 'r') as handle:
-            config = json.load(handle)
-        intervals = {p:v.get('interval',60) for p,v in config.items()}
-        p = subprocess.Popen(['/usr/bin/python3', PKMETER])
-        time.sleep(20)
-        while True:
+    with open(CONFIGPATH, 'r') as handle:
+        config = json.load(handle)
+    intervals = {p:v.get('interval',60) for p,v in config.items()}
+    p = subprocess.Popen(['/usr/bin/python3', PKMETER])
+    time.sleep(20)
+    while True:
+        try:
             time.sleep(10)
             with open(STATUSFILE, 'r') as handle:
                 status = json.load(handle)
             for plugin, lastupdate in status.items():
                 timeago = int(time.time() - lastupdate)
-                timeout = int(max(30, intervals.get(plugin,60)*3))
+                timeout = int(max(30, intervals.get(plugin,60) * 3))
                 if timeago > timeout:
                     log.info('%s lastupdate %ss ago (timeout=%s), restarting.' % (plugin, timeago, timeout))
                     safe_kill(p)
@@ -47,5 +47,9 @@ if __name__ == '__main__':
             if p.poll() is not None:
                 p = subprocess.Popen(['/usr/bin/python3', PKMETER])
                 time.sleep(20)
-    except KeyboardInterrupt:
-        log.info('KeyboardInterrupt: Quitting..')
+        except KeyboardInterrupt:
+            log.info('KeyboardInterrupt: Quitting..')
+            break
+        except Exception as err:
+            log.error('PKWatch Error: %s', err)
+            continue
