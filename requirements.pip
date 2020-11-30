@@ -14,5 +14,6 @@ plexapi
 psutil
 python-dateutil
 xmltodict
+PyQt5
 
 hg+https://mjs7231@bitbucket.org/gleb_zhulik/py3sensors
