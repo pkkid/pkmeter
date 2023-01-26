@@ -1,27 +1,22 @@
 # -*- coding: utf-8 -*-
-"""
-Useful constants
-"""
-import logging, os, sys
+import logging, os, signal, sys
 from logging.handlers import RotatingFileHandler
 
+# OS Specific Settings
+DATA = os.path.join(os.getenv('HOME'), '.config', 'PKMeter')
+if os.name == 'nt':
+    DATA = os.path.join(os.getenv('HOME'), os.environ['APPDATA'], 'PKMeter')
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # Allows ctrl+c to close the app
 
-# Basic Configuration
-APPNAME = 'PKMeter'
-VERSION = '0.7'
-CONFIGDIR = os.path.join(os.getenv('HOME'), '.config', 'pkmeter')
-CONFIGPATH = os.path.join(CONFIGDIR, 'config.json')
-STATUSFILE = os.path.join(CONFIGDIR, 'status.json')
-WORKDIR = os.path.dirname(os.path.dirname(__file__))
-PLUGINDIR = os.path.join(WORKDIR, 'pkm', 'plugins')
-SHAREDIR = os.path.join(WORKDIR, 'share')
-THEMEDIR = os.path.join(SHAREDIR, 'themes')
-HOMEPAGE = 'http://pushingkarma.com'
+# Global Constants
+STYLESHEET = os.path.join(os.path.dirname(__file__), 'windows', 'style.css')
+with open(STYLESHEET) as handle:
+    STYLES = handle.read()
 
 
 # Logging Configuration
 log = logging.getLogger('pkm')
-logfile = os.path.join(CONFIGDIR, 'pkmeter.log')
+logfile = os.path.join(DATA, 'pkmeter.log')
 logformat = logging.Formatter('%(asctime)s %(module)12s:%(lineno)-4s %(levelname)-9s %(message)s')
 logdir = os.path.dirname(logfile)
 os.makedirs(logdir, exist_ok=True)

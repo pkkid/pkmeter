@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+# -*- coding: utf-8 -*-
 from distutils.core import setup
 from pip.req import parse_requirements
 from setuptools import find_packages
@@ -9,10 +9,10 @@ requirements = [str(line.req) for line in parse_requirements('requirements.pip')
 setup(
     name='pkmeter',
     version='1.0',
-    description='QT-based meters and gadgets for your desktop!',
+    description='Desktop system monitors written in Python',
     author='pkkid',
     author_email='',
-    url='http://bitbucket.org/mjs7231/pkmeter',
+    url='https://github.com/pkkid/pkmeter',
     packages=find_packages(),
     scripts=['pkmeter'],
     install_requires=requirements,

@@ -1,0 +1,26 @@
+# Flake8 configuration
+# Copy or symlink this file to ~/.flake8
+# --------------------------------------
+# E128: continuation line under-indented for visual indent
+# E221: multiple spaces before operator
+# E226: missing whitespace around arithmetic operator
+# E231: missing whitespace after ‘,’, ‘;’, or ‘:’
+# E251: unexpected spaces around keyword / parameter equals
+# E265: block comment should start with ‘# ‘
+# E302: expected 2 blank lines, found 1
+# E401: multiple imports on one line
+# E501: line too long (82 > 79 characters)
+# E701: multiple statements on one line (colon)
+# E702: multiple statements on one line (semicolon)
+# E731: do not assign a lambda expression, use a def
+# E741: Ambigious variable name l
+# W291: trailing whitespace
+# W293: blank line contains whitespace
+# W503: line break before binary operator
+# W504: line break after binary operator
+[flake8]
+ignore=E128,E226,E231,E251,E401,E701,E731,E741,W293,W503,W504
+exclude=migrations,node_modules
+max-complexity = -1
+max-line-length = 125
+show-source = True

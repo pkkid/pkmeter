@@ -1,170 +1,46 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-"""
-PKMeter Desktop System Monitor
-Author: M.Shepanski (Apr 2014)
-"""
-import json, os, pkgutil, signal
-import sys, threading, time
+import os, sys
 from argparse import ArgumentParser
-from collections import defaultdict
-from datetime import datetime
-from PyQt5 import QtCore, QtWidgets
-from xml.etree import ElementTree
+from bunch import Bunch
+from PySide2 import QtCore, QtWidgets
 
-# Add pkm to sys.path if not already there. Useful when running
-# this application without officially installing it.
+# Add pkm to sys.path if not already there.
 if os.path.dirname(__file__) not in sys.path:
     sys.path.append(os.path.dirname(__file__))
 
-from pkm import PLUGINDIR, SHAREDIR, STATUSFILE, THEMEDIR  # noqa E402
-from pkm import log, pkwidgets, utils  # noqa E402
-from pkm.about import AboutWindow  # noqa E402
-from pkm.decorators import threaded_method  # noqa E402
-from pkm.pkconfig import PKConfig  # noqa E402
+from pkm import log, windows
 
 
-class PKMeter(QtCore.QObject):
-    """ PKMeter Desktop System Monitor """
-    plugin_updated = QtCore.pyqtSignal(object)
-
+class PKMeterApplication(QtCore.QObject):
+    
     def __init__(self, opts):
-        super(PKMeter, self).__init__()
-        log.setLevel(opts.loglevel)                     # Set the log level
-        self.opts = opts                                # Command line options
-        self.theme = self._init_theme()                 # Bunch contains {name, dir}
-        self.rlock = threading.RLock()                  # Lock for updates
-        self.data = {}                                  # Cached data from all namespaces
-        self._init_searchpath()                         # Init image resources
-        self.plugin_updated.connect(self.update)        # Plugin updated signal handler
-        self.modules = self._load_modules()             # Import all plugins
-        self.about = AboutWindow()                      # About Window
-        self.config = PKConfig(self)                    # Config Values and Window
-        self.plugins = self._init_plugins()             # Init plugins (but dont start yet)
-        self.widgets = self._init_widgets()             # List of PKMeter windows
-        self.actions = self._init_actions()             # actions to update (organized by namespace)
-        self._start_plugins()                           # Start all required plugins
-        signal.signal(signal.SIGINT, self.quit)         # Quit on Ctrl+C
+        super(PKMeterApplication, self).__init__()
+        log.info('Starting PKMeterApplication')
+        self.opts = opts
+        self._init_windows()
 
-    def _init_theme(self):
-        log.info('--- Starting PKMeter ---')
-        theme = utils.Bunch()
-        theme.name = self.opts.theme.lower()
-        theme.dir = os.path.join(THEMEDIR, theme.name)
-        return theme
-
-    def _init_searchpath(self):
-        imgdir = os.path.join(SHAREDIR, 'img')
-        QtCore.QDir.addSearchPath('img', imgdir)
-
-    def _load_modules(self):
-        modules = {}
-        for loader, name, ispkg in pkgutil.iter_modules([PLUGINDIR]):
-            try:
-                module = loader.find_module(name).load_module(name)
-                namespace = utils.namespace(module)
-                modules[namespace] = module
-            except Exception as err:
-                log.warn('Error loading module %s: %s', name, err)
-                if self.opts.verbose:
-                    log.exception(err)
-        return modules
-
-    def _init_actions(self):
-        actions = defaultdict(list)
-        for widget in self.widgets:
-            for action in widget.actions:
-                if getattr(action, 'namespaces', None):
-                    for namespace in action.namespaces:
-                        actions[namespace].append(action)
-                elif getattr(action, 'namespace', None):
-                    actions[action.namespace].append(action)
-        return actions
-
-    def _init_plugins(self):
-        plugins = {}
-        for namespace, module in self.modules.items():
-            plugincls = getattr(module, 'Plugin', None)
-            if plugincls:
-                try:
-                    plugin = module.Plugin(self)
-                    plugins[plugin.namespace] = plugin
-                except:
-                    log.exception('Error initalizing plugin: %s', plugin)
-        return plugins
-
-    def _start_plugins(self):
-        for plugin in self.plugins.values():
-            plugin.start()
-
-    def _init_widgets(self):
-        widgets = []
-        stylepath = os.path.join(self.theme.dir, 'style.css')
-        with open(stylepath) as handle:
-            style = handle.read()
-        layoutpath = os.path.join(self.theme.dir, 'layout.html')
-        with open(layoutpath) as handle:
-            etree = ElementTree.fromstring('<root>%s</root>' % handle.read())
-        for ewidget in etree:
-            if ewidget.tag.lower() != 'widget':
-                raise Exception('Top level layout tags must be widget not %s.' % ewidget.tag)
-            widget = pkwidgets.PKDeskWidget(ewidget, style, self)
-            widget.setPosition('5500,0')  # Force starting in top right
-            widget.show()
-            widgets.append(widget)
-        return widgets
-
-    def _update_status_file(self):
-        ts = lambda d: int(time.mktime(d.timetuple())) if d else 'NA'
-        status = {p:ts(d.get('lastupdate')) for p,d in self.data.items() if p != 'this' and d.get('enabled')}
-        with open(STATUSFILE, 'w') as handle:
-            json.dump(status, handle, indent=2)
-
-    def resize_to_min(self):
-        for widget in self.widgets:
-            widget.resize(widget.minimumSizeHint())
-
-    @threaded_method
-    def reload(self):
-        log.info('--- Reloading PKMeter ---')
-        for plugin in self.plugins.values():
-            oldenabled = plugin.enabled
-            newenabled = self.config.get(plugin.namespace, 'enabled', True)
-            if oldenabled != newenabled:
-                try:
-                    plugin.enable()
-                except:
-                    log.exception('Error reloading plugin: %s', plugin)
-                    plugin.disable()
-            else:
-                plugin.reload()
-
-    def update(self, plugin):
-        with self.rlock:
-            namespace = utils.namespace(plugin.__module__)
-            self.data[namespace] = plugin.data
-            self.data[namespace]['lastupdate'] = datetime.now()
-            for action in self.actions[namespace]:
-                action.apply(self.data)
-            if namespace == 'clock' and int(time.time()) % 10 == 0:
-                self._update_status_file()
+    def _init_windows(self):
+        """ Init the main windows that may be displayed. """
+        self.windows = Bunch()
+        self.windows.settings = windows.SettingsWindow(self)
+        self.windows.desktop = windows.DesktopWindow(self)
 
     def quit(self, *args):
         log.info('Quitting..')
-        self.config.save()
         QtCore.QCoreApplication.quit()
-
-
-def start_pkmeter(opts):
-    app = QtWidgets.QApplication(['PKMeter'])
-    PKMeter(opts)
-    app.exec_()
-
+    
+    @classmethod
+    def start(cls, opts):
+        app = QtWidgets.QApplication(['PKMeterApplication'])
+        _ = PKMeterApplication(opts)
+        app.exec_()  # Start the event loop
+        
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='PKMeter Desktop System Monitor')
-    parser.add_argument('--decorated', default=False, action='store_true', help='Decorate main window.')
-    parser.add_argument('--theme', default='default', help='Theme name to load.')
+    parser = ArgumentParser(description='PKMeter - Desktop System Monitor')
     parser.add_argument('--loglevel', default='INFO', help='Set the log level (DEBUG, INFO, WARN, ERROR).')
     opts = parser.parse_args()
-    start_pkmeter(opts)
+    if opts.loglevel:
+        log.setLevel(opts.loglevel)
+    PKMeterApplication.start(opts)
