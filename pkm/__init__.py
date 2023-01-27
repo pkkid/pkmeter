@@ -2,17 +2,15 @@
 import logging, os, signal, sys
 from logging.handlers import RotatingFileHandler
 
+
+# Global Constants
+ROOT = os.path.dirname(__file__)
+
 # OS Specific Settings
 DATA = os.path.join(os.getenv('HOME'), '.config', 'PKMeter')
 if os.name == 'nt':
     DATA = os.path.join(os.getenv('HOME'), os.environ['APPDATA'], 'PKMeter')
-    signal.signal(signal.SIGINT, signal.SIG_DFL)  # Allows ctrl+c to close the app
-
-# Global Constants
-STYLESHEET = os.path.join(os.path.dirname(__file__), 'windows', 'style.css')
-with open(STYLESHEET) as handle:
-    STYLES = handle.read()
-
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # allow ctrl+c to close
 
 # Logging Configuration
 log = logging.getLogger('pkm')

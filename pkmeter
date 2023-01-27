@@ -1,18 +1,22 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import os, sys
+import os
+import sys
 from argparse import ArgumentParser
-from bunch import Bunch
-from PySide2 import QtCore, QtWidgets
+from PySide2 import QtCore
+from PySide2.QtCore import QUrl
+from PySide2.QtGui import QGuiApplication
+from PySide2.QtQml import qmlRegisterType
+from PySide2.QtQml import QQmlApplicationEngine
 
 # Add pkm to sys.path if not already there.
 if os.path.dirname(__file__) not in sys.path:
     sys.path.append(os.path.dirname(__file__))
 
-from pkm import log, windows
+from pkm import ROOT, log
 
 
-class PKMeterApplication(QtCore.QObject):
+class PKMeterApplication:
     
     def __init__(self, opts):
         super(PKMeterApplication, self).__init__()
@@ -22,17 +26,14 @@ class PKMeterApplication(QtCore.QObject):
 
     def _init_windows(self):
         """ Init the main windows that may be displayed. """
-        self.windows = Bunch()
-        self.windows.settings = windows.SettingsWindow(self)
-        self.windows.desktop = windows.DesktopWindow(self)
-
-    def quit(self, *args):
-        log.info('Quitting..')
-        QtCore.QCoreApplication.quit()
+        filepath = os.path.join(ROOT, 'qml', 'desktop.qml')
+        self.engine = QQmlApplicationEngine()
+        #self.engine.addImportPath(os.path.join(ROOT, 'qml'));
+        self.window = self.engine.load(QUrl.fromLocalFile(filepath))
     
     @classmethod
     def start(cls, opts):
-        app = QtWidgets.QApplication(['PKMeterApplication'])
+        app = QGuiApplication()
         _ = PKMeterApplication(opts)
         app.exec_()  # Start the event loop
         

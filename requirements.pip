@@ -1,5 +1,4 @@
 #-------------------------------
 # PKMeter Python Requirements
 #-------------------------------
-bunch
-PySide2
+pyside2
