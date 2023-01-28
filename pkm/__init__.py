@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-import logging, os, signal, sys
+import logging
+import os
+import sys
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from PySide2.QtCore import QStandardPaths
 
 
 # Global Constants
-ROOT = os.path.dirname(__file__)
-
-# OS Specific Settings
-DATA = os.path.join(os.getenv('HOME'), '.config', 'PKMeter')
-if os.name == 'nt':
-    DATA = os.path.join(os.getenv('HOME'), os.environ['APPDATA'], 'PKMeter')
-    signal.signal(signal.SIGINT, signal.SIG_DFL)  # allow ctrl+c to close
+COMPANYNAME = "PKMeter"
+APPNAME = "pkmeter"
+ROOT = Path(__file__).parent
+APPDATA = Path(QStandardPaths.writableLocation(QStandardPaths.AppDataLocation))
 
 # Logging Configuration
 log = logging.getLogger('pkm')
-logfile = os.path.join(DATA, 'pkmeter.log')
+logfile = APPDATA / COMPANYNAME / 'pkmeter.log'
 logformat = logging.Formatter('%(asctime)s %(module)12s:%(lineno)-4s %(levelname)-9s %(message)s')
-logdir = os.path.dirname(logfile)
-os.makedirs(logdir, exist_ok=True)
+os.makedirs(logfile.parent, exist_ok=True)
 filehandler = RotatingFileHandler(logfile, 'a', 512000, 3)
 filehandler.setFormatter(logformat)
 streamhandler = logging.StreamHandler(sys.stdout)
