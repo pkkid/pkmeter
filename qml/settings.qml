@@ -8,9 +8,8 @@ ApplicationWindow {
   minimumHeight: 200
   title: "PKMeter Settings"
   visible: true
-  width: 300
-  x: Screen.width/2 - width/2
-  y: Screen.height/2 - height/2
+  maximumWidth: 300
+  minimumWidth: 300
   flags: Qt.WindowTitleHint |
     Qt.WindowMinimizeButtonHint
 

@@ -4,7 +4,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from PySide2.QtCore import QStandardPaths
+from PySide6.QtCore import QStandardPaths
 
 
 # Global Constants

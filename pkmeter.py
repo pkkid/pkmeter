@@ -4,8 +4,8 @@ import signal
 import sys
 from pathlib import Path
 from argparse import ArgumentParser
-from PySide2 import QtCore, QtGui, QtQml
-from PySide2.QtCore import QSettings
+from PySide6 import QtCore, QtGui, QtQml
+from PySide6.QtCore import QSettings
 
 sys.path.append(Path(__file__).parent)
 import pkm  # noqa
