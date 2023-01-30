@@ -10,7 +10,7 @@ from PySide2.QtCore import QStandardPaths
 # Global Constants
 COMPANYNAME = "PKMeter"
 APPNAME = "pkmeter"
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent
 APPDATA = Path(QStandardPaths.writableLocation(QStandardPaths.AppDataLocation))
 
 # Logging Configuration

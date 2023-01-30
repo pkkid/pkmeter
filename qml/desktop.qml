@@ -10,6 +10,8 @@ ApplicationWindow {
   title: "PKMeter"
   visible: true
   width: 200
+  x: 100
+  y: 100
   flags: Qt.Tool |
     //Qt.WindowStaysOnBottomHint |
     Qt.CustomizeWindowHint |
@@ -19,7 +21,7 @@ ApplicationWindow {
   // Load the Material Design Icons webfont
   FontLoader {
     id: mdi
-    source: "mdi-v7.1.96.ttf"
+    source: "resources/mdi-v7.1.96.ttf"
   }
 
   // Show and Hide the Toolbar when entering the app

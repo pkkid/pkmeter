@@ -18,9 +18,9 @@ RowLayout {
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor
       onClicked: {
-        var newWindow = Qt.createComponent("../settings.qml")
+        var newWindow = Qt.createComponent('../settings.qml')
         var newWindowObject = newWindow.createObject(desktopWindow)
-        newWindowObject.visible = true  
+        //newWindowObject.visible = true  
       }
     }
   }
