@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
+import "../settings"
 
 
 RowLayout {
@@ -16,6 +17,15 @@ RowLayout {
   ToolbarIcon {
     height: parent.height
     text: "󰢻"  // cog
+    MouseArea {
+      anchors.fill: parent
+      cursorShape: Qt.PointingHandCursor
+      onClicked: {
+        var newWindow = Qt.createComponent("../settings.qml")
+        var newWindowObject = newWindow.createObject(desktopWindow)
+        newWindowObject.visible = true  
+      }
+    }
   }
   ToolbarIcon {
     height: parent.height
