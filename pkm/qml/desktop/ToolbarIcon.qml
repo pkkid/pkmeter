@@ -5,4 +5,5 @@ Text {
   color: "#ddd"
   font.family: mdi.name
   font.pixelSize: 16
+  Layout.fillHeight: true
 }
