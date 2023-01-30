@@ -3,7 +3,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import "desktop"
 
-
 ApplicationWindow {
   id: desktopWindow
   color: "transparent"
