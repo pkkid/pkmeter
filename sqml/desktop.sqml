@@ -1,0 +1,4 @@
+
+<QWidget layout="QVBoxLayout">
+  <QPushButton text="Hi Mom!" />
+</QWidget>

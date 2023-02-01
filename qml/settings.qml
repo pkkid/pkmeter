@@ -5,7 +5,6 @@ import "settings"
 
 ApplicationWindow {
   id: settingsWindow
-  minimumHeight: 200
   title: "PKMeter Settings"
   visible: true
   maximumWidth: 300
@@ -20,8 +19,15 @@ ApplicationWindow {
     ColumnLayout {
       anchors.fill: parent
       Layout.alignment: Qt.AlignTop
-      
-      // Filler Row
+
+      ComboBox {
+        model: settings.monitor_choices
+        textRole: "text"
+        valueRole: "value"
+        currentIndex: 0
+      }
+
+      // Spacer
       Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
