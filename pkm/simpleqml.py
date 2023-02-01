@@ -15,6 +15,10 @@ QTCORE = dict(inspect.getmembers(QtCore, inspect.isclass))
 QTWIDGETS = dict(inspect.getmembers(QtWidgets, inspect.isclass))
 QOBJECTS = {k:v for k,v in {**QTCORE, **QTWIDGETS}.items() if k.startswith('Q')}
 
+REGEX_INT = re.compile(r'^\d+$')
+REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
+REGEX_LIST = re.compile(r'^\[.+?\]$')
+
 
 class SimpleObject:
     
@@ -43,17 +47,19 @@ class SimpleObject:
             setattr = f'set{attr[0].upper()}{attr[1:]}'
             if hasattr(qobj, setattr):
                 log.debug(f'{" "*indent}{setattr}({valuestr})')
-                getattr(qobj, setattr)(value)
+                if isinstance(value, list):
+                    getattr(qobj, setattr)(*value)
+                else:
+                    getattr(qobj, setattr)(value)
             
     def _parse_value(self, value):
         if value in QOBJECTS: return QOBJECTS[value]()
         if value.lower() in ['true']: return True
         if value.lower() in ['false']: return False
         if value.lower() in ['none']: return None
-        if re.findall(r'^\d+$', value): return int(value)
-        if re.findall(r'^\d+\.\d+$', value): return float(value)
-        if re.findall(r'^\[.+?\]$', value):
+        if re.findall(REGEX_INT, value): return int(value)
+        if re.findall(REGEX_FLOAT, value): return float(value)
+        if re.findall(REGEX_LIST, value):
             result = list(self._parse_value(x) for x in value.strip('[]').split(','))
-            log.info(result)
             return result
         return value

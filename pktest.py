@@ -23,7 +23,8 @@ if __name__ == '__main__':
     app = QApplication()
     desktop = simpleqml.SimpleObject(ROOT / 'sqml' / 'desktop.sqml')
     desktop.qobj.setAttribute(Qt.WA_TranslucentBackground)
-    desktop.qobj.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint | Qt.CustomizeWindowHint)
+    desktop.qobj.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
+    # | Qt.NoDropShadowWindowHint | Qt.CustomizeWindowHint)
     # Qt.WindowStaysOnBottomHint |
     desktop.qobj.show()
     app.exec()
