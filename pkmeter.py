@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 import signal
 import sys
-from pathlib import Path
+from os.path import dirname, join
 from argparse import ArgumentParser
-from PySide6 import QtWidgets
+from PySide6 import QtGui, QtWidgets
 
-sys.path.append(Path(__file__).parent)
-from pkm import APPNAME, log
+sys.path.append(dirname(__file__))
+from pkm import APPNAME, ROOT, log
 from pkm.desktop import DesktopWindow
 
 
@@ -17,9 +17,18 @@ class PKMeterApplication:
         log.info(f'Starting {APPNAME} application')
         self.app = app                  # QGuiApplication
         self.opts = opts                # Command line options
+        self._init_fonts()              # Load custom fonts
         self.desktop = DesktopWindow()  # Main desktop window
         self.desktop.show()
     
+    def _init_fonts(self):
+        """ Load custom fonts. """
+        # font-family: 'Material Design Icons'
+        filepath = join(ROOT, 'resources', 'mdi-v7.1.96.ttf')
+        font_id = QtGui.QFontDatabase.addApplicationFont(filepath)
+        font_family = QtGui.QFontDatabase.applicationFontFamilies(font_id)[0]
+        log.info(font_family)
+
     @classmethod
     def start(cls, opts):
         app = QtWidgets.QApplication()

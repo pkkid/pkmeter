@@ -8,6 +8,8 @@ from PySide6.QtCore import Qt
 
 class DesktopWindow(QTemplateWidget):
     TMPL = os.path.join(ROOT, 'tmpl', 'desktop.tmpl')
+    DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
+    DEFAULT_LAYOUT_SPACING = 0
 
     def __init__(self):
         log.info(f'Creating {self.__class__.__name__}')
