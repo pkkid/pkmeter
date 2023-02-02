@@ -1,4 +1,0 @@
-
-<QWidget title="PKMeter" layout="QVBoxLayout" geometry="[200,200,200,200]">
-  <QPushButton text="Hi Mom!" />
-</QWidget>
