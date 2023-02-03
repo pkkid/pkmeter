@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from PySide6.QtCore import QPropertyAnimation
+from PySide6.QtWidgets import QApplication
 
 
 class Bunch(dict):
@@ -6,6 +8,16 @@ class Bunch(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__dict__ = self
+
+
+def center_window(window):
+    """ Move the specified widget to the center of the screen. """
+    screen = QApplication.primaryScreen()
+    screen_rect = screen.availableGeometry()
+    window_rect = window.geometry()
+    x = (screen_rect.width() - window_rect.width()) / 2
+    y = (screen_rect.height() - window_rect.height()) / 2
+    window.move(x, y)
 
 
 def rget(obj, attrstr, default='_raise', delim='.'):

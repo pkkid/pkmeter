@@ -1,5 +1,45 @@
 
-<QWidget layout='QVBoxLayout'>
-  <QPushButton id='mybutton' text='Hi Mom!'>
-  </QPushButton>
+<QWidget layout='QVBoxLayout' geometry='[0,0,400,0]'>
+  <!-- Tab Bar -->
+  <QTabBar id='tabbar' expanding='false'>
+    <Connect tabBarClicked='show_tab'/>
+    <Tab args='[General]'/>
+    <Tab args='[Customize]'/>
+  </QTabBar>
+
+  <!-- General Contents -->
+  <QWidget id='general' layout='QVBoxLayout' layout.spacing='15'>
+    <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,0,0,0]'>
+      <QLabel text='Monitor'/>
+      <QComboBox />
+    </QWidget>
+    <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,0,0,0]'>
+      <QLabel text='Position'/>
+      <QComboBox />
+    </QWidget>
+    <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,0,0,0]'>
+      <QLabel text='Width'/>
+      <QSlider args='[Qt.Horizontal]'/>
+    </QWidget>
+  </QWidget>
+
+  <!-- Customize Tab -->
+  <QWidget id='customize' layout='QVBoxLayout' visible='false'>
+    <QLabel text='Customize Tab'/>
+  </QWidget>
+  <Stretch/>
+
+  <!-- Button Row -->
+  <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,10,0,0]'>
+    <Stretch/>
+    <QPushButton text='Apply'>
+      <Connect clicked='close'/>
+    </QPushButton>
+    <QPushButton text='Close'>
+      <Connect clicked='close'/>
+    </QPushButton>
+    <QPushButton text='Save'>
+      <Connect clicked='close'/>
+    </QPushButton>
+  </QWidget>
 </QWidget>

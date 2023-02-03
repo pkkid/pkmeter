@@ -1,12 +1,11 @@
 
 <QWidget layout='QVBoxLayout' geometry='[200,200,200,200]'>
-  <QWidget id='background'>
+  <QWidget id='desktop'>
     <Set layout='QVBoxLayout' layout.contentsMargins='[10,10,10,10]' layout.spacing='10' />
     
     <!-- Toolbar -->
-    <QWidget layout='QHBoxLayout'>
+    <QWidget id='toolbar' layout='QHBoxLayout' layout.spacing='5'>
       <Stretch/>
-      <QLabel id='foo' text='Hello!' />
       <QPushButton id='settingsButton' fixedWidth='20' text='󰢻'>
         <Connect clicked='show_settings'/>
       </QPushButton>

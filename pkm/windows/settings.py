@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
+from pkm import APPNAME
+from pkm import log, utils
 from pkm.qtemplate import QTemplateWidget
+from PySide6.QtCore import Qt
 
 
 class SettingsWindow(QTemplateWidget):
@@ -9,6 +12,29 @@ class SettingsWindow(QTemplateWidget):
     def __init__(self, app):
         super(SettingsWindow, self).__init__()
         self.app = app
+        self.setWindowFlags(Qt.Dialog)
+        self.setWindowModality(Qt.ApplicationModal)
+        self.setWindowTitle(f'{APPNAME} Settings')
+    
+    def show(self):
+        super(SettingsWindow, self).show()
+        utils.center_window(self)
+    
+    def show_tab(self, index):
+        if index < 0: return
+        for i in range(self.ids.tabbar.count()):
+            if i != index:
+                tabtext = self.ids.tabbar.tabText(i)
+                self.ids[tabtext.lower()].hide()
+        tabtext = self.ids.tabbar.tabText(index)
+        self.ids[tabtext.lower()].show()
+    
+    def close(self):
+        self.hide()
+
+    def closeEvent(self, event):
+        self.close()
+        event.ignore()
 
     # def __init__(self, parent=None):
     #     super().__init__(parent)

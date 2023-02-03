@@ -19,7 +19,7 @@ QOBJECTS['Qt'] = Qt
 
 REGEX_INT = re.compile(r'^\d+$')
 REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
-REGEX_LIST = re.compile(r'^\[.+?\]$')
+REGEX_LIST = re.compile(r'^\[.*?\]$')
 TRUEVALUES = ('yes', 'true', '1')
 
 
@@ -44,16 +44,18 @@ class QTemplateWidget(QtWidgets.QWidget):
         # Check this is a known tag
         if self._tag_qobject(elem, parent, indent): return    # <QWidget attr='value' />
         if self._tag_set(elem, parent, indent): return        # <set attr='value' />; no children
+        if self._tag_add(elem, parent, indent): return        # add<Tag>(attr=value)
         if self._tag_spacing(elem, parent, indent): return    # <spacing size='1' />; no children
         if self._tag_stretch(elem, parent, indent): return    # <stretch ratio='1' />; no children
         if self._tag_connect(elem, parent, indent): return    # <connect slot='callback' />; no children
-        raise Exception(f'Unknown tag "{elem.tag}" in element {parent.tag}.')
+        raise Exception(f'Unknown tag "{elem.tag}" in element {parent.__class__.__name__}.')
         
     def _tag_qobject(self, elem, parent, indent):
         """ Creates a QObject and appends it to the layout of parent. """
         if elem.tag in QOBJECTS:
             qcls = utils.rget(QOBJECTS, elem.tag)
-            qobj = self if parent is None else qcls(parent=parent)
+            args = self._parse_value(elem.attrib.get('args', '[]'))
+            qobj = self if parent is None else qcls(*args, parent=parent)
             log.debug(f'{" "*indent}{qobj.__class__.__name__}')
             self._apply_attrs(qobj, elem, indent+1)
             if parent is not None:
@@ -61,6 +63,15 @@ class QTemplateWidget(QtWidgets.QWidget):
             # Keep iterating the template
             for echild in elem:
                 self._walk_elem(echild, qobj, indent+1)
+            return True
+    
+    def _tag_add(self, elem, parent, indent):
+        """ Check we're adding an attribute to the parent. """
+        addfunc = f'add{elem.tag}'
+        if hasattr(parent, addfunc):
+            args = self._parse_value(elem.attrib.get('args', '[]'))
+            log.debug(f'{" "*indent}{addfunc}(*{args})')
+            getattr(parent, addfunc)(*args)
             return True
 
     def _tag_set(self, elem, parent, indent):
@@ -100,6 +111,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _apply_attrs(self, qobj, elem, indent=0):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
+            if attr == 'args': continue
             value = self._parse_value(valuestr)
             if self._attr_id(qobj, attr, value, valuestr, indent): continue             # id='myobject'
             if self._attr_layout(qobj, attr, value, valuestr, indent): continue         # layout.<attr>='value'
@@ -152,5 +164,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         if re.findall(REGEX_INT, value): return int(value)
         if re.findall(REGEX_FLOAT, value): return float(value)
         if re.findall(REGEX_LIST, value):
+            if value == '[]': return []
             return [self._parse_value(x.strip()) for x in value.strip('[]').split(',')]
         return value

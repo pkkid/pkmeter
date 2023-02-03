@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
-from pkm import log
+from pkm import log, utils
 from pkm.qtemplate import QTemplateWidget
 from PySide6.QtCore import Qt
 
@@ -15,6 +15,19 @@ class DesktopWindow(QTemplateWidget):
         self.app = app
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
+        self._init_toolbar_animation()
+    
+    def _init_toolbar_animation(self):
+        policy = self.ids.toolbar.sizePolicy()
+        policy.setRetainSizeWhenHidden(True)
+        self.ids.toolbar.setSizePolicy(policy)
+        self.ids.toolbar.hide()
+    
+    def enterEvent(self, event):
+        self.ids.toolbar.show()
+
+    def leaveEvent(self, event):
+        self.ids.toolbar.hide()
 
     def show_settings(self):
         self.app.settings.show()

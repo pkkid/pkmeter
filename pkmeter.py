@@ -16,9 +16,9 @@ class PKMeter(QtWidgets.QApplication):
     def __init__(self, opts):
         log.info(f'Starting {APPNAME} application')
         super(PKMeter, self).__init__()
-        self.opts = opts                        # Command line options
-        self._init_styles()                     # Load stylesheet and fonts
-        self.desktop = DesktopWindow(self)      # Main desktop window
+        self.opts = opts                                # Command line options
+        self._init_styles()                             # Load stylesheet and fonts
+        self.desktop = DesktopWindow(self)              # Main desktop window
         self.settings = SettingsWindow(self)    # Settings window
         self.desktop.show()
     

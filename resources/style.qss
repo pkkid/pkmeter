@@ -1,18 +1,22 @@
 
-#background {
+QWidget {
+  /* border: 1px solid rgba(255,0,0,0.1); */
+}
+#desktop {
   background-color: rgba(0,0,0,0.5);
   border-radius: 5px;
 }
-QWidget {
-  margin: 0px;
-  border: 1px solid rgba(255,0,0,0.3);
+#desktop QLabel {
+  color: #fff;
 }
-QLabel {
-  font-family: Material Design Icons;
-  color: white;
-}
-QPushButton {
-  color: red;
-  font-family:'Material Design Icons';
+#desktop #toolbar QPushButton {
+  border: rgba(0,0,0,0);
+  color: #fff;
+  font-family: 'Material Design Icons';
   font-size: 16px;
+  margin: 0px;
+}
+#desktop #toolbar QPushButton:hover {
+  color: #ddd;
+  
 }
