@@ -23,9 +23,8 @@ class SettingsWindow(QTemplateWidget):
     def show_tab(self, index):
         if index < 0: return
         for i in range(self.ids.tabbar.count()):
-            if i != index:
-                tabtext = self.ids.tabbar.tabText(i)
-                self.ids[tabtext.lower()].hide()
+            tabtext = self.ids.tabbar.tabText(i)
+            self.ids[tabtext.lower()].hide()
         tabtext = self.ids.tabbar.tabText(index)
         self.ids[tabtext.lower()].show()
     
