@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
-from pkm import log
 from pkm.qtemplate import QTemplateWidget
 
 
