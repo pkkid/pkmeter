@@ -8,8 +8,11 @@ QWidget {
   border: 1px solid rgba(255,0,0,0.3);
 }
 QLabel {
+  font-family: Material Design Icons;
   color: white;
 }
 QPushButton {
   color: red;
+  font-family:'Material Design Icons';
+  font-size: 16px;
 }

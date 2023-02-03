@@ -7,7 +7,7 @@
 # and dirty in some places.
 import inspect
 import re
-from os.path import basename, dirname, join, normpath
+from os.path import basename
 from pkm import log, utils
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt
@@ -20,6 +20,7 @@ QOBJECTS['Qt'] = Qt
 REGEX_INT = re.compile(r'^\d+$')
 REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
 REGEX_LIST = re.compile(r'^\[.+?\]$')
+TRUEVALUES = ('yes', 'true', '1')
 
 
 class QTemplateWidget(QtWidgets.QWidget):
@@ -31,14 +32,13 @@ class QTemplateWidget(QtWidgets.QWidget):
     def __init__(self):
         super(QTemplateWidget, self).__init__()
         self.ids = utils.Bunch()
-        self._read_template()
+        self.load_template()
         
-    def _read_template(self):
+    def load_template(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
         log.info(f'Reading template {basename(self.TMPL)}')
-        with open(self.TMPL) as handle:
-            elem = ElementTree.fromstring(handle.read())
-        self._walk_elem(elem)
+        tree = ElementTree.parse(self.TMPL)
+        self._walk_elem(tree.getroot())
     
     def _walk_elem(self, elem, parent=None, indent=0):
         # Check this is a known tag
@@ -52,7 +52,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_qobject(self, elem, parent, indent):
         """ Creates a QObject and appends it to the layout of parent. """
         if elem.tag in QOBJECTS:
-            qcls = QOBJECTS[elem.tag]
+            qcls = utils.rget(QOBJECTS, elem.tag)
             qobj = self if parent is None else qcls(parent=parent)
             log.debug(f'{" "*indent}{qobj.__class__.__name__}')
             self._apply_attrs(qobj, elem, indent+1)
@@ -93,7 +93,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """
         if elem.tag == 'Connect':
             for attr, valuestr in elem.attrib.items():
-                callback = getattr(self, valuestr)
+                callback = utils.rget(self, valuestr)
                 getattr(parent, attr).connect(callback)
             return True
 
@@ -102,7 +102,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         for attr, valuestr in elem.attrib.items():
             value = self._parse_value(valuestr)
             if self._attr_id(qobj, attr, value, valuestr, indent): continue             # id='myobject'
-            if self._attr_stylesheet(qobj, attr, value, valuestr, indent): continue     # attr='value'
             if self._attr_layout(qobj, attr, value, valuestr, indent): continue         # layout.<attr>='value'
             if self._attr_set(qobj, attr, value, valuestr, indent): continue            # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
@@ -127,19 +126,6 @@ class QTemplateWidget(QtWidgets.QWidget):
             return True
         if attr.startswith('layout.'):
             return self._attr_set(qobj.layout(), attr[7:], value, valuestr, indent)
-    
-    def _attr_stylesheet(self, qobj, attr, value, valuestr, indent):
-        """ Sets a stylesheet on the specified qobj. We treat this one special
-            because we have to find the relative path, read the file, and apply
-            a simple template langauge to it before applying the stylesheet
-            contents to the qobj.
-        """
-        if attr.lower() == 'stylesheet':
-            filepath = normpath(join(dirname(self.TMPL), value))
-            with open(filepath) as handle:
-                contents = handle.read()
-            qobj.setStyleSheet(contents)
-            return True
 
     def _attr_set(self, qobj, attr, value, valuestr, indent):
         """ Calls set<attr>(<value>) on the qbject. """
@@ -156,7 +142,9 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Takes a best guess converting a string value from the template
             to a native Python value.
         """
-        if value.split('.')[0] in QOBJECTS: return utils.rget(QOBJECTS, value)
+        if value.split('.')[0] in QOBJECTS:
+            value = utils.rget(QOBJECTS, value)
+            return value() if callable(value) else value
         # if value.startswith('Qt.'): return getattr(Qt, value[3:])
         if value.lower() in ['true']: return True
         if value.lower() in ['false']: return False

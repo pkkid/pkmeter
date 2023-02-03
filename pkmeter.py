@@ -8,32 +8,33 @@ from PySide6 import QtGui, QtWidgets
 
 sys.path.append(dirname(__file__))
 from pkm import APPNAME, ROOT, log
-from pkm.desktop import DesktopWindow
+from pkm.windows import DesktopWindow, SettingsWindow
 
 
-class PKMeterApplication:
+class PKMeter(QtWidgets.QApplication):
 
-    def __init__(self, app, opts):
+    def __init__(self, opts):
         log.info(f'Starting {APPNAME} application')
-        self.app = app                  # QGuiApplication
-        self.opts = opts                # Command line options
-        self._init_fonts()              # Load custom fonts
-        self.desktop = DesktopWindow()  # Main desktop window
+        super(PKMeter, self).__init__()
+        self.opts = opts                        # Command line options
+        self._init_styles()                     # Load stylesheet and fonts
+        self.desktop = DesktopWindow(self)      # Main desktop window
+        self.settings = SettingsWindow(self)    # Settings window
         self.desktop.show()
     
-    def _init_fonts(self):
+    def _init_styles(self):
         """ Load custom fonts. """
         # font-family: 'Material Design Icons'
         filepath = join(ROOT, 'resources', 'mdi-v7.1.96.ttf')
-        font_id = QtGui.QFontDatabase.addApplicationFont(filepath)
-        font_family = QtGui.QFontDatabase.applicationFontFamilies(font_id)[0]
-        log.info(font_family)
+        QtGui.QFontDatabase.addApplicationFont(filepath)
+        # Application stylesheet
+        stylesheet = open(join(ROOT, 'resources', 'style.qss')).read()
+        self.setStyleSheet(stylesheet)
 
     @classmethod
     def start(cls, opts):
-        app = QtWidgets.QApplication()
-        _ = PKMeterApplication(app, opts)
-        app.exec()  # start the event loop
+        app = PKMeter(opts)
+        app.exec()
         log.info('Quitting..')
 
 
@@ -44,4 +45,4 @@ if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.loglevel:
         log.setLevel(opts.loglevel)
-    PKMeterApplication.start(opts)
+    PKMeter.start(opts)

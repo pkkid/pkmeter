@@ -1,21 +1,26 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os
-from pkm import ROOT, log
+from os.path import dirname, join
+from pkm import log
 from pkm.qtemplate import QTemplateWidget
 from PySide6.QtCore import Qt
 
 
 class DesktopWindow(QTemplateWidget):
-    TMPL = os.path.join(ROOT, 'tmpl', 'desktop.tmpl')
+    TMPL = join(dirname(__file__), 'desktop.tmpl')
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 
-    def __init__(self):
-        log.info(f'Creating {self.__class__.__name__}')
+    def __init__(self, app):
         super(DesktopWindow, self).__init__()
+        self.app = app
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
+
+    def show_settings(self):
+        self.app.settings.show()
     
+    def quit_app(self):
+        self.app.quit()
+
     def mybutton_clicked(self):
         log.info('CLICK!')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pkm import log
+
 
 class Bunch(dict):
     """ Allows dot notation to set and get dict values. """
@@ -18,7 +18,6 @@ def rget(obj, attrstr, default='_raise', delim='.'):
         elif isinstance(obj, list): value = obj[int(attr)]
         elif isinstance(obj, tuple): value = obj[int(attr)]
         elif isinstance(obj, object): value = getattr(obj, attr)
-        if callable(value) and not attrstr: value = value()
         if attrstr: return rget(value, attrstr, default, delim)
         return value
     except Exception:
