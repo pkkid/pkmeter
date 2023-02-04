@@ -1,0 +1,49 @@
+
+/* Default Application Styles */
+QWidget {
+  font-family: 'Josefin Sans';
+  font-size: 12px;
+  background-color: #303030;
+  color: #c5c5c5;
+  /* border: 1px solid rgba(255,0,0,0.1);  /* Debugging */
+}
+QLabel {
+  background-color: rgba(0,0,0,0);
+}
+
+/* QMenu Styles */
+QMenu {
+  background-color: #222222;
+  /* color: #c5c5c5; */
+}
+QMenu::item {
+  spacing: 3px;
+  padding: 8px 40px 8px 20px;
+  background: transparent;
+  border-radius: 5px;
+}
+QMenu::item:selected {
+  color: #ffffff;
+  background-color: #181818;
+}
+
+/* Desktop Widget Styles */
+#desktop {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 5px;
+}
+#desktop QLabel {
+  color: #fff;
+}
+#desktop #toolbar QPushButton {
+  border: rgba(0,0,0,0);
+  color: #fff;
+  font-family: 'Material Design Icons';
+  font-size: 16px;
+  margin: 0px;
+}
+#desktop #toolbar QPushButton:hover {
+  color: #ddd; 
+}
+
+

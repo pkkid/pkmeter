@@ -67,6 +67,7 @@ TRUEVALUES = ('yes', 'true', '1')
 class QTemplateWidget(QtWidgets.QWidget):
     """ My interpreation of a less verbose Qt Template language. """
     TMPL = None  # filepath of tmpl file to load
+    TMPLSTR = None   # string template (if not using a file)
     DEFAULT_LAYOUT_MARGINS = None  # default values for qobj.layout().setContentsMargins()
     DEFAULT_LAYOUT_SPACING = None  # default values for qobj.layout().setSpacing()
     
@@ -77,9 +78,14 @@ class QTemplateWidget(QtWidgets.QWidget):
         
     def load_template(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
-        log.info(f'Reading template {basename(self.TMPL)}')
-        tree = ElementTree.parse(self.TMPL)
-        self._walk_elem(tree.getroot())
+        if self.TMPL is not None:
+            log.info(f'Reading template file {basename(self.TMPL)} for {self.__class__.__name__}')
+            tree = ElementTree.parse(self.TMPL)
+            self._walk_elem(tree.getroot())
+        elif self.TMPLSTR is not None:
+            log.info(f'Reading template string for {self.__class__.__name__}')
+            tree = ElementTree.fromstring(self.TMPLSTR)
+            self._walk_elem(tree.getroot())
     
     def _walk_elem(self, elem, parent=None, indent=0):
         # Check this is a known tag

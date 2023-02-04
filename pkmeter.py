@@ -19,10 +19,16 @@ class PKMeter(QtWidgets.QApplication):
         log.info(f'Starting {APPNAME} application')
         super(PKMeter, self).__init__()
         self.opts = opts                        # Command line options
+        self._init_application()                # Setup OS environment
         self._init_styles()                     # Load stylesheet and fonts
-        self.desktop = DesktopWidget(self)      # Main desktop window
         self.settings = SettingsWindow(self)    # Settings window
+        self.desktop = DesktopWidget(self)      # Main desktop window
         self.desktop.show()
+    
+    def _init_application(self):
+        # Application icon
+        iconpath = join(ROOT, 'resources', 'chart-box-custom.png')
+        self.setWindowIcon(QtGui.QIcon(iconpath))
     
     def _init_styles(self):
         """ Load custom fonts. """
@@ -34,7 +40,7 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f"Loading font '{fontname}'")
         # Application stylesheet
-        stylesheet = open(join(ROOT, 'resources', 'style.qss')).read()
+        stylesheet = open(join(ROOT, 'resources', 'styles.qss')).read()
         self.setStyleSheet(stylesheet)
 
     @classmethod
