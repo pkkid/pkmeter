@@ -5,6 +5,13 @@ QWidget {
   /* border: 1px solid rgba(255,0,0,0.1); */
 }
 
+/* #preferences {
+  background-color: #303030;
+  titlebar-color: #222222;
+  color: #c5c5c5;
+} */
+
+
 #desktop {
   background-color: rgba(0,0,0,0.5);
   border-radius: 5px;
@@ -22,3 +29,5 @@ QWidget {
 #desktop #toolbar QPushButton:hover {
   color: #ddd; 
 }
+
+

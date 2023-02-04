@@ -1,0 +1,42 @@
+
+<QWidget layout='QVBoxLayout' geometry='[0,0,400,0]'>
+
+  <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,0,0,0]'>
+    <QWidget layout='QVBoxLayout' layout.contentsMargins='[0,0,0,0]' layout.spacing='0'>
+      <QPushButton text='PKMeter Application' property='[toggle,pkmeter]'>
+        <Connect clicked='toggle_listwidget'/>
+      </QPushButton>
+      <QListWidget id='pkmeter'>
+      </QListWidget>
+      <QPushButton text='Enabled Plugins' property='[toggle,enabledplugins]'>
+        <Connect clicked='toggle_listwidget'/>
+      </QPushButton>
+      <QListWidget id='enabledplugins'>
+      </QListWidget>
+      <QPushButton text='Disabled Plugins' property='[toggle,enabledplugins]'>
+        <Connect clicked='toggle_listwidget'/>
+      </QPushButton>
+      <QListWidget id='disabledplugins'>
+      </QListWidget>
+    </QWidget>
+
+    <QWidget layout='QVBoxLayout'>
+      <QLabel text='Hi Dad!'/>
+      <Stretch/>
+    </QWidget>
+  </QWidget>
+
+  <!-- Button Row -->
+  <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,10,0,0]'>
+    <Stretch/>
+    <QPushButton text='Apply'>
+      <Connect clicked='close'/>
+    </QPushButton>
+    <QPushButton text='Close'>
+      <Connect clicked='close'/>
+    </QPushButton>
+    <QPushButton text='Save'>
+      <Connect clicked='close'/>
+    </QPushButton>
+  </QWidget>
+</QWidget>

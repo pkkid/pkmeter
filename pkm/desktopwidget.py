@@ -5,13 +5,13 @@ from pkm.qtemplate import QTemplateWidget
 from PySide6.QtCore import Qt
 
 
-class DesktopWindow(QTemplateWidget):
-    TMPL = join(dirname(__file__), 'desktop.tmpl')
+class DesktopWidget(QTemplateWidget):
+    TMPL = join(dirname(__file__), 'tmpl', 'desktop.tmpl')
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 
     def __init__(self, app):
-        super(DesktopWindow, self).__init__()
+        super(DesktopWidget, self).__init__()
         self.app = app
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)

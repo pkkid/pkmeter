@@ -9,7 +9,8 @@ from PySide6 import QtGui, QtWidgets
 
 sys.path.append(dirname(__file__))
 from pkm import APPNAME, ROOT, log
-from pkm.windows import DesktopWindow, SettingsWindow
+from pkm.desktopwidget import DesktopWidget
+from pkm.settings import SettingsWindow
 
 
 class PKMeter(QtWidgets.QApplication):
@@ -19,7 +20,7 @@ class PKMeter(QtWidgets.QApplication):
         super(PKMeter, self).__init__()
         self.opts = opts                        # Command line options
         self._init_styles()                     # Load stylesheet and fonts
-        self.desktop = DesktopWindow(self)      # Main desktop window
+        self.desktop = DesktopWidget(self)      # Main desktop window
         self.settings = SettingsWindow(self)    # Settings window
         self.desktop.show()
     
