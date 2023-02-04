@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
 import signal
 import sys
 from os.path import dirname, join
@@ -25,7 +26,12 @@ class PKMeter(QtWidgets.QApplication):
     def _init_styles(self):
         """ Load custom fonts. """
         # Application fonts
-        QtGui.QFontDatabase.addApplicationFont(join(ROOT, 'resources', 'mdi.ttf'))
+        resources = join(ROOT, 'resources')
+        for filename in os.listdir(resources):
+            if filename.endswith('.ttf'):
+                fontid = QtGui.QFontDatabase.addApplicationFont(join(resources, filename))
+                fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
+                log.info(f"Loading font '{fontname}'")
         # Application stylesheet
         stylesheet = open(join(ROOT, 'resources', 'style.qss')).read()
         self.setStyleSheet(stylesheet)

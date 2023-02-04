@@ -1,10 +1,51 @@
 # -*- coding: utf-8 -*-
-# Simple Qt Markup Language
-# This will convert a sqml file to its equivilent pyside6 Qt widgets. Rather
-# than create QtQuick Controls, this will create the more native QtWidgets
-# Because of this, I believe the markup to be more powerful than qml, and much
-# less verbose than QT Creator .ui files. However note, it's also a bit quick
-# and dirty in some places.
+"""
+Simple Qt Markup Language
+
+A QWidget that can read an xml template file to easily* build the application
+structure of other Qt widgets. I created this as I personally the Qt Designer
+to be lacking in available widgets, the .qml format was not very friendly to
+use, and building apps in straight Python is quite cumbersome.
+
+When reading the .tmpl file, there can only be one top level QWidget defiend.
+This is what the main class will be represented as. From there, the following
+rules are followed while traversing the XML tree as new elements are found.
+
+TAGS - When a new tag is found, the following are checked:
+
+1. If the tag name matches a QObject in the PySide6.QQtWidgets module, it
+   will be created and added to the layout of it's parent element.
+2. If the tag name is "Set" it will read the attributes of that element and
+   apply all values to the parent qobject.
+3. If the tag name matches an "add<Tag>" method on the parent, that function
+   will be called on the parent element, using the arg or args attribute to
+   determine the arguments. For example: <TabBar><Tab arg='General'></TabBar>
+4. If the tag name is "Spacing" or "Stretch", the addSpacing or addStretch will
+   be called on the parent layout.
+5. If the tag name is Connect, it must be accomonied by an attribute named
+   after the signal function to connect from with its value being a dot
+   delimited string referring to the function to be called.
+   For example: <Connect clicked='app.quit'/>
+
+ATTRIBUTES - When attributes are found, the following are checked:
+
+1. if the attribute is "args", the value(s) will be parsed and passed
+   as constructor arguments to the class being created.
+2. if the attribute is "id", a reference to the created object will be added to
+   self.ids for easier access to it from other Python functions. As well, the
+   object.setObjectName will be called to set the object name, allowing you to
+   refer to this object in stylesheets.
+3. If the attribute follows the format "layout.<attr>", it will attempt the call
+   the layout().set<attr>() function on the parent qobject.
+4. Finally, we check the the parent qobject has a method definition for
+   set<attr>(), and if so it will be called with the attribute values.
+
+VALUES - When values are found there is a best guess made for the type to cast
+the string value to. The following types are supported: bool, int, float, list.
+If the value looks like a list, each item will also be parsed. The values will
+sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
+supported, and can be represented by the string such as "Qt.ApplicationModal".
+"""
 import inspect
 import re
 from os.path import basename
@@ -55,6 +96,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         if elem.tag in QOBJECTS:
             qcls = utils.rget(QOBJECTS, elem.tag)
             args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = [args] if not isinstance(args, list) else args
             qobj = self if parent is None else qcls(*args, parent=parent)
             log.debug(f'{" "*indent}{qobj.__class__.__name__}')
             self._apply_attrs(qobj, elem, indent+1)
@@ -70,6 +112,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         addfunc = f'add{elem.tag}'
         if hasattr(parent, addfunc):
             args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = [args] if not isinstance(args, list) else args
             log.debug(f'{" "*indent}{addfunc}(*{args})')
             getattr(parent, addfunc)(*args)
             return True
