@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pkgutil
-from os.path import basename
 from pkm import log
 from PySide6.QtWidgets import QApplication
 
@@ -24,12 +23,10 @@ def center_window(window):
 
 def load_modules(dirpath):
     """ Load and return modules in the specified directory. """
-    modules = {}
+    modules = []
     for loader, name, ispkg in pkgutil.iter_modules([dirpath]):
         try:
-            module = loader.find_module(name).load_module(name)
-            namespace = module if isinstance(module, str) else basename(module.__file__).split('.')[0]
-            modules[namespace] = module
+            modules.append(loader.find_module(name).load_module(name))
         except Exception as err:
             log.warn('Error loading module %s: %s', name, err)
             log.debug(err, exc_info=1)

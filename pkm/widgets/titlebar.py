@@ -2,7 +2,7 @@
 from pkm.qtemplate import QTemplateWidget
 
 
-class QTitleBar(QTemplateWidget):
+class TitleBar(QTemplateWidget):
     """ Window titlebar with custom styles. """
     TMPLSTR = r"""
       <QWidget layout='QHBoxLayout' id='titlebar' layout.contentsMargins='[0,0,0,10]' layout.spacing='8'>
@@ -16,9 +16,9 @@ class QTitleBar(QTemplateWidget):
     """
 
     def __init__(self, *args, **kwargs):
-        super(QTitleBar, self).__init__(*args, **kwargs)
-        self.mousePos = None
-        self.widgetPos = None
+        super(TitleBar, self).__init__(*args, **kwargs)
+        self.mousepos = None
+        self.widgetpos = None
     
     def close(self):
         self.parent().parent().close()

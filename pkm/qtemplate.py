@@ -77,11 +77,11 @@ class QTemplateWidget(QtWidgets.QWidget):
     def load_template(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
         if self.TMPL is not None:
-            log.info(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
+            log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
             tree = ElementTree.parse(self.TMPL)
             self._walk_elem(tree.getroot())
         elif self.TMPLSTR is not None:
-            log.info(f'Reading template for {self.__class__.__name__}')
+            log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
             self._walk_elem(root)
     
@@ -91,10 +91,10 @@ class QTemplateWidget(QtWidgets.QWidget):
         if not _QOBJECTS:
             _QOBJECTS['Qt'] = Qt
             modules = utils.load_modules(join(ROOT, 'pkm', 'widgets'))
-            modules = list(modules.values()) + [QtGui, QtWidgets]
+            modules += [QtGui, QtWidgets]
             for module in modules:
                 members = dict(inspect.getmembers(module, inspect.isclass))
-                _QOBJECTS.update({k:v for k,v in members.items() if k.startswith('Q')})
+                _QOBJECTS.update({k:v for k,v in members.items()})
     
     def _walk_elem(self, elem, parent=None, indent=0):
         # Check this is a known tag
@@ -165,7 +165,19 @@ class QTemplateWidget(QtWidgets.QWidget):
         if elem.tag == 'Connect':
             for attr, valuestr in elem.attrib.items():
                 callback = utils.rget(self, valuestr)
-                getattr(parent, attr).connect(callback)
+                try:
+                    # First try connecting to a signal event using via
+                    # parent.<signal>.connect(callback)
+                    getattr(parent, attr).connect(callback)
+                except AttributeError:
+                    # If the above fails, we can connect to an event handler
+                    # using a temporary function to ensure we always call the
+                    # original event handler before calling our own callabck
+                    if not attr.endswith('Event'): raise
+                    def _eventHandler(*args, **kwargs):  # noqa
+                        getattr(super(parent.__class__, parent), attr)(*args, **kwargs)
+                        callback(*args, **kwargs)
+                    setattr(parent, attr, _eventHandler)
             return True
 
     def _apply_attrs(self, qobj, elem, indent=0):
@@ -181,7 +193,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _attr_id(self, qobj, attr, value, valuestr, indent):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
-            log.info(f'{" "*indent}setObjectName({value})')
+            log.debug(f'{" "*indent}setObjectName({value})')
             qobj.setObjectName(value)
             self.ids[value] = qobj
             return True

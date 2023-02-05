@@ -1,5 +1,7 @@
 
-/* Default Styles */
+/*------------------------
+/* Default Styles
+/*------------------------*/
 QWidget {
   font-family: 'Josefin Sans';
   font-size: 12px;
@@ -47,7 +49,6 @@ QScrollBar::sub-page:vertical {
   background: none;
 }
 
-
 /* QTitleBar */
 #titlebar #appicon {
   border-image: url('resources/chart-box-custom.png') 0 0 0 0 stretch stretch;
@@ -70,7 +71,9 @@ QScrollBar::sub-page:vertical {
   color: #ffffff;
 }
 
-/* Settings */
+/*------------------------
+/* Settings Window
+/*------------------------*/
 #settings {
   border-radius: 8px;
   border: 1px solid #444;
@@ -80,32 +83,45 @@ QScrollBar::sub-page:vertical {
   padding: 8px;
   border-radius: 3px;
 }
+#settings #sidepanel QPushButton[class='selected'],
 #settings #sidepanel QPushButton:hover {
   background-color: #181818;
   color: #ffffff;
 }
-#settings #sidepanel {
+#settings QWidget#sidepanel {
   width: 100px;
   max-width: 170px;
   min-width: 170px;
 }
-#settings #plugins {
+#settings QListWidget#pluginlist {
   border: 0px solid rgba(0,0,0,0);
   background-color: #222222;
   border-radius: 5px;
   margin-top: 5px;
-  padding: 10px 5px;
+  padding: 5px;
+  selection-color: #ffffff;
+  /* selection-background-color: #181818; */
+  font-size: 13px;
+  outline: 0;
 }
-#settings #contents {
+#settings QListWidget#pluginlist::item:selected,
+#settings QListWidget#pluginlist::item:hover {
+  background-color: #181818;
+  border-radius: 3px;
+}
+#settings QWidget#contents {
   /* background-color: #222222; */
   border-radius: 5px;
 }
-#settings #contents QListWidgetItem {
-  color: #f00;
+#settings QLabel[class=subtext] {
+  font-size: 10px;
+  color: #777777;
 }
 
 
-/* Desktop Widget Styles */
+/*------------------------
+/* Desktop Windows
+/*------------------------*/
 #desktop {
   background-color: rgba(0,0,0,0.5);
   border-radius: 5px;

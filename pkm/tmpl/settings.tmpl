@@ -1,26 +1,25 @@
 
 <QWidget layout='QVBoxLayout' geometry='[0,0,600,500]'>
   <QWidget id='settings' layout='QVBoxLayout'>
-    <QTitleBar/>
+    <TitleBar/>
 
+    <!-- Side Panel -->
     <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,0,0,0]' layout.spacing='20'>
       <QWidget id='sidepanel' layout='QVBoxLayout' layout.contentsMargins='[0,0,0,0]' layout.spacing='0'>
-        <QPushButton text='General Settings' />
+        <QPushButton text='General Preferences'>
+          <Connect clicked='generalSettingsClicked' />
+        </QPushButton>
         <Spacing args='20'/>
         <QLabel text='Available Plugins' />
-        <QListWidget id='plugins' dragDropMode='QAbstractItemView.InternalMove'>
-          <Item args='Clock'/>
-          <Item args='CPU'/>
-          <Item args='File System'/>
-          <Item args='Google Calendar'/>
-          <Item args='Graphics Card'/>
-          <Item args='Network'/>
-          <Item args='Processes'/>
-          <Item args='Sensors'/>
-          <Item args='Weather'/>
+        <QListWidget id='pluginlist' dragDropMode='QAbstractItemView.InternalMove'>
+          <Connect dropEvent='pluginDropEvent' />
+          <Connect mouseReleaseEvent='pluginMouseReleaseEvent' />
         </QListWidget>
+        <Spacing args='5'/>
+        <QLabel text='Drag to reorder plugins.' property='[class,subtext]'/>
       </QWidget>
 
+      <!-- Settings -->
       <QWidget id='contents' layout='QVBoxLayout'>
         <QLabel text='Hi Dad!'/>
         <Stretch/>

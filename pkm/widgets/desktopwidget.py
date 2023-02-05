@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 
 
 class DesktopWidget(QTemplateWidget):
-    TMPL = join(dirname(__file__), 'tmpl', 'desktop.tmpl')
+    # TMPL = join(dirname(__file__), 'tmpl', 'desktop.tmpl')
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 
@@ -15,7 +15,6 @@ class DesktopWidget(QTemplateWidget):
         self.app = app
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
-        # self._init_toolbar_animation()
         self._init_rightclick_menu()
     
     def _init_rightclick_menu(self):

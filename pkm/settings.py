@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
 from pkm import APPNAME
-from pkm import log, utils
+from pkm import log, utils  # noqa
 from pkm.qtemplate import QTemplateWidget
+from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
 
 
 class SettingsWindow(QTemplateWidget):
     TMPL = join(dirname(__file__), 'tmpl', 'settings.tmpl')
+    # We need a custom signal for the dropEvent
+    # https://stackoverflow.com/a/62986558
+    _dropEventSignal = QtCore.Signal()
 
     def __init__(self, app):
         super(SettingsWindow, self).__init__()
@@ -16,26 +20,40 @@ class SettingsWindow(QTemplateWidget):
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setWindowModality(Qt.ApplicationModal)
         self.setWindowTitle(f'{APPNAME} Settings')
+        
+    def _init_pluginlist(self):
+        pluginlist = self.ids.pluginlist
+        pluginlist.clear()
+        # pluginlist.dropEvent = self.reorder_plugins
+        for name, plugin in self.app.plugins.items():
+            item = QtWidgets.QListWidgetItem(name)
+            item.setSizeHint(QtCore.QSize(80, 30))
+            pluginlist.addItem(item)
     
-    def toggle_listwidget(self):
-        listname = self.sender().property('toggle')
-        qlist = self.ids[listname]
-        currentlyexpanded = True  # qlist.maximumHeight > 0
-        log.info(listname)
-        if currentlyexpanded:
-            qlist.setMaximumHeight(0)
-        else:
-            qlist.setMaximumHeight(999)
+    def pluginDropEvent(self, event):
+        """ Reorder the plugins. """
+        log.info('Reorder the plugins.')
+        event.accept()
+
+    def pluginMouseReleaseEvent(self, event):
+        """ Display the selected plugin settings. """
+        log.info('Display the selected plugin settings.')
+        log.info(self.ids.pluginlist.selectedItems()[0].text())
+        log.info(event)
+        event.accept()
+    
+    def generalSettingsClicked(self):
+        log.info('Display General Settings.')
 
     def show(self):
-        super(SettingsWindow, self).show()
+        """ Show this settings window. """
+        self._init_pluginlist()
         utils.center_window(self)
-    
-    def close(self):
-        self.hide()
+        super(SettingsWindow, self).show()
 
     def closeEvent(self, event):
-        self.close()
+        """ Close this settings window. """
+        self.hide()
         event.ignore()
 
     # def __init__(self, parent=None):
@@ -59,60 +77,3 @@ class SettingsWindow(QTemplateWidget):
     # @QtCore.Property(type=list)
     # def dock_choices(self):
     #     return ['Left', 'Right']
-
-
-# from PySide6.QtWidgets import *
-# # Create a list widget with 3 different expandable sections, each with 3 list items inside
-# mylist = QListWidget()
-# item = QListWidgetItem('Section 1', mylist)
-# # Call setExpandable on the item
-# item.setExpandable(True)
-# # Create child 1
-# child1 = QListWidgetItem('Value 1', mylist)
-# # Set the parent of child 1 to item
-# child1.setParent(item)
-# # Create child 2
-# child2 = QListWidgetItem('Value 2', mylist)
-# # Set parent of child 2 to item
-# child2.setParent(item)
-# # Create child 3
-# child3 = QListWidgetItem('Value 3', mylist
-# # Set the parent of child 3 to item
-# child3.setParent(item)
- 
-# # Create a second list item
-# item2 = QListWidgetItem('Section 2', mylist)
-# # Call setExpandable on the item
-# item2.setExpandable(True)
-# # Create child 4
-# child4 = QListWidgetItem('Value 4', mylist)
-# # Set the parent of child 4 to item2
-# child4.setParent(item2)
-# # Create child 5
-# child5 = QListWidgetItem('Value 5', mylist)
-# # Set the parent of child 5 to item2
-# child5.setParent(item2)
-# # Create child 6
-# child6 = QListWidgetItem('Value 6', mylist)
-# # Set the parent of child 6 to item2
-# child6.setParent(item2)
- 
-# # Create a third list item
-# item3 = QListWidgetItem('Section 3', mylist)
-# # Call setExpandable on the item
-# item3.setExpandable(True)
-# # Create child 7
-# child7 = QListWidgetItem('Value 7', mylist)
-# # Set the parent of child 7 to item3
-# child7.setParent(item3)
-# # Create child 8
-# child8 = QListWidgetItem('Value 8', mylist)
-# # Set the parent of child 8 to item2
-# child8.setParent(item3)
-# # Create child 9
-# child9 = QListWidgetItem('Value 9', mylist)
-# # Set the parent of child 9 to item3
-# child9.setParent(item3)
- 
-# # Show the list
-# mylist.show()
