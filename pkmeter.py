@@ -23,7 +23,7 @@ class PKMeter(QtWidgets.QApplication):
         self._init_styles()                     # Load stylesheet and fonts
         self.settings = SettingsWindow(self)    # Settings window
         self.desktop = DesktopWidget(self)      # Main desktop window
-        self.desktop.show()
+        self.settings.show()
     
     def _init_application(self):
         # Application icon

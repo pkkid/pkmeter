@@ -1,20 +1,19 @@
 
-/* Default Application Styles */
+/* Default Styles */
 QWidget {
   font-family: 'Josefin Sans';
   font-size: 12px;
   background-color: #303030;
   color: #c5c5c5;
-  /* border: 1px solid rgba(255,0,0,0.1);  /* Debugging */
+  /* border: 1px solid rgba(255,0,0,0.2);  /* Debugging */
 }
 QLabel {
   background-color: rgba(0,0,0,0);
 }
 
-/* QMenu Styles */
+/* QMenu */
 QMenu {
   background-color: #222222;
-  /* color: #c5c5c5; */
 }
 QMenu::item {
   spacing: 3px;
@@ -27,23 +26,102 @@ QMenu::item:selected {
   background-color: #181818;
 }
 
+/* Scroll bars */
+QScrollBar:vertical {
+  border: 0px;
+  margin: 0px 0px;
+  width: 6px;
+  background: #222;
+}
+QScrollBar::handle:vertical {
+  background: #444;
+  min-height: 0px;
+  max-height: 0px;
+  border-radius: 3px;
+}
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+  height: 0px;
+  background: none;
+}
+
+
+/* QTitleBar */
+#titlebar #appicon {
+  border-image: url('resources/chart-box-custom.png') 0 0 0 0 stretch stretch;
+  min-width: 20px;
+  max-width: 20px;
+  min-height: 20px;
+  max-height: 20px;
+}
+#titlebar QLabel {
+  color: #eeeeee;
+  font-size: 14px;
+}
+#titlebar QPushButton {
+  font-family: 'Material Design Icons';
+  font-size: 20px;
+  border: rgba(0,0,0,0);
+  color: #c5c5c5;
+}
+#titlebar QPushButton:hover {
+  color: #ffffff;
+}
+
+/* Settings */
+#settings {
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+#settings #sidepanel QPushButton {
+  background-color: #222222;
+  padding: 8px;
+  border-radius: 3px;
+}
+#settings #sidepanel QPushButton:hover {
+  background-color: #181818;
+  color: #ffffff;
+}
+#settings #sidepanel {
+  width: 100px;
+  max-width: 170px;
+  min-width: 170px;
+}
+#settings #plugins {
+  border: 0px solid rgba(0,0,0,0);
+  background-color: #222222;
+  border-radius: 5px;
+  margin-top: 5px;
+  padding: 10px 5px;
+}
+#settings #contents {
+  /* background-color: #222222; */
+  border-radius: 5px;
+}
+#settings #contents QListWidgetItem {
+  color: #f00;
+}
+
+
 /* Desktop Widget Styles */
 #desktop {
   background-color: rgba(0,0,0,0.5);
   border-radius: 5px;
 }
 #desktop QLabel {
-  color: #fff;
+  color: #ffffff;
 }
 #desktop #toolbar QPushButton {
   border: rgba(0,0,0,0);
-  color: #fff;
+  color: #ffffff;
   font-family: 'Material Design Icons';
   font-size: 16px;
   margin: 0px;
 }
 #desktop #toolbar QPushButton:hover {
-  color: #ddd; 
+  color: #dddddd; 
 }
 
 

@@ -48,16 +48,13 @@ supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import inspect
 import re
-from os.path import basename
-from pkm import log, utils
-from PySide6 import QtWidgets
+from os.path import basename, join
+from pkm import ROOT, log, utils
+from PySide6 import QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from xml.etree import ElementTree
 
-QTWIDGETS = dict(inspect.getmembers(QtWidgets, inspect.isclass))
-QOBJECTS = {k:v for k,v in {**QTWIDGETS}.items() if k.startswith('Q')}
-QOBJECTS['Qt'] = Qt
-
+_QOBJECTS = {}
 REGEX_INT = re.compile(r'^\d+$')
 REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
 REGEX_LIST = re.compile(r'^\[.*?\]$')
@@ -71,21 +68,33 @@ class QTemplateWidget(QtWidgets.QWidget):
     DEFAULT_LAYOUT_MARGINS = None  # default values for qobj.layout().setContentsMargins()
     DEFAULT_LAYOUT_SPACING = None  # default values for qobj.layout().setSpacing()
     
-    def __init__(self):
-        super(QTemplateWidget, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(QTemplateWidget, self).__init__(*args, **kwargs)
         self.ids = utils.Bunch()
+        self._init_qobjects()
         self.load_template()
         
     def load_template(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
         if self.TMPL is not None:
-            log.info(f'Reading template file {basename(self.TMPL)} for {self.__class__.__name__}')
+            log.info(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
             tree = ElementTree.parse(self.TMPL)
             self._walk_elem(tree.getroot())
         elif self.TMPLSTR is not None:
-            log.info(f'Reading template string for {self.__class__.__name__}')
-            tree = ElementTree.fromstring(self.TMPLSTR)
-            self._walk_elem(tree.getroot())
+            log.info(f'Reading template for {self.__class__.__name__}')
+            root = ElementTree.fromstring(self.TMPLSTR)
+            self._walk_elem(root)
+    
+    def _init_qobjects(self):
+        """ Create a lookup to convert xml string to Qt objects. """
+        global _QOBJECTS
+        if not _QOBJECTS:
+            _QOBJECTS['Qt'] = Qt
+            modules = utils.load_modules(join(ROOT, 'pkm', 'widgets'))
+            modules = list(modules.values()) + [QtGui, QtWidgets]
+            for module in modules:
+                members = dict(inspect.getmembers(module, inspect.isclass))
+                _QOBJECTS.update({k:v for k,v in members.items() if k.startswith('Q')})
     
     def _walk_elem(self, elem, parent=None, indent=0):
         # Check this is a known tag
@@ -99,8 +108,8 @@ class QTemplateWidget(QtWidgets.QWidget):
         
     def _tag_qobject(self, elem, parent, indent):
         """ Creates a QObject and appends it to the layout of parent. """
-        if elem.tag in QOBJECTS:
-            qcls = utils.rget(QOBJECTS, elem.tag)
+        if elem.tag in _QOBJECTS:
+            qcls = utils.rget(_QOBJECTS, elem.tag)
             args = self._parse_value(elem.attrib.get('args', '[]'))
             args = [args] if not isinstance(args, list) else args
             qobj = self if parent is None else qcls(*args, parent=parent)
@@ -134,17 +143,19 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_spacing(self, elem, parent, indent):
         """ Adds a stretch tag to the layout, pushing other content away. """
         if elem.tag == 'Spacing':
-            size = int(elem.attrib.get('size', 1))
-            log.debug(f'{" "*indent}Spacing(size={size})')
-            parent.layout().addStretch(size)
+            args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = [args] if not isinstance(args, list) else args
+            log.debug(f'{" "*indent}Spacing')
+            parent.layout().addSpacing(*args)
             return True
 
     def _tag_stretch(self, elem, parent, indent):
         """ Adds a stretch tag to the layout, pushing other content away. """
         if elem.tag == 'Stretch':
-            ratio = int(elem.attrib.get('ratio', 1))
-            log.debug(f'{" "*indent}Stretch(ratio={ratio})')
-            parent.layout().addStretch(ratio)
+            args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = [args] if not isinstance(args, list) else args
+            log.debug(f'{" "*indent}Stretch')
+            parent.layout().addStretch(*args)
             return True
     
     def _tag_connect(self, elem, parent, indent):
@@ -170,6 +181,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _attr_id(self, qobj, attr, value, valuestr, indent):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
+            log.info(f'{" "*indent}setObjectName({value})')
             qobj.setObjectName(value)
             self.ids[value] = qobj
             return True
@@ -203,8 +215,8 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Takes a best guess converting a string value from the template
             to a native Python value.
         """
-        if value.split('.')[0] in QOBJECTS:
-            value = utils.rget(QOBJECTS, value)
+        if value.split('.')[0] in _QOBJECTS:
+            value = utils.rget(_QOBJECTS, value)
             return value() if callable(value) else value
         # if value.startswith('Qt.'): return getattr(Qt, value[3:])
         if value.lower() in ['true']: return True

@@ -4,7 +4,6 @@ from pkm import APPNAME
 from pkm import log, utils
 from pkm.qtemplate import QTemplateWidget
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QListWidgetItem
 
 
 class SettingsWindow(QTemplateWidget):
@@ -13,7 +12,8 @@ class SettingsWindow(QTemplateWidget):
     def __init__(self, app):
         super(SettingsWindow, self).__init__()
         self.app = app
-        self.setWindowFlags(Qt.Dialog)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setWindowModality(Qt.ApplicationModal)
         self.setWindowTitle(f'{APPNAME} Settings')
     
@@ -116,4 +116,3 @@ class SettingsWindow(QTemplateWidget):
  
 # # Show the list
 # mylist.show()
-
