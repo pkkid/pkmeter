@@ -8,3 +8,7 @@ class SettingsWidget(QTemplateWidget):
         <QLabel text='CPU Settings'/>
       </QWidget>
     """
+
+    def __init__(self, app, *args, **kwargs):
+        super(SettingsWidget, self).__init__(*args, **kwargs)
+        self.app = app

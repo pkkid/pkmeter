@@ -83,8 +83,8 @@ QScrollBar::sub-page:vertical {
   padding: 8px;
   border-radius: 3px;
 }
-#settings #sidepanel QPushButton[class='selected'],
-#settings #sidepanel QPushButton:hover {
+#settings #sidepanel QPushButton:hover,
+#settings #sidepanel QPushButton[class=selected] {
   background-color: #181818;
   color: #ffffff;
 }

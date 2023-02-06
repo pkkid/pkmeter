@@ -1,12 +1,14 @@
 
 <QWidget layout='QVBoxLayout' geometry='[0,0,600,500]'>
   <QWidget id='settings' layout='QVBoxLayout'>
-    <TitleBar/>
+    <TitleBar id='titlebar'/>
 
     <!-- Side Panel -->
-    <QWidget layout='QHBoxLayout' layout.contentsMargins='[0,0,0,0]' layout.spacing='20'>
-      <QWidget id='sidepanel' layout='QVBoxLayout' layout.contentsMargins='[0,0,0,0]' layout.spacing='0'>
-        <QPushButton text='General Preferences'>
+    <QWidget layout='QHBoxLayout'>
+      <Set layout.contentsMargins='[0,0,0,0]' layout.spacing='20' />
+      <QWidget id='sidepanel' layout='QVBoxLayout' >
+        <Set layout.contentsMargins='[0,0,0,0]' layout.spacing='0' />
+        <QPushButton id='generalbtn' text='General Preferences' property='[class,selected]'>
           <Connect clicked='generalSettingsClicked' />
         </QPushButton>
         <Spacing args='20'/>
@@ -20,8 +22,11 @@
       </QWidget>
 
       <!-- Settings -->
-      <QWidget id='contents' layout='QVBoxLayout'>
-        <QLabel text='Hi Dad!'/>
+      <QWidget id='contents-wrap' layout='QVBoxLayout'>
+        <Set layout.contentsMargins='[0,0,0,0]' layout.spacing='0' />
+        <QWidget id='contents' layout='QVBoxLayout'>
+          <Set layout.contentsMargins='[0,0,0,0]' />
+        </QWidget>
         <Stretch/>
       </QWidget>
     </QWidget>

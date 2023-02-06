@@ -3,11 +3,10 @@
 import os
 import signal
 import sys
-from os.path import dirname, join
 from argparse import ArgumentParser
 from PySide6 import QtGui, QtWidgets
 
-sys.path.append(dirname(__file__))
+sys.path.append(os.path.dirname(__file__))
 from pkm import APPNAME, ROOT
 from pkm import log, utils  # noqa
 from pkm.settings import SettingsWindow
@@ -26,40 +25,45 @@ class PKMeter(QtWidgets.QApplication):
     def _init_application(self):
         """ Setup the application environment. """
         # Application Icon
-        iconpath = join(ROOT, 'resources', 'chart-box-custom.png')
+        iconpath = os.path.join(ROOT, 'resources', 'chart-box-custom.png')
         self.setWindowIcon(QtGui.QIcon(iconpath))
         # Application fonts
-        resources = join(ROOT, 'resources')
+        resources = os.path.join(ROOT, 'resources')
         for filename in os.listdir(resources):
             if filename.endswith('.ttf'):
-                fontid = QtGui.QFontDatabase.addApplicationFont(join(resources, filename))
+                filepath = os.path.join(resources, filename)
+                fontid = QtGui.QFontDatabase.addApplicationFont(filepath)
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f"Loading font '{fontname}'")
         # Application stylesheet
-        stylesheet = open(join(ROOT, 'resources', 'styles.qss')).read()
+        stylepath = os.path.join(ROOT, 'resources', 'styles.qss')
+        stylesheet = open(stylepath).read()
         self.setStyleSheet(stylesheet)
     
     def _load_plugins(self):
         """ Find and load all plugins. """
-        plugins = utils.Bunch()
-        plugindir = join(ROOT, 'pkm', 'plugins')
-        for name in os.listdir(plugindir):
+        plugins = []
+        plugindir = os.path.join(ROOT, 'pkm', 'plugins')
+        for dirname in os.listdir(plugindir):
             try:
-                log.info(f"Loading {name} plugin")
-                plugin = utils.Bunch(widget=None, settings=None)
-                dirpath = join(plugindir, name)
+                log.info(f"Loading {dirname} plugin")
+                pluginid = utils.clean_name(dirname)
+                plugin = utils.Bunch(id=pluginid)
+                dirpath = os.path.join(plugindir, dirname)
                 if os.path.isdir(dirpath):
                     modules = utils.load_modules(dirpath)
                     for module in modules:
+                        if module.__name__ == 'settings':
+                            plugin.settings = module.SettingsWidget(self)
+                            plugin.settings.setObjectName(f'{pluginid}_settings')
                         if module.__name__ == 'widget':
                             plugin.widget = module.DesktopWidget(self)
-                        if module.__name__ == 'settings':
-                            plugin.settings = module.SettingsWidget()
+                            plugin.widget.setObjectName(f'{pluginid}_widget')
                 if plugin.widget is None:
-                    raise Exception(f'{name} plugin does not contain widget.py')
-                plugins[name] = plugin
+                    raise Exception(f'{dirname} plugin does not contain widget.py')
+                plugins.append(plugin)
             except Exception as err:
-                log.warning('Error loading plugin %s: %s', name, err)
+                log.warning('Error loading plugin %s: %s', dirname, err)
                 log.debug(err, exc_info=1)
         return plugins
 
@@ -75,8 +79,8 @@ class PKMeter(QtWidgets.QApplication):
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     parser = ArgumentParser(description=f'{APPNAME} - Desktop System Monitor')
-    parser.add_argument('--loglevel', default='INFO', help='Set the log level (DEBUG, INFO, WARN, ERROR).')
+    parser.add_argument('--debug', action='store_true', help='Enable debug logging.')
     opts = parser.parse_args()
-    if opts.loglevel:
-        log.setLevel(opts.loglevel)
+    if opts.debug:
+        log.setLevel('DEBUG')
     PKMeter.start(opts)

@@ -7,7 +7,7 @@ class TitleBar(QTemplateWidget):
     TMPLSTR = r"""
       <QWidget layout='QHBoxLayout' id='titlebar' layout.contentsMargins='[0,0,0,10]' layout.spacing='8'>
         <QLabel id='appicon'/>
-        <QLabel text='PKMeter Preferences' />
+        <QLabel id='title' />
         <Stretch />
         <QPushButton text='󰅖'>
           <Connect clicked='close'/>
@@ -20,6 +20,9 @@ class TitleBar(QTemplateWidget):
         self.mousepos = None
         self.widgetpos = None
     
+    def setTitle(self, title):
+        self.ids.title.setText(title)
+
     def close(self):
         self.parent().parent().close()
 

@@ -6,9 +6,14 @@ from PySide6.QtWidgets import QApplication
 
 class Bunch(dict):
     """ Allows dot notation to set and get dict values. """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__dict__ = self
+    def __getattr__(self, item):
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            return None
+
+    def __setattr__(self, item, value):
+        return self.__setitem__(item, value)
 
 
 def center_window(window):
@@ -21,6 +26,11 @@ def center_window(window):
     window.move(x, y)
 
 
+def clean_name(name):
+    """ Clean the specified name of non-variable characters. """
+    return "".join(c for c in name.lower() if c.isalnum() or c == "_")
+
+
 def load_modules(dirpath):
     """ Load and return modules in the specified directory. """
     modules = []
@@ -31,6 +41,14 @@ def load_modules(dirpath):
             log.warn('Error loading module %s: %s', name, err)
             log.debug(err, exc_info=1)
     return modules
+
+
+def setPropertyAndRedraw(qobj, name, value):
+    """ After setting a property on a QtWidget, redraw it. """
+    qobj.setProperty(name, value)
+    qobj.style().unpolish(qobj)
+    qobj.style().polish(qobj)
+    qobj.update()
 
 
 def rget(obj, attrstr, default='_raise', delim='.'):
