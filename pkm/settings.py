@@ -57,6 +57,7 @@ class SettingsWindow(QTemplateWidget):
         for i in range(layout.count()):
             item = layout.itemAt(i)
             item.widget().setVisible(False)
+        utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', '')
         # Display the newly selected plugin settings
         self.ids[f'{pluginid}_settings'].setVisible(True)
         # If the pluginid is general, delselect all items in the
@@ -64,9 +65,6 @@ class SettingsWindow(QTemplateWidget):
         if pluginid == GENERAL:
             self.ids.pluginlist.clearSelection()
             utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', 'selected')
-        else:
-            utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', '')
-        log.info(self.ids.generalbtn.property('class'))
 
     def pluginDropEvent(self, event):
         """ Reorder the plugins. """
