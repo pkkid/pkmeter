@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from os.path import dirname, join
+from os.path import dirname, normpath
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtGui
 from PySide6.QtCore import Qt
 
 
 class DesktopWidget(QTemplateWidget):
-    # TMPL = join(dirname(__file__), 'tmpl', 'desktop.tmpl')
+    # TMPL = normpath(f'{dirname(__file__)}/tmpl/desktop.tmpl')
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 

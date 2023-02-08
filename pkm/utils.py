@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import pkgutil
+import re
 from pkm import log
 from PySide6.QtWidgets import QApplication
+from string import Template
 
 
 class Bunch(dict):
@@ -49,6 +51,14 @@ def setPropertyAndRedraw(qobj, name, value):
     qobj.style().unpolish(qobj)
     qobj.style().polish(qobj)
     qobj.update()
+
+
+def render(tmplstr, context=None):
+    """ Read variables from the file. Poor mans template with constants. """
+    tmplvars = dict(re.findall(r"\$(\w+)\s*\=\s*'(.+?)'", tmplstr))
+    context = context if context else {}
+    context.update(tmplvars)
+    return Template(tmplstr).substitute(context)
 
 
 def rget(obj, attrstr, default='_raise', delim='.'):

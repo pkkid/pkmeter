@@ -1,17 +1,33 @@
-
 /*------------------------
-/* Default Styles
+/* Qt Widget Styles
+/* https://doc.qt.io/qt-6/stylesheet-reference.html
+/* https://github.com/morhetz/gruvbox
+/*
+/*  $primary        = '#458588'
+/*  $primarylight   = '#83a598'
+/*  $secondary      = '#333333'
+/*  $secondarylight = '#555555'
+/*  $secondarydark  = '#222222'
+/*  $primarytext    = '#f8f8f8'
+/*  $secondarytext  = '#c5c5c5'
+/*  $dimtext        = '#777777'
 /*------------------------*/
 QWidget {
+  color: $secondarytext;
   font-family: 'Josefin Sans';
-  font-size: 12px;
-  background-color: #303030;
-  color: #c5c5c5;
-  /* border: 1px solid rgba(255,0,0,0.2);  /* Debugging */
+  font-size: 13px;
 }
 QLabel {
   background-color: rgba(0,0,0,0);
 }
+QPushButton {
+  text-transform: none;
+  font-weight: normal;
+}
+QListWidget::item {
+  border-radius: 3px;
+}
+
 
 /* QMenu */
 QMenu {
@@ -26,6 +42,22 @@ QMenu::item {
 QMenu::item:selected {
   color: #ffffff;
   background-color: #181818;
+}
+
+/* QListWidget */
+QListWidget {
+  border: 0px solid rgba(0,0,0,0);
+  background-color: $secondarydark;
+  border-radius: 5px;
+  margin-top: 5px;
+  padding: 5px;
+  selection-color: #ffffff;
+  font-size: 13px;
+  outline: 0;
+}
+QListWidget::item:selected,
+QListWidget::item:hover {
+  background-color: $secondarylight;
 }
 
 /* Scroll bars */
@@ -45,30 +77,25 @@ QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical,
 QScrollBar::add-page:vertical,
 QScrollBar::sub-page:vertical {
-  height: 0px;
-  background: none;
+  /* height: 0px; */
+  /* background: none; */
 }
 
 /* QTitleBar */
 #titlebar #appicon {
-  border-image: url('resources/chart-box-custom.png') 0 0 0 0 stretch stretch;
+  border-image: url('resources/icons/chart-box.png') 0 0 0 0 stretch stretch;
   min-width: 20px;
   max-width: 20px;
   min-height: 20px;
   max-height: 20px;
 }
-#titlebar QLabel {
-  color: #eeeeee;
-  font-size: 14px;
-}
 #titlebar QPushButton {
-  font-family: 'Material Design Icons';
-  font-size: 20px;
   border: rgba(0,0,0,0);
-  color: #c5c5c5;
+  color: $secondarytext;
+  font-size: 18px;
 }
 #titlebar QPushButton:hover {
-  color: #ffffff;
+  color: $primarytext;
 }
 
 /*------------------------
@@ -77,45 +104,36 @@ QScrollBar::sub-page:vertical {
 #settings {
   border-radius: 8px;
   border: 1px solid #444;
+  background-color: $secondary;
+}
+#settings #sidepanel {
+  max-width: 190px;
+  min-width: 190px;
 }
 #settings #sidepanel QPushButton {
-  background-color: #222222;
+  background-color: $secondarydark;
   padding: 8px;
   border-radius: 3px;
 }
-#settings #sidepanel QPushButton:hover,
+#settings #sidepanel QPushButton:hover {
+  background-color: $secondarylight;
+}
 #settings #sidepanel QPushButton[class=selected] {
-  background-color: #181818;
-  color: #ffffff;
+  background-color: $secondarylight;
+  color: $primarytext;
 }
-#settings QWidget#sidepanel {
-  width: 100px;
-  max-width: 170px;
-  min-width: 170px;
-}
-#settings QListWidget#pluginlist {
-  border: 0px solid rgba(0,0,0,0);
-  background-color: #222222;
-  border-radius: 5px;
-  margin-top: 5px;
-  padding: 5px;
-  selection-color: #ffffff;
-  /* selection-background-color: #181818; */
-  font-size: 13px;
-  outline: 0;
-}
-#settings QListWidget#pluginlist::item:selected,
-#settings QListWidget#pluginlist::item:hover {
-  background-color: #181818;
-  border-radius: 3px;
-}
-#settings QWidget#contents {
-  /* background-color: #222222; */
-  border-radius: 5px;
+
+#settings QLabel#plugintitle {
+  /* font-size: 14px; */
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 #settings QLabel[class=subtext] {
   font-size: 10px;
-  color: #777777;
+  color: $dimtext;
+  padding-left: 2px;
+}
+#settings #content QLabel {
+  max-width: 100px;
 }
 
 
@@ -123,21 +141,21 @@ QScrollBar::sub-page:vertical {
 /* Desktop Windows
 /*------------------------*/
 #desktop {
-  background-color: rgba(0,0,0,0.5);
-  border-radius: 5px;
+  /* background-color: rgba(0,0,0,0.5); */
+  /* border-radius: 5px; */
 }
 #desktop QLabel {
-  color: #ffffff;
+  /* color: #ffffff; */
 }
 #desktop #toolbar QPushButton {
-  border: rgba(0,0,0,0);
-  color: #ffffff;
-  font-family: 'Material Design Icons';
-  font-size: 16px;
-  margin: 0px;
+  /* border: rgba(0,0,0,0); */
+  /* color: #ffffff; */
+  /* font-family: 'Material Design Icons'; */
+  /* font-size: 16px; */
+  /* margin: 0px; */
 }
 #desktop #toolbar QPushButton:hover {
-  color: #dddddd; 
+  /* color: #dddddd;  */
 }
 
 

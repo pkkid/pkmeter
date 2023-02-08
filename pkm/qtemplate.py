@@ -29,7 +29,7 @@ TAGS - When a new tag is found, the following are checked:
 
 ATTRIBUTES - When attributes are found, the following are checked:
 
-1. if the attribute is "args", the value(s) will be parsed and passed
+1. If the attribute is "args", the value(s) will be parsed and passed
    as constructor arguments to the class being created.
 2. if the attribute is "id", a reference to the created object will be added to
    self.ids for easier access to it from other Python functions. As well, the
@@ -48,7 +48,7 @@ supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import inspect
 import re
-from os.path import basename, join
+from os.path import basename, normpath
 from pkm import ROOT, log, utils
 from PySide6 import QtGui, QtWidgets
 from PySide6.QtCore import Qt
@@ -57,7 +57,7 @@ from xml.etree import ElementTree
 _QOBJECTS = {}
 REGEX_INT = re.compile(r'^\d+$')
 REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
-REGEX_LIST = re.compile(r'^\[.*?\]$')
+REGEX_LIST = re.compile(r'^\(.*?\)$')
 TRUEVALUES = ('yes', 'true', '1')
 
 
@@ -90,7 +90,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         global _QOBJECTS
         if not _QOBJECTS:
             _QOBJECTS['Qt'] = Qt
-            modules = utils.load_modules(join(ROOT, 'pkm', 'widgets'))
+            modules = utils.load_modules(normpath(f'{ROOT}/pkm/widgets'))
             modules += [QtGui, QtWidgets]
             for module in modules:
                 members = dict(inspect.getmembers(module, inspect.isclass))
@@ -110,7 +110,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Creates a QObject and appends it to the layout of parent. """
         if elem.tag in _QOBJECTS:
             qcls = utils.rget(_QOBJECTS, elem.tag)
-            args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = self._parse_value(elem.attrib.get('args', '()'))
             args = [args] if not isinstance(args, list) else args
             qobj = self if parent is None else qcls(*args, parent=parent)
             log.debug(f'{" "*indent}{qobj.__class__.__name__}')
@@ -126,7 +126,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Check we're adding an attribute to the parent. """
         addfunc = f'add{elem.tag}'
         if hasattr(parent, addfunc):
-            args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = self._parse_value(elem.attrib.get('args', '()'))
             args = [args] if not isinstance(args, list) else args
             log.debug(f'{" "*indent}{addfunc}(*{args})')
             getattr(parent, addfunc)(*args)
@@ -143,7 +143,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_spacing(self, elem, parent, indent):
         """ Adds a stretch tag to the layout, pushing other content away. """
         if elem.tag == 'Spacing':
-            args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = self._parse_value(elem.attrib.get('args', '()'))
             args = [args] if not isinstance(args, list) else args
             log.debug(f'{" "*indent}Spacing')
             parent.layout().addSpacing(*args)
@@ -152,7 +152,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_stretch(self, elem, parent, indent):
         """ Adds a stretch tag to the layout, pushing other content away. """
         if elem.tag == 'Stretch':
-            args = self._parse_value(elem.attrib.get('args', '[]'))
+            args = self._parse_value(elem.attrib.get('args', '()'))
             args = [args] if not isinstance(args, list) else args
             log.debug(f'{" "*indent}Stretch')
             parent.layout().addStretch(*args)
@@ -237,6 +237,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         if re.findall(REGEX_INT, value): return int(value)
         if re.findall(REGEX_FLOAT, value): return float(value)
         if re.findall(REGEX_LIST, value):
-            if value == '[]': return []
-            return [self._parse_value(x.strip()) for x in value.strip('[]').split(',')]
+            if value == '()': return []
+            return [self._parse_value(x.strip()) for x in value.strip('()').split(',')]
         return value

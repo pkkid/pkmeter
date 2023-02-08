@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-import os
-from pkm import APPNAME, log, utils  # noqa
+from os.path import dirname, normpath
+from pkm import ROOT, APPNAME, log, utils  # noqa
 from pkm.qtemplate import QTemplateWidget
-from pkm.widgets import generalsettings
+from pkm.widgets import preferences
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Qt
 
-GENERAL = 'general'  # General settings pluginid
+GENERAL = 'General'  # General settings pluginid
+ICONBLANK = '󰄱'  # checkbox-blank-outline
+ICONCHECK = '󰄵'  # checkbox-marked-outline
 
 
 class SettingsWindow(QTemplateWidget):
-    TMPL = os.path.join(os.path.dirname(__file__), 'tmpl', 'settings.tmpl')
+    TMPL = normpath(f'{dirname(__file__)}/tmpl/settings.tmpl')
     # We need a custom signal for the dropEvent
     # https://stackoverflow.com/a/62986558
     _dropEventSignal = QtCore.Signal()
@@ -23,42 +25,54 @@ class SettingsWindow(QTemplateWidget):
         self.setWindowModality(Qt.ApplicationModal)
         self.setWindowTitle(f'{APPNAME} Settings')
         self.ids.titlebar.setTitle(f'{APPNAME} Settings')
-        self._init_general_settings()
+        self._init_general_preferences()
     
     def show(self):
         """ Show this settings window. """
         self._init_plugins()
         utils.center_window(self)
+        self._show_settings_content(GENERAL)
         super(SettingsWindow, self).show()
         
-    def _init_general_settings(self):
+    def _init_general_preferences(self):
         """ Create the general settings widget. """
-        settings = generalsettings.SettingsWidget(self.app)
-        settings.setObjectName(f'{GENERAL}_settings')
-        self.ids[settings.objectName()] = settings
-        self.ids.contents.layout().addWidget(settings)
+        settings = preferences.SettingsWidget(self.app)
+        self._add_settings_content(GENERAL, settings)
 
     def _init_plugins(self):
         """ Initialize the plugins list and settings content. """
         pluginlist = self.ids.pluginlist
         pluginlist.clear()
-        for plugin in self.app.plugins:
-            item = QtWidgets.QListWidgetItem(plugin.widget.NAME)
+        for plugin in self.app.plugins.values():
+            item = QtWidgets.QListWidgetItem(f'{plugin.widget.NAME}')
             item.setData(Qt.UserRole, plugin.id)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Checked)
             item.setSizeHint(QtCore.QSize(80, 30))
             pluginlist.addItem(item)
-            self.ids[plugin.settings.objectName()] = plugin.settings
-            self.ids.contents.layout().addWidget(plugin.settings)
+            self._add_settings_content(plugin.id, plugin.settings)
+
+    def _add_settings_content(self, pluginid, settings):
+        """ Add settings content to the window. """
+        settings.setObjectName(f'{pluginid}_settings')
+        settings.layout().setContentsMargins(0,15,0,20)
+        self.ids[settings.objectName()] = settings
+        self.ids.content.layout().addWidget(settings)
+        settings.hide()
 
     def _show_settings_content(self, pluginid):
         """ Show the specified settings content. """
         # Hide all currently displayed settings
-        layout = self.ids.contents.layout()
+        layout = self.ids.content.layout()
         for i in range(layout.count()):
             item = layout.itemAt(i)
             item.widget().setVisible(False)
         utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', '')
         # Display the newly selected plugin settings
+        title = f'{GENERAL} Settings'
+        if pluginid in self.app.plugins:
+            title = f'{self.app.plugins[pluginid].name} Settings'
+        self.ids.plugintitle.setText(title)
         self.ids[f'{pluginid}_settings'].setVisible(True)
         # If the pluginid is general, delselect all items in the
         # QListWidget and set the button to be highlighted
@@ -75,10 +89,14 @@ class SettingsWindow(QTemplateWidget):
         """ Callback when a plugin listitem is clicked. """
         items = self.ids.pluginlist.selectedItems()
         if len(items):
-            item = self.ids.pluginlist.selectedItems()[0]
-            pluginid = item.data(Qt.UserRole)
-            self._show_settings_content(pluginid)
-            event.accept()
+            if event.pos().x() <= 22:
+                # Click was inside the checkmark, toggle the plugin
+                pass
+            else:
+                # Click was outside the checkmark, select the item
+                item = self.ids.pluginlist.selectedItems()[0]
+                pluginid = item.data(Qt.UserRole)
+                self._show_settings_content(pluginid)
     
     def generalSettingsClicked(self):
         """ Callback when the general settings button is clicked. """

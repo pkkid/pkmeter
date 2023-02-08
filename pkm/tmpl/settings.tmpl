@@ -1,14 +1,15 @@
 
-<QWidget layout='QVBoxLayout' geometry='[0,0,600,500]'>
-  <QWidget id='settings' layout='QVBoxLayout'>
+<QWidget layout='QVBoxLayout' geometry='(0,0,600,500)'>
+  <QWidget id='settings' layout='QVBoxLayout' layout.contentsMargins='(15,10,15,15)'>
     <TitleBar id='titlebar'/>
 
     <!-- Side Panel -->
-    <QWidget layout='QHBoxLayout'>
-      <Set layout.contentsMargins='[0,0,0,0]' layout.spacing='20' />
-      <QWidget id='sidepanel' layout='QVBoxLayout' >
-        <Set layout.contentsMargins='[0,0,0,0]' layout.spacing='0' />
-        <QPushButton id='generalbtn' text='General Preferences' property='[class,selected]'>
+    <QWidget layout='QHBoxLayout' layout.spacing='20'>
+      <Set layout.contentsMargins='(0,0,0,0)'/>
+      <QWidget id='sidepanel' layout='QVBoxLayout'>
+        <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
+        <QPushButton id='generalbtn' text='General Settings'>
+          <Set property='(class,selected)'/>
           <Connect clicked='generalSettingsClicked' />
         </QPushButton>
         <Spacing args='20'/>
@@ -18,14 +19,15 @@
           <Connect mouseReleaseEvent='pluginMouseReleaseEvent' />
         </QListWidget>
         <Spacing args='5'/>
-        <QLabel text='Drag to reorder plugins.' property='[class,subtext]'/>
+        <QLabel text='Drag to reorder plugins.' property='(class,subtext)'/>
       </QWidget>
 
       <!-- Settings -->
-      <QWidget id='contents-wrap' layout='QVBoxLayout'>
-        <Set layout.contentsMargins='[0,0,0,0]' layout.spacing='0' />
-        <QWidget id='contents' layout='QVBoxLayout'>
-          <Set layout.contentsMargins='[0,0,0,0]' />
+      <QWidget id='content-wrap' layout='QVBoxLayout'>
+        <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0' />
+        <QLabel id='plugintitle' />
+        <QWidget id='content' layout='QVBoxLayout'>
+          <Set layout.contentsMargins='(0,0,0,0)' />
         </QWidget>
         <Stretch/>
       </QWidget>

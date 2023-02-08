@@ -2,17 +2,33 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "2.0.0",
-  "tasks": [{
-    "label": "Run",
-    "type": "shell",
-    "command": "python.exe .\\pkmeter.py",
-    "presentation": {
-      "echo": true,
-      "reveal": "always",
-      "focus": false,
-      "panel": "shared",
-      "showReuseMessage": false,
-      "clear": true
+  "tasks": [
+    {
+      "label": "Run",
+      "type": "shell",
+      "command": "python.exe ./pkmeter.py",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "View Qt-Material Theme",
+      "type": "shell",
+      "command": "code C:/Users/michael/Sources/qt-material/examples/full_features/main_window.ui && cd C:/Users/michael/Sources/qt-material/examples/full_features/ && python.exe main.py --pyside6; cd -",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
     }
-  }]
+  ]
 }

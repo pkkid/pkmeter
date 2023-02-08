@@ -3,10 +3,11 @@
 import os
 import signal
 import sys
+from os.path import dirname, isdir, normpath
 from argparse import ArgumentParser
 from PySide6 import QtGui, QtWidgets
 
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(dirname(__file__))
 from pkm import APPNAME, ROOT
 from pkm import log, utils  # noqa
 from pkm.settings import SettingsWindow
@@ -24,46 +25,45 @@ class PKMeter(QtWidgets.QApplication):
     
     def _init_application(self):
         """ Setup the application environment. """
-        # Application Icon
-        iconpath = os.path.join(ROOT, 'resources', 'chart-box-custom.png')
-        self.setWindowIcon(QtGui.QIcon(iconpath))
         # Application fonts
-        resources = os.path.join(ROOT, 'resources')
+        resources = normpath(f'{ROOT}/resources')
         for filename in os.listdir(resources):
             if filename.endswith('.ttf'):
-                filepath = os.path.join(resources, filename)
+                filepath = normpath(f'{resources}/{filename}')
                 fontid = QtGui.QFontDatabase.addApplicationFont(filepath)
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f"Loading font '{fontname}'")
         # Application stylesheet
-        stylepath = os.path.join(ROOT, 'resources', 'styles.qss')
-        stylesheet = open(stylepath).read()
-        self.setStyleSheet(stylesheet)
+        styles = open(normpath(f'{ROOT}/resources/styles.qss')).read()
+        if opts.outline:
+            styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
+        self.setStyleSheet(utils.render(styles))
     
     def _load_plugins(self):
         """ Find and load all plugins. """
-        plugins = []
-        plugindir = os.path.join(ROOT, 'pkm', 'plugins')
-        for dirname in os.listdir(plugindir):
+        plugins = {}
+        plugindir = normpath(f'{ROOT}/pkm/plugins')
+        for dir in os.listdir(plugindir):
             try:
-                log.info(f"Loading {dirname} plugin")
-                pluginid = utils.clean_name(dirname)
+                log.info(f"Loading {dir} plugin")
+                pluginid = utils.clean_name(dir)
                 plugin = utils.Bunch(id=pluginid)
-                dirpath = os.path.join(plugindir, dirname)
-                if os.path.isdir(dirpath):
+                dirpath = normpath(f'{plugindir}/{dir}')
+                if isdir(dirpath):
                     modules = utils.load_modules(dirpath)
                     for module in modules:
                         if module.__name__ == 'settings':
                             plugin.settings = module.SettingsWidget(self)
-                            plugin.settings.setObjectName(f'{pluginid}_settings')
+                            # plugin.settings.setObjectName(f'{pluginid}_settings')
                         if module.__name__ == 'widget':
                             plugin.widget = module.DesktopWidget(self)
                             plugin.widget.setObjectName(f'{pluginid}_widget')
+                            plugin.name = plugin.widget.NAME
                 if plugin.widget is None:
-                    raise Exception(f'{dirname} plugin does not contain widget.py')
-                plugins.append(plugin)
+                    raise Exception(f'{dir} plugin does not contain widget.py')
+                plugins[pluginid] = plugin
             except Exception as err:
-                log.warning('Error loading plugin %s: %s', dirname, err)
+                log.warning('Error loading plugin %s: %s', dir, err)
                 log.debug(err, exc_info=1)
         return plugins
 
@@ -80,6 +80,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     parser = ArgumentParser(description=f'{APPNAME} - Desktop System Monitor')
     parser.add_argument('--debug', action='store_true', help='Enable debug logging.')
+    parser.add_argument('--outline', action='store_true', help='Add outline to QWidgets')
     opts = parser.parse_args()
     if opts.debug:
         log.setLevel('DEBUG')
