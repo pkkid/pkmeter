@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
-from pkm import ROOT, APPNAME, log, utils  # noqa
+from pkm import APPDATA, APPNAME, log, utils
 from pkm.qtemplate import QTemplateWidget
-from pkm.widgets import preferences
+from pkm.widgets import generalsettings
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSettings, Qt
 
 GENERAL = 'General'  # General settings pluginid
 ICONBLANK = '󰄱'  # checkbox-blank-outline
@@ -13,9 +13,6 @@ ICONCHECK = '󰄵'  # checkbox-marked-outline
 
 class SettingsWindow(QTemplateWidget):
     TMPL = normpath(f'{dirname(__file__)}/tmpl/settings.tmpl')
-    # We need a custom signal for the dropEvent
-    # https://stackoverflow.com/a/62986558
-    _dropEventSignal = QtCore.Signal()
 
     def __init__(self, app):
         super(SettingsWindow, self).__init__()
@@ -25,6 +22,7 @@ class SettingsWindow(QTemplateWidget):
         self.setWindowModality(Qt.ApplicationModal)
         self.setWindowTitle(f'{APPNAME} Settings')
         self.ids.titlebar.setTitle(f'{APPNAME} Settings')
+        self._init_settings_storage()
         self._init_general_preferences()
     
     def show(self):
@@ -34,10 +32,16 @@ class SettingsWindow(QTemplateWidget):
         self._show_settings_content(GENERAL)
         super(SettingsWindow, self).show()
         
+    def _init_settings_storage(self):
+        """ Initialize the settings storage file. """
+        self.storage = QSettings(QSettings.IniFormat, QSettings.UserScope, APPNAME, APPNAME.lower())
+        self.storage.setPath(QSettings.IniFormat, QSettings.UserScope, str(APPDATA))
+        log.info(f'Settings storage: {self.storage.fileName()}')
+
     def _init_general_preferences(self):
         """ Create the general settings widget. """
-        settings = preferences.SettingsWidget(self.app)
-        self._add_settings_content(GENERAL, settings)
+        widget = generalsettings.SettingsWidget(self.app)
+        self._add_settings_content(GENERAL, widget)
 
     def _init_plugins(self):
         """ Initialize the plugins list and settings content. """
@@ -52,13 +56,13 @@ class SettingsWindow(QTemplateWidget):
             pluginlist.addItem(item)
             self._add_settings_content(plugin.id, plugin.settings)
 
-    def _add_settings_content(self, pluginid, settings):
+    def _add_settings_content(self, pluginid, widget):
         """ Add settings content to the window. """
-        settings.setObjectName(f'{pluginid}_settings')
-        settings.layout().setContentsMargins(0,15,0,20)
-        self.ids[settings.objectName()] = settings
-        self.ids.content.layout().addWidget(settings)
-        settings.hide()
+        widget.setObjectName(f'{pluginid}_settings')
+        widget.layout().setContentsMargins(0,15,0,20)
+        self.ids[widget.objectName()] = widget
+        self.ids.content.layout().addWidget(widget)
+        widget.hide()
 
     def _show_settings_content(self, pluginid):
         """ Show the specified settings content. """
@@ -117,14 +121,3 @@ class SettingsWindow(QTemplateWidget):
     # # @QtCore.Property(str, constant=True)
     # # def name(self):
     # #     return "Hi Dad!"
-
-    # @QtCore.Property(type=list)
-    # def monitor_choices(self):
-    #     choices = []
-    #     for i, screen in enumerate(self.parent.app.screens()):
-    #         choices.append({'value':0, 'text':f'#{i} ({screen.name()})'})
-    #     return choices
-
-    # @QtCore.Property(type=list)
-    # def dock_choices(self):
-    #     return ['Left', 'Right']
