@@ -11,18 +11,6 @@ APPNAME = 'PKMeter'
 ROOT = dirname(dirname(__file__))
 APPDATA = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
 
-# Color Theme
-THEME = {
-    'primary': '#458588',
-    'primarylight': '#83a598',
-    'secondary': '#282828',
-    'secondarylight': '#3c3836',
-    'secondarydark': '#1d2021',
-    'primarytext': '#fbf1c7',
-    'secondarytext': '#bdae93',
-    'dimtext': '#a89984',
-}
-
 # Logging Configuration
 log = logging.getLogger('pkm')
 logfile = normpath(f'{APPDATA}/{APPNAME}/pkmeter.log')

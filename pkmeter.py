@@ -34,6 +34,7 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f"Loading font '{fontname}'")
         # Application stylesheet
+        self.setStyle('Fusion')
         styles = open(normpath(f'{ROOT}/resources/styles.qss')).read()
         if opts.outline:
             styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
@@ -69,8 +70,7 @@ class PKMeter(QtWidgets.QApplication):
 
     @classmethod
     def start(cls, opts):
-        log.info('---')
-        log.info(f'Starting {APPNAME} application')
+        log.info(f'--- Starting {APPNAME} application ---')
         app = PKMeter(opts)
         app.exec()
         log.info('Quitting.')
