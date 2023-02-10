@@ -47,7 +47,6 @@ sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import inspect
-import re
 from os.path import basename, normpath
 from pkm import ROOT, log, utils
 from PySide6 import QtGui, QtWidgets
@@ -55,10 +54,6 @@ from PySide6.QtCore import Qt
 from xml.etree import ElementTree
 
 _QOBJECTS = {}
-REGEX_INT = re.compile(r'^\d+$')
-REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
-REGEX_LIST = re.compile(r'^\(.*?\)$')
-TRUEVALUES = ('yes', 'true', '1')
 
 
 class QTemplateWidget(QtWidgets.QWidget):
@@ -110,8 +105,8 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Creates a QObject and appends it to the layout of parent. """
         if elem.tag in _QOBJECTS:
             qcls = utils.rget(_QOBJECTS, elem.tag)
-            args = self._parse_value(elem.attrib.get('args', '()'))
-            args = [args] if not isinstance(args, list) else args
+            args = self._evaluate(elem.attrib.get('args', '()'))
+            args = [args] if not isinstance(args, (list,tuple)) else args
             qobj = self if parent is None else qcls(*args, parent=parent)
             log.debug(f'{" "*indent}{qobj.__class__.__name__}')
             self._apply_attrs(qobj, elem, indent+1)
@@ -126,7 +121,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Check we're adding an attribute to the parent. """
         addfunc = f'add{elem.tag}'
         if hasattr(parent, addfunc):
-            args = self._parse_value(elem.attrib.get('args', '()'))
+            args = self._evaluate(elem.attrib.get('args', '()'))
             args = [args] if not isinstance(args, list) else args
             log.debug(f'{" "*indent}{addfunc}(*{args})')
             getattr(parent, addfunc)(*args)
@@ -143,8 +138,8 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_spacing(self, elem, parent, indent):
         """ Adds a stretch tag to the layout, pushing other content away. """
         if elem.tag == 'Spacing':
-            args = self._parse_value(elem.attrib.get('args', '()'))
-            args = [args] if not isinstance(args, list) else args
+            args = self._evaluate(elem.attrib.get('args', utils.EMPTY_TUPLE))
+            args = [args] if not isinstance(args, (list, tuple)) else args
             log.debug(f'{" "*indent}Spacing')
             parent.layout().addSpacing(*args)
             return True
@@ -152,8 +147,8 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_stretch(self, elem, parent, indent):
         """ Adds a stretch tag to the layout, pushing other content away. """
         if elem.tag == 'Stretch':
-            args = self._parse_value(elem.attrib.get('args', '()'))
-            args = [args] if not isinstance(args, list) else args
+            args = self._evaluate(elem.attrib.get('args', utils.EMPTY_TUPLE))
+            args = [args] if not isinstance(args, (list, tuple)) else args
             log.debug(f'{" "*indent}Stretch')
             parent.layout().addStretch(*args)
             return True
@@ -184,7 +179,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
             if attr == 'args': continue
-            value = self._parse_value(valuestr)
+            value = self._evaluate(valuestr)
             if self._attr_id(qobj, attr, value, valuestr, indent): continue             # id='myobject'
             if self._attr_layout(qobj, attr, value, valuestr, indent): continue         # layout.<attr>='value'
             if self._attr_set(qobj, attr, value, valuestr, indent): continue            # attr='value'
@@ -217,26 +212,12 @@ class QTemplateWidget(QtWidgets.QWidget):
         setattr = f'set{attr[0].upper()}{attr[1:]}'
         if hasattr(qobj, setattr):
             log.debug(f'{" "*indent}{setattr}({valuestr})')
-            if isinstance(value, list):
+            if isinstance(value, (list, tuple)):
                 getattr(qobj, setattr)(*value)
                 return True
             getattr(qobj, setattr)(value)
             return True
     
-    def _parse_value(self, value):
-        """ Takes a best guess converting a string value from the template
-            to a native Python value.
-        """
-        if value.split('.')[0] in _QOBJECTS:
-            value = utils.rget(_QOBJECTS, value)
-            return value() if callable(value) else value
-        # if value.startswith('Qt.'): return getattr(Qt, value[3:])
-        if value.lower() in ['true']: return True
-        if value.lower() in ['false']: return False
-        if value.lower() in ['none']: return None
-        if re.findall(REGEX_INT, value): return int(value)
-        if re.findall(REGEX_FLOAT, value): return float(value)
-        if re.findall(REGEX_LIST, value):
-            if value == '()': return []
-            return [self._parse_value(x.strip()) for x in value.strip('()').split(',')]
-        return value
+    def _evaluate(self, expr):
+        """  Evaluate a given expression and return the result. """
+        return utils.evaluate(expr, context=_QOBJECTS, call=True)
