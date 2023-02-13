@@ -16,8 +16,8 @@ class DataStore(dict):
             cls.instance = super(DataStore, cls).__new__(cls, *args, **kwargs)
         return cls.instance
     
-    def register(self, obj, method, item, value, default=None):
-        log.info(f'register({item}, {value})')
+    def register(self, elem, attr, qobj):
+        log.info(f'register({elem.tag}, {attr}, {qobj})')
 
     def update(self, item, value):
         super(DataStore, self).__setattr__(item, value)

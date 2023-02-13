@@ -80,8 +80,11 @@ class QTemplateWidget(QtWidgets.QWidget):
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
+        else:
+            raise Exception('TMPL or TMPLSTR are both not set.')
         context = self._init_context()
         self._walk_elem(root, context=context)
+        self._current = None
 
     def _init_context(self):
         """ Create a lookup to convert xml string to Qt objects. """
@@ -103,10 +106,10 @@ class QTemplateWidget(QtWidgets.QWidget):
             registers the current self._obj to be updated each time the
             data attribute value changes.
         """
-        log.info('READING DATA')
         if self._current:
             elem, attr, qobj = self._current
             log.info(f'register {elem}, {attr}, {elem.attrib[attr]}, {qobj}')
+            self._data.register(elem, attr, qobj)
             # self._data.register()
         return self._data
     
@@ -115,15 +118,13 @@ class QTemplateWidget(QtWidgets.QWidget):
         if self._tag_repeater(elem, parent, context, indent): return   # Check this is a repeater
         if self._tag_set(elem, parent, context, indent): return        # <set attr='value' />; no children
         if self._tag_add(elem, parent, context, indent): return        # add<Tag>(attr=value)
-        if self._tag_spacing(elem, parent, context, indent): return    # <spacing size='1' />; no children
-        if self._tag_stretch(elem, parent, context, indent): return    # <stretch ratio='1' />; no children
         if self._tag_connect(elem, parent, context, indent): return    # <connect slot='callback' />; no children
         raise Exception(f'Unknown tag "{elem.tag}" in element {parent.__class__.__name__}.')
     
     def _tag_repeater(self, elem, parent, context, indent):
-        if elem.tag == 'Repeater':
+        if elem.tag == Repeater.__name__:
             qobj = Repeater(self, elem, parent, context)
-            qobj.createChildren(indent)
+            self._apply_attrs(qobj, elem, context, indent+1)
             return True
 
     def _tag_qobject(self, elem, parent, context, indent):
@@ -144,10 +145,11 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _tag_add(self, elem, parent, context, indent):
         """ Check we're adding an attribute to the parent. """
         addfunc = f'add{elem.tag}'
-        if hasattr(parent, addfunc):
+        callback = getattr(parent, addfunc, getattr(parent.layout(), addfunc, None))
+        if callback:
             args = self._attr_args(elem, context, indent)
             log.debug(f'{" "*indent}{addfunc}(*{args})')
-            getattr(parent, addfunc)(*args)
+            callback(*args)
             return True
 
     def _tag_set(self, elem, parent, context, indent):
@@ -156,22 +158,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         """
         if elem.tag.lower() == 'set':
             self._apply_attrs(parent, elem, context, indent)
-            return True
-    
-    def _tag_spacing(self, elem, parent, context, indent):
-        """ Adds a stretch tag to the layout, pushing other content away. """
-        if elem.tag == 'Spacing':
-            args = self._attr_args(elem, context, indent)
-            log.debug(f'{" "*indent}Spacing')
-            parent.layout().addSpacing(*args)
-            return True
-
-    def _tag_stretch(self, elem, parent, context, indent):
-        """ Adds a stretch tag to the layout, pushing other content away. """
-        if elem.tag == 'Stretch':
-            args = self._attr_args(elem, context, indent)
-            log.debug(f'{" "*indent}Stretch')
-            parent.layout().addStretch(*args)
             return True
     
     def _tag_connect(self, elem, parent, context, indent):
@@ -237,7 +223,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Calls set<attr>(<value>) on the qbject. """
         setattr = f'set{attr[0].upper()}{attr[1:]}'
         if hasattr(qobj, setattr):
-            log.debug(f'{" "*indent}{setattr}')
+            log.debug(f'{" "*indent}{setattr}({elem.attrib.get(attr,"")})')
             if isinstance(value, (list, tuple)):
                 getattr(qobj, setattr)(*value)
                 return True
@@ -250,20 +236,28 @@ class QTemplateWidget(QtWidgets.QWidget):
 
 
 class Repeater:
-    """ Widget-like object used for repeatng child elements in QTemplate. """
+    """ Widget-like object used for repeatng child elements in QTemplate.
+        <Repeater for='i in 3'>
+          <..children../>
+        </Repeater>
+    """
 
     def __init__(self, qtmpl, elem, parent, context):
-        self.qtmpl = qtmpl
-        self.elem = elem
-        self.parent = parent
-        self.context = context
+        self.qtmpl = qtmpl          # Ref to parent QTemplateWidget object
+        self.elem = elem            # Current etree item to render children
+        self.parent = parent        # Parent qobj to add children to
+        self.context = context      # Context for building the children
     
-    def createChildren(self, indent=None):
-        varname = self.elem.attrib['var']
-        valuestr = self.elem.attrib['for']
-        value = self.qtmpl._evaluate(valuestr, self.context)
+    def setFor(self, valuestr):
+        """ Rebuild the children elements on the parent. """
+        # Delete all children of the parent
+        utils.deleteChildren(self.parent)
+        # Build the new template objects
+        varname, iterstr = [x.strip() for x in valuestr.split('in')]
+        log.info(f'{varname=} {iterstr=}')
+        value = self.qtmpl._evaluate(iterstr, self.context)
         iter = range(value) if isinstance(value, int) else value
-        for x in iter:
+        for item in iter:
             for echild in self.elem:
-                subcontext = dict(**self.context, **{varname:x})
-                self.qtmpl._walk_elem(echild, self.parent, subcontext, indent)
+                subcontext = dict(**self.context, **{varname:item})
+                self.qtmpl._walk_elem(echild, self.parent, subcontext)

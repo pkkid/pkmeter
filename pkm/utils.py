@@ -62,6 +62,20 @@ def setPropertyAndRedraw(qobj, name, value):
     qobj.update()
 
 
+def deleteChildren(qobj):
+    """ Delete all children of the specified QObject. """
+    if hasattr(qobj, 'clear'):
+        return qobj.clear()
+    layout = qobj.layout()
+    while layout.count():
+        item = layout.takeAt(0)
+        widget = item.widget()
+        if widget:
+            widget.deleteLater()
+        else:
+            deleteChildren(item.layout())
+
+
 def render(tmplstr, context=None):
     """ Read variables from the file. Poor mans template with constants. """
     tmplvars = dict(re.findall(r"\$(\w+)\s*\=\s*'(.+?)'", tmplstr))
