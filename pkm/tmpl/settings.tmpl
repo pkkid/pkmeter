@@ -1,7 +1,12 @@
 
 <QWidget layout='QVBoxLayout' geometry='(0,0,600,500)'>
+  <Set attribute='Qt.WA_TranslucentBackground'/>
+  <Set layout.contentsMargins='(0,0,0,0)'/>
+  <Set windowFlags='Qt.Dialog | Qt.FramelessWindowHint'/>
+  <Set windowModality='Qt.ApplicationModal'/>
+  <Set windowTitle='APPNAME+" Settings"'/>
   <QWidget id='settings' layout='QVBoxLayout' layout.contentsMargins='(15,10,15,15)'>
-    <TitleBar id='titlebar'/>
+    <TitleBar id='titlebar' title='APPNAME+" Settings"'/>
 
     <!-- Side Panel -->
     <QWidget layout='QHBoxLayout' layout.spacing='20'>

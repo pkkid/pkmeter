@@ -17,11 +17,6 @@ class SettingsWindow(QTemplateWidget):
     def __init__(self, app):
         super(SettingsWindow, self).__init__()
         self.app = app
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
-        self.setWindowModality(Qt.ApplicationModal)
-        self.setWindowTitle(f'{APPNAME} Settings')
-        self.ids.titlebar.setTitle(f'{APPNAME} Settings')
         self._init_settings_storage()
         self._init_general_preferences()
     
@@ -110,14 +105,3 @@ class SettingsWindow(QTemplateWidget):
         """ Close this settings window. """
         self.hide()
         event.ignore()
-
-    # def __init__(self, parent=None):
-    #     super().__init__(parent)
-    #     self.parent = parent
-    #     self._settings = QSettings(QSettings.IniFormat, QSettings.UserScope, APPNAME, APPNAME.lower())
-    #     self._settings.setPath(QSettings.IniFormat, QSettings.UserScope, str(APPDATA))
-    #     log.info(f'Settings location: {self._settings.fileName()}')
-    
-    # # @QtCore.Property(str, constant=True)
-    # # def name(self):
-    # #     return "Hi Dad!"

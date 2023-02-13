@@ -8,6 +8,7 @@ from string import Template
 
 REGEX_INT = re.compile(r'^\d+$')
 REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
+REGEX_STRING = re.compile(r'^".+?"$')
 START_LIST, END_LIST, REGEX_LIST = '[', ']', re.compile(r'^\[.*?\]$')
 START_TUPLE, END_TUPLE, REGEX_TUPLE = '(', ')', re.compile(r'^\(.*?\)$')
 EMPTY_LIST, EMPTY_TUPLE = f'{START_LIST}{END_LIST}', f'{START_TUPLE}{END_TUPLE}'
@@ -108,18 +109,18 @@ def evaluate(expr, context=None, call=True):
 
 def tokenize_expression(expr):
     """ Tokenize a given expression into a list of tokens. """
-    tokens = []
-    current_token = ''
+    tokens = []     # List of resulting tokens
+    token = ''      # Reference to current token
     for char in expr:
         if char in OPS.keys():
-            if current_token:
-                tokens.append(current_token.strip())
-                current_token = ''
+            if token:
+                tokens.append(token.strip())
+                token = ''
             tokens.append(char)
             continue
-        current_token += char
-    if current_token:
-        tokens.append(current_token.strip())
+        token += char
+    if token:
+        tokens.append(token.strip())
     return [t for t in tokens if t]
 
 
@@ -134,6 +135,7 @@ def parse_values(tokens, context=None, call=True):
         elif tokens[i].lower() in ('null', 'none'): tokens[i] = None
         elif re.findall(REGEX_INT, tokens[i]): tokens[i] = int(tokens[i])
         elif re.findall(REGEX_FLOAT, tokens[i]): tokens[i] = float(tokens[i])
+        elif re.findall(REGEX_STRING, tokens[i]): tokens[i] = tokens[i][1:-1]
         # Build the object or call the function
         if call and callable(tokens[i]):
             tokens[i] = tokens[i]()
