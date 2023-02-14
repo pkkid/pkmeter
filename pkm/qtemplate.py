@@ -47,7 +47,6 @@ sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import inspect
-from copy import deepcopy
 from os.path import basename, normpath
 from pkm import APPNAME, ROOT, log, utils
 from pkm.datastore import DataStore
@@ -67,8 +66,8 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
-        self._current = None          # Current elem, attr, qobj applying attrs
-        self._data = DataStore()      # Data store can register and apply updates to the ui
+        self._loading = False
+        self.data = DataStore()      # Data store can register and apply updates to the ui
         self.ids = utils.Bunch()
         self.load_template()
         
@@ -80,11 +79,11 @@ class QTemplateWidget(QtWidgets.QWidget):
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
-        else:
-            raise Exception('TMPL or TMPLSTR are both not set.')
+        self._loading = True
         context = self._init_context()
         self._walk_elem(root, context=context)
-        self._current = None
+        self._loading = False
+        self.data._loading = None
 
     def _init_context(self):
         """ Create a lookup to convert xml string to Qt objects. """
@@ -99,19 +98,6 @@ class QTemplateWidget(QtWidgets.QWidget):
                 members = dict(inspect.getmembers(module, inspect.isclass))
                 _GLOBAL_CONTEXT.update({k:v for k,v in members.items()})
         return dict(**_GLOBAL_CONTEXT, **{'data':self.data})
-    
-    @property
-    def data(self):
-        """ Special data property that can be used in the context that
-            registers the current self._obj to be updated each time the
-            data attribute value changes.
-        """
-        if self._current:
-            elem, attr, qobj = self._current
-            log.info(f'register {elem}, {attr}, {elem.attrib[attr]}, {qobj}')
-            self._data.register(elem, attr, qobj)
-            # self._data.register()
-        return self._data
     
     def _walk_elem(self, elem, parent=None, context=None, indent=0):
         if self._tag_qobject(elem, parent, context, indent): return    # <QWidget attr='value' />
@@ -186,10 +172,11 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
             if attr == 'args': continue
+            if attr.startswith('_'): continue
             value = self._evaluate(valuestr, context)
-            if self._attr_id(qobj, elem, attr, value, context, indent): continue      # id='myobject'
-            if self._attr_layout(qobj, elem, attr, value, context, indent): continue  # layout.<attr>='value'
-            if self._attr_set(qobj, elem, attr, value, context, indent): continue     # attr='value'
+            if self._attr_id(qobj, elem, attr, context, value, indent): continue      # id='myobject'
+            if self._attr_layout(qobj, elem, attr, context, value, indent): continue  # layout.<attr>='value'
+            if self._attr_set(qobj, elem, attr, context, value, indent): continue     # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
 
     def _attr_args(self, elem, context, indent):
@@ -197,7 +184,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         args = self._evaluate(args, context)
         return [args] if not isinstance(args, (list,tuple)) else args
 
-    def _attr_id(self, qobj, elem, attr, value, context, indent):
+    def _attr_id(self, qobj, elem, attr, context, value, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
             log.debug(f'{" "*indent}setObjectName({value})')
@@ -205,23 +192,25 @@ class QTemplateWidget(QtWidgets.QWidget):
             self.ids[value] = qobj
             return True
     
-    def _attr_layout(self, qobj, elem, attr, value, context, indent):
+    def _attr_layout(self, qobj, elem, attr, context, value, indent=0):
         """ Sets the layout or layout.property(). Also reads the DEFAULT_LAYOUT_*
             properties on the class and applies those if specified.
         """
         if attr == 'layout':
-            self._attr_set(qobj, elem, attr, value, context, indent)
+            self._attr_set(qobj, elem, attr, context, value, indent=0)
             if self.DEFAULT_LAYOUT_MARGINS is not None:
                 qobj.layout().setContentsMargins(*self.DEFAULT_LAYOUT_MARGINS)
             if self.DEFAULT_LAYOUT_SPACING is not None:
                 qobj.layout().setSpacing(self.DEFAULT_LAYOUT_SPACING)
             return True
         if attr.startswith('layout.'):
-            return self._attr_set(qobj.layout(), elem, attr[7:], value, context, indent)
+            return self._attr_set(qobj.layout(), elem, attr[7:], context, value, indent)
 
-    def _attr_set(self, qobj, elem, attr, value, context, indent):
+    def _attr_set(self, qobj, elem, attr, context, value, indent=0):
         """ Calls set<attr>(<value>) on the qbject. """
         setattr = f'set{attr[0].upper()}{attr[1:]}'
+        if self._loading:
+            self.data._loading = self, qobj, elem, attr, context
         if hasattr(qobj, setattr):
             log.debug(f'{" "*indent}{setattr}({elem.attrib.get(attr,"")})')
             if isinstance(value, (list, tuple)):
@@ -253,9 +242,10 @@ class Repeater:
         # Delete all children of the parent
         utils.deleteChildren(self.parent)
         # Build the new template objects
-        varname, iterstr = [x.strip() for x in valuestr.split('in')]
-        log.info(f'{varname=} {iterstr=}')
-        value = self.qtmpl._evaluate(iterstr, self.context)
+        varname, iterstr = [x.strip() for x in valuestr.split(' in ')]
+        value = self.qtmpl._evaluate(iterstr, self.context) or 0
+        if isinstance(value, str):
+            raise Exception(f"Lookup iterstr '{iterstr}' failed.")
         iter = range(value) if isinstance(value, int) else value
         for item in iter:
             for echild in self.elem:

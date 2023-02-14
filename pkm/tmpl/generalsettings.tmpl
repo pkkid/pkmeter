@@ -3,8 +3,8 @@
   <QWidget layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)'>
     <QLabel text='Monitor'/>
     <QComboBox>
-      <Repeater for='i in 3'>
-        <Item args='Hi Mom!'/>
+      <Repeater for='monitor in data.generalsettings.monitors'>
+        <Item args='monitor.text'/>
       </Repeater>
     </QComboBox>
   </QWidget>

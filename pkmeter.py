@@ -55,10 +55,8 @@ class PKMeter(QtWidgets.QApplication):
                     for module in modules:
                         if module.__name__ == 'settings':
                             plugin.settings = module.SettingsWidget(self)
-                            # plugin.settings.setObjectName(f'{pluginid}_settings')
                         if module.__name__ == 'widget':
                             plugin.widget = module.DesktopWidget(self)
-                            plugin.widget.setObjectName(f'{pluginid}_widget')
                             plugin.name = plugin.widget.NAME
                 if plugin.widget is None:
                     raise Exception(f'{dir} plugin does not contain widget.py')

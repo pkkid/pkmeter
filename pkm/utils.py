@@ -86,19 +86,34 @@ def render(tmplstr, context=None):
 
 def rget(obj, attrstr, default='_raise', delim='.'):
     """ Recursively get a value from a nested dictionary. """
+    from pkm.datastore import DataStore
     try:
         parts = attrstr.split(delim, 1)
         attr = parts[0]
-        attrstr = parts[1] if len(parts) == 2 else None
-        if isinstance(obj, dict): value = obj[attr]
+        substr = parts[1] if len(parts) == 2 else None
+        if isinstance(obj, DataStore): return obj.get(attrstr)
+        elif isinstance(obj, dict): value = obj[attr]
         elif isinstance(obj, list): value = obj[int(attr)]
         elif isinstance(obj, tuple): value = obj[int(attr)]
         elif isinstance(obj, object): value = getattr(obj, attr)
-        if attrstr: return rget(value, attrstr, default, delim)
+        if substr: return rget(value, substr, default, delim)
         return value
     except Exception:
         if default == '_raise': raise
         return default
+
+
+def rset(obj, attrstr, value, delim='.'):
+    """ Recursively set a value to a nested dictionary. """
+    parts = attrstr.split(delim, 1)
+    attr = parts[0]
+    attrstr = parts[1] if len(parts) == 2 else None
+    if attrstr and not isinstance(getattr(obj, attr), Bunch):
+        obj[attr] = Bunch()
+    if attrstr:
+        rset(obj[attr], attrstr, value)
+        return
+    obj[attr] = value
 
 
 def evaluate(expr, context=None, call=True):
