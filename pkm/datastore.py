@@ -6,7 +6,7 @@ from pkm import log, utils
 Sync = namedtuple('Callback', ('qtmpl', 'qobj', 'elem', 'attr', 'context'))
 
 
-class DataStore(object):
+class DataStore(dict):
 
     def __init__(self, *args, **kwargs):
         super(DataStore, self).__init__(*args, **kwargs)
@@ -18,19 +18,16 @@ class DataStore(object):
         if not hasattr(cls, 'instance'):
             cls.instance = super(DataStore, cls).__new__(cls, *args, **kwargs)
         return cls.instance
-
-    def get(self, item, default=None):
+    
+    def __getitem__(self, item):
         if self._loading:
             self.register(Sync(*self._loading))
-        log.info(f'get({item=})')
-        result = utils.rget(self._data, item, default=default)
-        log.info(f'{result=}')
-        return result
+        return self._data.get(item)
     
     def register(self, sync):
         valuestr = sync.elem.attrib.get(sync.attr, '')
         valuestr = valuestr.split(' in ')[1] if ' in ' in valuestr else valuestr
-        tokens = utils.tokenize_expression(valuestr)
+        tokens = utils.tokenize(valuestr)
         tokens = [t[5:] for t in tokens if t.startswith('data.')]
         for token in tokens:
             log.info(f'register[{token}].append({sync.elem.tag}, {sync.attr})')
@@ -41,9 +38,7 @@ class DataStore(object):
         utils.rset(self._data, item, value)
         keys = sorted(k for k in self._registry.keys() if k.startswith(item))
         for key in keys:
-            log.info(f'{key=}')
             for qtmpl, qobj, elem, attr, context in self._registry[key]:
                 valuestr = elem.attrib[attr]
-                log.info(f'{valuestr=}')
                 value = qtmpl._evaluate(valuestr, context)
                 qtmpl._attr_set(qobj, elem, attr, context, value)

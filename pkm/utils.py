@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import operator as op
 import pkgutil
 import re
 from pkm import log
@@ -12,7 +11,11 @@ REGEX_STRING = re.compile(r'^".+?"$')
 START_LIST, END_LIST, REGEX_LIST = '[', ']', re.compile(r'^\[.*?\]$')
 START_TUPLE, END_TUPLE, REGEX_TUPLE = '(', ')', re.compile(r'^\(.*?\)$')
 EMPTY_LIST, EMPTY_TUPLE = f'{START_LIST}{END_LIST}', f'{START_TUPLE}{END_TUPLE}'
-OPS = {'|':op.or_, '&':op.and_, '+':op.add, '-':op.sub, '*':op.mul, '/':op.truediv}
+OPS = {
+    '&': lambda a, b: a & b,
+    '|': lambda a, b: a | b,
+    '||': lambda a, b: a or b,
+}
 
 
 class Bunch(dict):
@@ -84,22 +87,20 @@ def render(tmplstr, context=None):
     return Template(tmplstr).substitute(context)
 
 
-def rget(obj, attrstr, default='_raise', delim='.'):
+def rget(obj, attrstr, default=None, delim='.'):
     """ Recursively get a value from a nested dictionary. """
-    from pkm.datastore import DataStore
     try:
         parts = attrstr.split(delim, 1)
         attr = parts[0]
         substr = parts[1] if len(parts) == 2 else None
-        if isinstance(obj, DataStore): return obj.get(attrstr)
-        elif isinstance(obj, dict): value = obj[attr]
+        if isinstance(obj, dict): value = obj[attr]
         elif isinstance(obj, list): value = obj[int(attr)]
         elif isinstance(obj, tuple): value = obj[int(attr)]
         elif isinstance(obj, object): value = getattr(obj, attr)
         if substr: return rget(value, substr, default, delim)
         return value
-    except Exception:
-        if default == '_raise': raise
+    except Exception as err:
+        log.warning(err)
         return default
 
 
@@ -129,28 +130,30 @@ def evaluate(expr, context=None, call=True):
     if re.findall(REGEX_TUPLE, expr):
         if expr == EMPTY_TUPLE: return tuple()
         return tuple(evaluate(x.strip(), context) for x in expr.strip('()').split(','))
-    tokens = tokenize_expression(expr)
+    tokens = tokenize(expr, OPS)
     tokens = parse_values(tokens, context, call)
     while len(tokens) > 1:
         tokens = [OPS[tokens[1]](tokens[0], tokens[2])] + tokens[3:]
     return tokens[0]
 
 
-def tokenize_expression(expr):
+def tokenize(expr, ops=OPS):
     """ Tokenize a given expression into a list of tokens. """
-    tokens = []     # List of resulting tokens
-    token = ''      # Reference to current token
-    for char in expr:
-        if char in OPS.keys():
-            if token:
-                tokens.append(token.strip())
+    tokens = []
+    token, i = '', 0
+    while i < len(expr):
+        for op in sorted(ops, key=len, reverse=True):
+            if expr[i:].startswith(op):
+                tokens.append(token)
+                tokens.append(op)
                 token = ''
-            tokens.append(char)
-            continue
-        token += char
+                i += len(op)
+                continue
+        token += expr[i]
+        i += 1
     if token:
         tokens.append(token.strip())
-    return [t for t in tokens if t]
+    return [t.strip() for t in tokens if t]
 
 
 def parse_values(tokens, context=None, call=True):
