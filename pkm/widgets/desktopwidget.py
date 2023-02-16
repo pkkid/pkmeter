@@ -15,9 +15,9 @@ class DesktopWidget(QTemplateWidget):
         self.app = app
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
-        self._init_rightclick_menu()
+        self._initRightclickMenu()
     
-    def _init_rightclick_menu(self):
+    def _initRightclickMenu(self):
         self.addAction(QtGui.QAction('Preferences', self, triggered=self.app.settings.show))
         self.addAction(QtGui.QAction('Quit', self, triggered=self.app.quit))
         self.setContextMenuPolicy(Qt.ActionsContextMenu)

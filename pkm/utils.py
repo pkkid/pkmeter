@@ -30,7 +30,7 @@ class Bunch(dict):
         return self.__setitem__(item, value)
 
 
-def center_window(window):
+def centerWindow(window):
     """ Move the specified widget to the center of the screen. """
     screen = QApplication.primaryScreen()
     screen_rect = screen.availableGeometry()
@@ -40,12 +40,12 @@ def center_window(window):
     window.move(x, y)
 
 
-def clean_name(name):
+def cleanName(name):
     """ Clean the specified name of non-variable characters. """
     return "".join(c for c in name.lower() if c.isalnum() or c == "_")
 
 
-def load_modules(dirpath):
+def loadModules(dirpath):
     """ Load and return modules in the specified directory. """
     modules = []
     for loader, name, ispkg in pkgutil.iter_modules([dirpath]):
@@ -131,7 +131,7 @@ def evaluate(expr, context=None, call=True):
         if expr == EMPTY_TUPLE: return tuple()
         return tuple(evaluate(x.strip(), context) for x in expr.strip('()').split(','))
     tokens = tokenize(expr, OPS)
-    tokens = parse_values(tokens, context, call)
+    tokens = parseValues(tokens, context, call)
     while len(tokens) > 1:
         tokens = [OPS[tokens[1]](tokens[0], tokens[2])] + tokens[3:]
     return tokens[0]
@@ -156,7 +156,7 @@ def tokenize(expr, ops=OPS):
     return [t.strip() for t in tokens if t]
 
 
-def parse_values(tokens, context=None, call=True):
+def parseValues(tokens, context=None, call=True):
     """ Parse the values of a list of tokens and return the updated list. """
     context = context or {}
     for i in range(len(tokens)):

@@ -17,28 +17,28 @@ class SettingsWindow(QTemplateWidget):
     def __init__(self, app):
         super(SettingsWindow, self).__init__()
         self.app = app
-        self._init_settings_storage()
-        self._init_general_preferences()
+        self._initSettingsStorage()
+        self._initGeneralPreferences()
     
     def show(self):
         """ Show this settings window. """
-        self._init_plugins()
-        utils.center_window(self)
-        self._show_settings_content(GENERAL)
+        self._initPlugins()
+        utils.centerWindow(self)
+        self._showSettingsContent(GENERAL)
         super(SettingsWindow, self).show()
         
-    def _init_settings_storage(self):
+    def _initSettingsStorage(self):
         """ Initialize the settings storage file. """
         self.storage = QSettings(QSettings.IniFormat, QSettings.UserScope, APPNAME, APPNAME.lower())
         self.storage.setPath(QSettings.IniFormat, QSettings.UserScope, str(APPDATA))
         log.info(f'Settings storage: {self.storage.fileName()}')
 
-    def _init_general_preferences(self):
+    def _initGeneralPreferences(self):
         """ Create the general settings widget. """
         widget = generalsettings.SettingsWidget(self.app)
-        self._add_settings_content(GENERAL, widget)
+        self._addSettingsContent(GENERAL, widget)
 
-    def _init_plugins(self):
+    def _initPlugins(self):
         """ Initialize the plugins list and settings content. """
         pluginlist = self.ids.pluginlist
         pluginlist.clear()
@@ -49,9 +49,9 @@ class SettingsWindow(QTemplateWidget):
             item.setCheckState(Qt.Checked)
             item.setSizeHint(QtCore.QSize(80, 30))
             pluginlist.addItem(item)
-            self._add_settings_content(plugin.id, plugin.settings)
+            self._addSettingsContent(plugin.id, plugin.settings)
 
-    def _add_settings_content(self, pluginid, widget):
+    def _addSettingsContent(self, pluginid, widget):
         """ Add settings content to the window. """
         widget.setObjectName(f'{pluginid}_settings')
         widget.layout().setContentsMargins(0,15,0,20)
@@ -59,7 +59,7 @@ class SettingsWindow(QTemplateWidget):
         self.ids.content.layout().addWidget(widget)
         widget.hide()
 
-    def _show_settings_content(self, pluginid):
+    def _showSettingsContent(self, pluginid):
         """ Show the specified settings content. """
         # Hide all currently displayed settings
         layout = self.ids.content.layout()
@@ -95,11 +95,11 @@ class SettingsWindow(QTemplateWidget):
                 # Click was outside the checkmark, select the item
                 item = self.ids.pluginlist.selectedItems()[0]
                 pluginid = item.data(Qt.UserRole)
-                self._show_settings_content(pluginid)
+                self._showSettingsContent(pluginid)
     
     def generalSettingsClicked(self):
         """ Callback when the general settings button is clicked. """
-        self._show_settings_content(GENERAL)
+        self._showSettingsContent(GENERAL)
 
     def closeEvent(self, event):
         """ Close this settings window. """

@@ -41,4 +41,4 @@ class DataStore(dict):
             for qtmpl, qobj, elem, attr, context in self._registry[key]:
                 valuestr = elem.attrib[attr]
                 value = qtmpl._evaluate(valuestr, context)
-                qtmpl._attr_set(qobj, elem, attr, context, value)
+                qtmpl._attrSet(qobj, elem, attr, context, value)

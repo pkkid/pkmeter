@@ -18,12 +18,12 @@ class PKMeter(QtWidgets.QApplication):
     def __init__(self, opts):
         super(PKMeter, self).__init__()
         self.opts = opts                        # Command line options
-        self._init_application()                # Setup OS environment
+        self._initApplication()                # Setup OS environment
         self.settings = SettingsWindow(self)    # Settings window
-        self.plugins = self._load_plugins()     # Find and load plugins
+        self.plugins = self._loadPlugins()     # Find and load plugins
         self.settings.show()
     
-    def _init_application(self):
+    def _initApplication(self):
         """ Setup the application environment. """
         # Application fonts
         resources = normpath(f'{ROOT}/resources')
@@ -40,18 +40,18 @@ class PKMeter(QtWidgets.QApplication):
             styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
         self.setStyleSheet(utils.render(styles))
     
-    def _load_plugins(self):
+    def _loadPlugins(self):
         """ Find and load all plugins. """
         plugins = {}
         plugindir = normpath(f'{ROOT}/pkm/plugins')
         for dir in os.listdir(plugindir):
             try:
                 log.info(f"Loading {dir} plugin")
-                pluginid = utils.clean_name(dir)
+                pluginid = utils.cleanName(dir)
                 plugin = utils.Bunch(id=pluginid)
                 dirpath = normpath(f'{plugindir}/{dir}')
                 if isdir(dirpath):
-                    modules = utils.load_modules(dirpath)
+                    modules = utils.loadModules(dirpath)
                     for module in modules:
                         if module.__name__ == 'settings':
                             plugin.settings = module.SettingsWidget(self)

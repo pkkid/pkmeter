@@ -8,7 +8,16 @@ what makes this app different from the other solutions out there:
 * Available for Windows and Linux
 
 
-### Licensing
+## Common Questions
+
+**Why are you using camelCase and not following PEP8 guidelines?**
+
+This project heavily uses and integrates with PySide6 using the Qt library. It
+was decided to conform to their style so that the API variable names directly
+match with the provided interface provided by Qt.
+
+
+## Licensing
 PKMeter is available under under both Open Source (LGPLv3/GPLv2) licenses.
 
 PySide6 is available under both Open Source (LGPLv3/GPLv2) and commercial license. Using PyPi is the recommended installation source, because the content of the wheels is valid for both cases. For more information, refer to the Qt Licensing page.

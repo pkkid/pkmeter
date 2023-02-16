@@ -10,9 +10,9 @@ class SettingsWidget(QTemplateWidget):
     def __init__(self, app, *args, **kwargs):
         super(SettingsWidget, self).__init__(*args, **kwargs)
         self.app = app
-        self._init_data()
+        self._initData()
     
-    def _init_data(self):
+    def _initData(self):
         monitors = []
         for i, screen in enumerate(self.app.screens()):
             monitor = utils.Bunch()

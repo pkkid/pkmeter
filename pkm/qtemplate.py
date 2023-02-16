@@ -69,9 +69,9 @@ class QTemplateWidget(QtWidgets.QWidget):
         self._loading = False
         self.data = DataStore()      # Data store can register and apply updates to the ui
         self.ids = utils.Bunch()
-        self.load_template()
-        
-    def load_template(self, filepath=TMPL):
+        self.loadTemplate()
+
+    def loadTemplate(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
         if self.TMPL is not None:
             log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
@@ -80,12 +80,12 @@ class QTemplateWidget(QtWidgets.QWidget):
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
         self._loading = True
-        context = self._init_context()
-        self._walk_elem(root, context=context)
+        context = self._initContext()
+        self._walkElem(root, context=context)
         self._loading = False
         self.data._loading = None
 
-    def _init_context(self):
+    def _initContext(self):
         """ Create a lookup to convert xml string to Qt objects. """
         global _GLOBAL_CONTEXT
         if not _GLOBAL_CONTEXT:
@@ -93,60 +93,60 @@ class QTemplateWidget(QtWidgets.QWidget):
             _GLOBAL_CONTEXT = {'APPNAME':APPNAME, 'Qt':Qt}
             # Load everything within a few modules
             modules = [QtGui, QtWidgets]
-            modules += utils.load_modules(normpath(f'{ROOT}/pkm/widgets'))
+            modules += utils.loadModules(normpath(f'{ROOT}/pkm/widgets'))
             for module in modules:
                 members = dict(inspect.getmembers(module, inspect.isclass))
                 _GLOBAL_CONTEXT.update({k:v for k,v in members.items()})
         return dict(**_GLOBAL_CONTEXT, **{'data':self.data})
     
-    def _walk_elem(self, elem, parent=None, context=None, indent=0):
-        if self._tag_qobject(elem, parent, context, indent): return    # <QWidget attr='value' />
-        if self._tag_repeater(elem, parent, context, indent): return   # Check this is a repeater
-        if self._tag_set(elem, parent, context, indent): return        # <set attr='value' />; no children
-        if self._tag_add(elem, parent, context, indent): return        # add<Tag>(attr=value)
-        if self._tag_connect(elem, parent, context, indent): return    # <connect slot='callback' />; no children
+    def _walkElem(self, elem, parent=None, context=None, indent=0):
+        if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />
+        if self._tagRepeater(elem, parent, context, indent): return   # Check this is a repeater
+        if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
+        if self._tagAdd(elem, parent, context, indent): return        # add<Tag>(attr=value)
+        if self._tagConnect(elem, parent, context, indent): return    # <connect slot='callback' />; no children
         raise Exception(f'Unknown tag "{elem.tag}" in element {parent.__class__.__name__}.')
     
-    def _tag_repeater(self, elem, parent, context, indent):
+    def _tagRepeater(self, elem, parent, context, indent):
         if elem.tag == Repeater.__name__:
             qobj = Repeater(self, elem, parent, context)
-            self._apply_attrs(qobj, elem, context, indent+1)
+            self._applyAttrs(qobj, elem, context, indent+1)
             return True
 
-    def _tag_qobject(self, elem, parent, context, indent):
+    def _tagQobject(self, elem, parent, context, indent):
         """ Creates a QObject and appends it to the layout of parent. """
         if elem.tag in context:
             qcls = utils.rget(context, elem.tag)
-            args = self._attr_args(elem, context, indent)
+            args = self._attrArgs(elem, context, indent)
             qobj = self if parent is None else qcls(*args, parent=parent)
             log.debug(f'{" "*indent}{qobj.__class__.__name__}')
-            self._apply_attrs(qobj, elem, context, indent+1)
+            self._applyAttrs(qobj, elem, context, indent+1)
             if parent is not None:
                 parent.layout().addWidget(qobj)
             # Keep iterating the template
             for echild in elem:
-                self._walk_elem(echild, qobj, context, indent+1)
+                self._walkElem(echild, qobj, context, indent+1)
             return True
     
-    def _tag_add(self, elem, parent, context, indent):
+    def _tagAdd(self, elem, parent, context, indent):
         """ Check we're adding an attribute to the parent. """
         addfunc = f'add{elem.tag}'
         callback = getattr(parent, addfunc, getattr(parent.layout(), addfunc, None))
         if callback:
-            args = self._attr_args(elem, context, indent)
+            args = self._attrArgs(elem, context, indent)
             log.debug(f'{" "*indent}{addfunc}(*{args})')
             callback(*args)
             return True
 
-    def _tag_set(self, elem, parent, context, indent):
+    def _tagSet(self, elem, parent, context, indent):
         """ Reads attributes of a Set tag and applies values by calling
             set<attr>(<value>) on the parent Qt object.
         """
         if elem.tag.lower() == 'set':
-            self._apply_attrs(parent, elem, context, indent)
+            self._applyAttrs(parent, elem, context, indent)
             return True
     
-    def _tag_connect(self, elem, parent, context, indent):
+    def _tagConnect(self, elem, parent, context, indent):
         """ Reads attributes of a Connect tag, and sets the callback
             for the specified attribute name to self.<value>().
         """
@@ -168,23 +168,23 @@ class QTemplateWidget(QtWidgets.QWidget):
                     setattr(parent, attr, _eventHandler)
             return True
 
-    def _apply_attrs(self, qobj, elem, context, indent=0):
+    def _applyAttrs(self, qobj, elem, context, indent=0):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
             if attr == 'args': continue
             if attr.startswith('_'): continue
             value = self._evaluate(valuestr, context)
-            if self._attr_id(qobj, elem, attr, context, value, indent): continue      # id='myobject'
-            if self._attr_layout(qobj, elem, attr, context, value, indent): continue  # layout.<attr>='value'
-            if self._attr_set(qobj, elem, attr, context, value, indent): continue     # attr='value'
+            if self._attrId(qobj, elem, attr, context, value, indent): continue      # id='myobject'
+            if self._attrLayout(qobj, elem, attr, context, value, indent): continue  # layout.<attr>='value'
+            if self._attrSet(qobj, elem, attr, context, value, indent): continue     # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
 
-    def _attr_args(self, elem, context, indent):
+    def _attrArgs(self, elem, context, indent):
         args = elem.attrib.get('args', '()')
         args = self._evaluate(args, context)
         return [args] if not isinstance(args, (list,tuple)) else args
 
-    def _attr_id(self, qobj, elem, attr, context, value, indent=0):
+    def _attrId(self, qobj, elem, attr, context, value, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
             log.debug(f'{" "*indent}setObjectName({value})')
@@ -192,21 +192,21 @@ class QTemplateWidget(QtWidgets.QWidget):
             self.ids[value] = qobj
             return True
     
-    def _attr_layout(self, qobj, elem, attr, context, value, indent=0):
+    def _attrLayout(self, qobj, elem, attr, context, value, indent=0):
         """ Sets the layout or layout.property(). Also reads the DEFAULT_LAYOUT_*
             properties on the class and applies those if specified.
         """
         if attr == 'layout':
-            self._attr_set(qobj, elem, attr, context, value, indent=0)
+            self._attrSet(qobj, elem, attr, context, value, indent=0)
             if self.DEFAULT_LAYOUT_MARGINS is not None:
                 qobj.layout().setContentsMargins(*self.DEFAULT_LAYOUT_MARGINS)
             if self.DEFAULT_LAYOUT_SPACING is not None:
                 qobj.layout().setSpacing(self.DEFAULT_LAYOUT_SPACING)
             return True
         if attr.startswith('layout.'):
-            return self._attr_set(qobj.layout(), elem, attr[7:], context, value, indent)
+            return self._attrSet(qobj.layout(), elem, attr[7:], context, value, indent)
 
-    def _attr_set(self, qobj, elem, attr, context, value, indent=0):
+    def _attrSet(self, qobj, elem, attr, context, value, indent=0):
         """ Calls set<attr>(<value>) on the qbject. """
         setattr = f'set{attr[0].upper()}{attr[1:]}'
         if self._loading:
@@ -250,4 +250,4 @@ class Repeater:
         for item in iter:
             for echild in self.elem:
                 subcontext = dict(**self.context, **{varname:item})
-                self.qtmpl._walk_elem(echild, self.parent, subcontext)
+                self.qtmpl._walkElem(echild, self.parent, subcontext)
