@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from pkm import ROOT, utils
-from pkm.datastore import DataStore
+from pkm import ROOT, utils, log
 from pkm.qtemplate import QTemplateWidget
 
 
@@ -22,6 +21,15 @@ class SettingsWidget(QTemplateWidget):
             monitors.append(monitor)
         self.data.update('generalsettings.monitors', monitors)
     
-    # @QtCore.Property(type=list)
-    # def position_choices(self):
-    #     return ['Left', 'Right']
+    def setValue(self, key, value):
+        """ Save a settigns value. """
+        log.info(f'Saving generalsettings/{key} = {value}')
+        # self.app.settings.storage.setValue(f'generalsettings/{key}', value)
+
+    def setMonitor(self, index):
+        """ Save new monitor value. """
+        self.setValue('monitor', 'Hi Mom!')
+
+    def setPosition(self, index):
+        """ Save the new position value. """
+        self.setValue('position', 'Hi Dad!')

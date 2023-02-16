@@ -1,15 +1,25 @@
 
 <QWidget layout='QVBoxLayout' layout.spacing='20'>
+
+  <!-- Monitor -->
   <QWidget layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)'>
     <QLabel text='Monitor'/>
     <QComboBox>
+      <Connect currentIndexChanged='setMonitor'/>
       <Repeater for='monitor in data.generalsettings.monitors'>
         <Item args='monitor.text'/>
       </Repeater>
     </QComboBox>
   </QWidget>
+  
+  <!-- Position -->
   <QWidget layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)'>
     <QLabel text='Position'/>
-    <QComboBox/>
+    <QComboBox>
+      <Connect currentIndexChanged='setPosition'/>
+      <Item args='Left'/>
+      <Item args='Right'/>
+    </QComboBox>
   </QWidget>
+
 </QWidget>
