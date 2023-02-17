@@ -66,12 +66,19 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
+        self._loaded = False            # Set True once template loaded, typically on first show()
         self._loading = False
         self.data = DataStore()      # Data store can register and apply updates to the ui
         self.ids = utils.Bunch()
-        self.loadTemplate()
+        self._load()
 
-    def loadTemplate(self, filepath=TMPL):
+    # def show(self):
+    #     if not self._loaded:
+    #         self._load()
+    #         self._loaded = True
+    #     super(QTemplateWidget, self).show()
+
+    def _load(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
         if self.TMPL is not None:
             log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
@@ -81,7 +88,7 @@ class QTemplateWidget(QtWidgets.QWidget):
             root = ElementTree.fromstring(self.TMPLSTR)
         self._loading = True
         context = self._initContext()
-        self._walkElem(root, context=context)
+        self._walk(root, context=context)
         self._loading = False
         self.data._loading = None
 
@@ -99,7 +106,7 @@ class QTemplateWidget(QtWidgets.QWidget):
                 _GLOBAL_CONTEXT.update({k:v for k,v in members.items()})
         return dict(**_GLOBAL_CONTEXT, **{'data':self.data})
     
-    def _walkElem(self, elem, parent=None, context=None, indent=0):
+    def _walk(self, elem, parent=None, context=None, indent=0):
         if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />
         if self._tagRepeater(elem, parent, context, indent): return   # Check this is a repeater
         if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
@@ -125,7 +132,7 @@ class QTemplateWidget(QtWidgets.QWidget):
                 parent.layout().addWidget(qobj)
             # Keep iterating the template
             for echild in elem:
-                self._walkElem(echild, qobj, context, indent+1)
+                self._walk(echild, qobj, context, indent+1)
             return True
     
     def _tagAdd(self, elem, parent, context, indent):
@@ -250,4 +257,4 @@ class Repeater:
         for item in iter:
             for echild in self.elem:
                 subcontext = dict(**self.context, **{varname:item})
-                self.qtmpl._walkElem(echild, self.parent, subcontext)
+                self.qtmpl._walk(echild, self.parent, subcontext)

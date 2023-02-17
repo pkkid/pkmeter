@@ -5,7 +5,7 @@ from pkm.qtemplate import QTemplateWidget
 
 
 class SettingsWidget(QTemplateWidget):
-    TMPL = os.path.normpath(f'{ROOT}/pkm/tmpl/generalsettings.tmpl')
+    TMPL = os.path.normpath(f'{ROOT}/pkm/tmpl/gensettings.tmpl')
 
     def __init__(self, app, *args, **kwargs):
         super(SettingsWidget, self).__init__(*args, **kwargs)
