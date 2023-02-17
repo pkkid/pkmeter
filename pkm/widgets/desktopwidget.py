@@ -10,12 +10,13 @@ class DesktopWidget(QTemplateWidget):
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 
-    def __init__(self, app):
+    def __init__(self, app, plugin):
         super(DesktopWidget, self).__init__()
         self.app = app
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
-        self._initRightclickMenu()
+        self.plugin = plugin
+        # self.setAttribute(Qt.WA_TranslucentBackground)
+        # self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
+        # self._initRightclickMenu()
     
     def _initRightclickMenu(self):
         self.addAction(QtGui.QAction('Preferences', self, triggered=self.app.settings.show))
