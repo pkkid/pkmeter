@@ -15,9 +15,9 @@ class Plugin:
         self.app = app                                          # Reference to main app
         self.rootdir = rootdir                                  # Root directory of this plugin
         self.name = manifest['name']                            # Required: Plugin name
-        self.namespace = manifest['namespace']                  # Required: Plugin namespace
         self.version = manifest['version']                      # Required: Plugin version
         self.theme = manifest['theme']                          # Required: Plugin theme
+        self.id = self._createId()                              # Unique ID and namespace
         self.description = manifest.description                 # Optional: Plugin description
         self.settings = self._loadModule(manifest.settings)     # Optional: Settings QObject
         self.widget = self._loadModule(manifest.widget)         # Optional: Widget QObject
@@ -31,10 +31,16 @@ class Plugin:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return getattr(module, clsname)(self.app, self)
+    
+    def _createId(self):
+        """ Create a unique id for this plugin. """
+        theme = ''.join(c for c in self.theme.lower() if c.isalnum() or c == "_")
+        name = ''.join(c for c in self.name.lower() if c.isalnum() or c == "_")
+        return f'{theme}.{name}'
 
 
 def loadPlugins(app, plugindirs=None):
-    """ Find and load all plugins. Returns a dict of {namespace: plugin}. """
+    """ Find and load all plugins. Returns a dict of {id: plugin}. """
     plugins = utils.Bunch()
     plugindirs = plugindirs or [
         os.path.normpath(f'{ROOT}/pkm/plugins'),
@@ -54,8 +60,8 @@ def loadPlugins(app, plugindirs=None):
                         with open(manifestpath) as handle:
                             manifest = utils.Bunch(json5.load(handle))
                         plugin = Plugin(app, rootdir, manifest)
-                        plugins[plugin.name] = plugin
-                        log.info(f'Loaded plugin {subdir1}.{subdir2}')
+                        plugins[plugin.id] = plugin
+                        log.info(f'  Found plugin {plugin.id}')
                     except Exception as err:
                         log.warning(f'Error loading plugin {subdir1}.{subdir2}')
                         log.debug(err, exc_info=1)

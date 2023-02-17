@@ -68,7 +68,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
         self._loaded = False            # Set True once template loaded, typically on first show()
         self._loading = False
-        self.data = DataStore()      # Data store can register and apply updates to the ui
+        self.data = DataStore()         # Data store can register and apply updates to the ui
         self.ids = utils.Bunch()
         self._load()
 

@@ -20,7 +20,7 @@ class SettingsWindow(QTemplateWidget):
     
     def show(self):
         """ Show this settings window. """
-        # self._initPlugins()
+        self._initPlugins()
         utils.centerWindow(self)
         self._swapContent(GENERAL)
         super(SettingsWindow, self).show()
@@ -41,7 +41,7 @@ class SettingsWindow(QTemplateWidget):
         pluginlist = self.ids.pluginlist
         pluginlist.clear()
         for plugin in self.app.plugins.values():
-            item = QtWidgets.QListWidgetItem(f'{plugin.widget.NAME}')
+            item = QtWidgets.QListWidgetItem(f'{plugin.name}')
             item.setData(Qt.UserRole, plugin.id)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Checked)

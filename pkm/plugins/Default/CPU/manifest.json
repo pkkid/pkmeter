@@ -1,6 +1,5 @@
 {
   name: "CPU",
-  namespace: "cpu",
   version: "1.0.0",
   author: "Michael Shepanski",
   theme: "Default",
