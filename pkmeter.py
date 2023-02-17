@@ -18,11 +18,11 @@ class PKMeter(QtWidgets.QApplication):
 
     def __init__(self, opts):
         super(PKMeter, self).__init__()
-        self.opts = opts                        # Command line options
-        self._initApplication()                 # Setup OS environment
-        self.settings = SettingsWindow(self)    # Settings window
-        self.plugins = loadPlugins(self)        # Find and load plugins
-        self.settings.show()                    # TODO: Remove
+        self.opts = opts                    # Command line options
+        self._initApplication()             # Setup OS environment
+        self.settings = SettingsWindow()    # Settings window
+        self.plugins = loadPlugins()        # Find and load plugins
+        self.settings.show()                # TODO: Remove
 
     def _initApplication(self):
         """ Setup the application environment. """

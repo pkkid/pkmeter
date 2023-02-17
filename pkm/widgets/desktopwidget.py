@@ -10,9 +10,8 @@ class DesktopWidget(QTemplateWidget):
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 
-    def __init__(self, app, plugin):
+    def __init__(self, plugin):
         super(DesktopWidget, self).__init__()
-        self.app = app
         self.plugin = plugin
         # self.setAttribute(Qt.WA_TranslucentBackground)
         # self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)

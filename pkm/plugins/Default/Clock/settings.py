@@ -9,7 +9,6 @@ class SettingsWidget(QTemplateWidget):
       </QWidget>
     """
 
-    def __init__(self, app, plugin, *args, **kwargs):
+    def __init__(self, plugin, *args, **kwargs):
         super(SettingsWidget, self).__init__(*args, **kwargs)
-        self.app = app
         self.plugin = plugin

@@ -5,18 +5,6 @@ from pkm import log
 from PySide6.QtWidgets import QApplication
 from string import Template
 
-REGEX_INT = re.compile(r'^\d+$')
-REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
-REGEX_STRING = re.compile(r'^".+?"$')
-START_LIST, END_LIST, REGEX_LIST = '[', ']', re.compile(r'^\[.*?\]$')
-START_TUPLE, END_TUPLE, REGEX_TUPLE = '(', ')', re.compile(r'^\(.*?\)$')
-EMPTY_LIST, EMPTY_TUPLE = f'{START_LIST}{END_LIST}', f'{START_TUPLE}{END_TUPLE}'
-OPS = {
-    '&': lambda a, b: a & b,
-    '|': lambda a, b: a | b,
-    '||': lambda a, b: a or b,
-}
-
 
 class Bunch(dict):
     """ Allows dot notation to set and get dict values. """
@@ -38,11 +26,6 @@ def centerWindow(window):
     x = (screen_rect.width() - window_rect.width()) / 2
     y = (screen_rect.height() - window_rect.height()) / 2
     window.move(x, y)
-
-
-def cleanName(name):
-    """ Clean the specified name of non-variable characters. """
-    return "".join(c for c in name.lower() if c.isalnum() or c == "_")
 
 
 def loadModules(dirpath):
@@ -117,28 +100,11 @@ def rset(obj, attrstr, value, delim='.'):
     obj[attr] = value
 
 
-def evaluate(expr, context=None, call=True):
-    """ Evaluate a given expression and return the result. Supports the operators
-        and, or, add, sub, mul, div. Attempts to infer values types based on simple
-        rtegex patterns. Supports types None, Bool, Int, Float. Will reference
-        context and replace strings with their context counterparts. Order of
-        operations is NOT supported.
+def tokenize(expr, ops):
+    """ Tokenize a given expression into a list of tokens.
+        expr (str): The expression to tokenize.
+        ops (dict{op:func}): Dict of operator strings and their resolving function.
     """
-    if re.findall(REGEX_LIST, expr):
-        if expr == EMPTY_LIST: return list()
-        return list(evaluate(x.strip(), context) for x in expr.strip('[]').split(','))
-    if re.findall(REGEX_TUPLE, expr):
-        if expr == EMPTY_TUPLE: return tuple()
-        return tuple(evaluate(x.strip(), context) for x in expr.strip('()').split(','))
-    tokens = tokenize(expr, OPS)
-    tokens = parseValues(tokens, context, call)
-    while len(tokens) > 1:
-        tokens = [OPS[tokens[1]](tokens[0], tokens[2])] + tokens[3:]
-    return tokens[0]
-
-
-def tokenize(expr, ops=OPS):
-    """ Tokenize a given expression into a list of tokens. """
     tokens = []
     token, i = '', 0
     while i < len(expr):
@@ -154,21 +120,3 @@ def tokenize(expr, ops=OPS):
     if token:
         tokens.append(token.strip())
     return [t.strip() for t in tokens if t]
-
-
-def parseValues(tokens, context=None, call=True):
-    """ Parse the values of a list of tokens and return the updated list. """
-    context = context or {}
-    for i in range(len(tokens)):
-        if tokens[i].split('.')[0] in context:
-            tokens[i] = rget(context, tokens[i])
-        elif tokens[i].lower() in ('yes', 'true'): tokens[i] = True
-        elif tokens[i].lower() in ('no', 'false'): tokens[i] = False
-        elif tokens[i].lower() in ('null', 'none'): tokens[i] = None
-        elif re.findall(REGEX_INT, tokens[i]): tokens[i] = int(tokens[i])
-        elif re.findall(REGEX_FLOAT, tokens[i]): tokens[i] = float(tokens[i])
-        elif re.findall(REGEX_STRING, tokens[i]): tokens[i] = tokens[i][1:-1]
-        # Build the object or call the function
-        if call and callable(tokens[i]):
-            tokens[i] = tokens[i]()
-    return tokens

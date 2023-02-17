@@ -4,7 +4,7 @@ from pkm import APPDATA, APPNAME, log, utils
 from pkm.qtemplate import QTemplateWidget
 from pkm.widgets import gensettings
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QSettings, Qt
+from PySide6.QtCore import QCoreApplication, QSettings, Qt
 
 GENERAL = 'General'  # General settings pluginid
 
@@ -12,9 +12,9 @@ GENERAL = 'General'  # General settings pluginid
 class SettingsWindow(QTemplateWidget):
     TMPL = normpath(f'{dirname(__file__)}/tmpl/settings.tmpl')
 
-    def __init__(self, app):
+    def __init__(self):
         super(SettingsWindow, self).__init__()
-        self.app = app
+        self.app = QCoreApplication.instance()
         self._initStorage()
         self._initGeneralSettings()
     
@@ -33,7 +33,7 @@ class SettingsWindow(QTemplateWidget):
 
     def _initGeneralSettings(self):
         """ Create the general settings widget. """
-        widget = gensettings.SettingsWidget(self.app)
+        widget = gensettings.SettingsWidget()
         self._addSettingsContent(GENERAL, widget)
 
     def _initPlugins(self):

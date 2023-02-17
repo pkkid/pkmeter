@@ -47,6 +47,7 @@ sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import inspect
+import re
 from os.path import basename, normpath
 from pkm import APPNAME, ROOT, log, utils
 from pkm.datastore import DataStore
@@ -54,7 +55,15 @@ from PySide6 import QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from xml.etree import ElementTree
 
-_GLOBAL_CONTEXT = {}  # Shared context for all QTemplateWidgets
+# Define tokens for parsing values in templates
+_QOBJECTS = None
+REGEX_INT = re.compile(r'^\d+$')
+REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
+REGEX_STRING = re.compile(r'^".+?"$')
+START_LIST, END_LIST, REGEX_LIST = '[', ']', re.compile(r'^\[.*?\]$')
+START_TUPLE, END_TUPLE, REGEX_TUPLE = '(', ')', re.compile(r'^\(.*?\)$')
+EMPTY_LIST, EMPTY_TUPLE = f'{START_LIST}{END_LIST}', f'{START_TUPLE}{END_TUPLE}'
+OPS = {'&':lambda a,b:a & b, '|':lambda a,b:a | b, '||':lambda a,b:a or b}
 
 
 class QTemplateWidget(QtWidgets.QWidget):
@@ -66,45 +75,41 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
-        self._loaded = False            # Set True once template loaded, typically on first show()
-        self._loading = False
         self.data = DataStore()         # Data store can register and apply updates to the ui
         self.ids = utils.Bunch()
+        self._loading = True            # Set False after initial objects loaded
+        self._initData()
         self._load()
+    
+    def _initData(self):
+        """ Abstract method to initialize the DataStore object with items
+            required for rendering the UI.
+        """
+        pass
 
-    # def show(self):
-    #     if not self._loaded:
-    #         self._load()
-    #         self._loaded = True
-    #     super(QTemplateWidget, self).show()
+    def _initQObjects(self):
+        global _QOBJECTS
+        if not _QOBJECTS:
+            _QOBJECTS = {'APPNAME':APPNAME, 'Qt':Qt}
+            modules = [QtGui, QtWidgets]
+            modules += utils.loadModules(normpath(f'{ROOT}/pkm/widgets'))
+            for module in modules:
+                members = dict(inspect.getmembers(module, inspect.isclass))
+                _QOBJECTS.update({k:v for k,v in members.items()})
 
     def _load(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
+        self._initQObjects()
         if self.TMPL is not None:
             log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
             root = ElementTree.parse(self.TMPL).getroot()
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
-        self._loading = True
-        context = self._initContext()
+        context = dict(**_QOBJECTS, **{'self':self})
         self._walk(root, context=context)
         self._loading = False
         self.data._loading = None
-
-    def _initContext(self):
-        """ Create a lookup to convert xml string to Qt objects. """
-        global _GLOBAL_CONTEXT
-        if not _GLOBAL_CONTEXT:
-            log.debug('Building QTemplateWidget context')
-            _GLOBAL_CONTEXT = {'APPNAME':APPNAME, 'Qt':Qt}
-            # Load everything within a few modules
-            modules = [QtGui, QtWidgets]
-            modules += utils.loadModules(normpath(f'{ROOT}/pkm/widgets'))
-            for module in modules:
-                members = dict(inspect.getmembers(module, inspect.isclass))
-                _GLOBAL_CONTEXT.update({k:v for k,v in members.items()})
-        return dict(**_GLOBAL_CONTEXT, **{'data':self.data})
     
     def _walk(self, elem, parent=None, context=None, indent=0):
         if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />
@@ -225,17 +230,47 @@ class QTemplateWidget(QtWidgets.QWidget):
                 return True
             getattr(qobj, setattr)(value)
             return True
+
+    def _evaluate(self, expr, context=None, call=True):
+        """ Evaluate a given expression and return the result. Supports the operators
+            and, or, add, sub, mul, div. Attempts to infer values types based on simple
+            rtegex patterns. Supports types None, Bool, Int, Float. Will reference
+            context and replace strings with their context counterparts. Order of
+            operations is NOT supported.
+        """
+        if re.findall(REGEX_LIST, expr):
+            if expr == EMPTY_LIST: return list()
+            return list(self._evaluate(x.strip(), context) for x in expr.strip('[]').split(','))
+        if re.findall(REGEX_TUPLE, expr):
+            if expr == EMPTY_TUPLE: return tuple()
+            return tuple(self._evaluate(x.strip(), context) for x in expr.strip('()').split(','))
+        tokens = utils.tokenize(expr, OPS)
+        tokens = self._parseValues(tokens, context, call)
+        while len(tokens) > 1:
+            tokens = [OPS[tokens[1]](tokens[0], tokens[2])] + tokens[3:]
+        return tokens[0]
     
-    def _evaluate(self, expr, context):
-        """  Evaluate a given expression and return the result. """
-        return utils.evaluate(expr, context=context, call=True)
+    def _parseValues(self, tokens, context=None, call=True):
+        """ Parse the values of a list of tokens and return the updated list. """
+        context = context or {}
+        for i in range(len(tokens)):
+            if tokens[i].split('.')[0] in context:
+                tokens[i] = utils.rget(context, tokens[i])
+            elif tokens[i].lower() in ('yes', 'true'): tokens[i] = True
+            elif tokens[i].lower() in ('no', 'false'): tokens[i] = False
+            elif tokens[i].lower() in ('null', 'none'): tokens[i] = None
+            elif re.findall(REGEX_INT, tokens[i]): tokens[i] = int(tokens[i])
+            elif re.findall(REGEX_FLOAT, tokens[i]): tokens[i] = float(tokens[i])
+            elif re.findall(REGEX_STRING, tokens[i]): tokens[i] = tokens[i][1:-1]
+            # Build the object or call the function
+            if call and callable(tokens[i]):
+                tokens[i] = tokens[i]()
+        return tokens
 
 
 class Repeater:
     """ Widget-like object used for repeatng child elements in QTemplate.
-        <Repeater for='i in 3'>
-          <..children../>
-        </Repeater>
+        <Repeater for='i in 3'>...</Repeater>
     """
 
     def __init__(self, qtmpl, elem, parent, context):
@@ -250,7 +285,7 @@ class Repeater:
         utils.deleteChildren(self.parent)
         # Build the new template objects
         varname, iterstr = [x.strip() for x in valuestr.split(' in ')]
-        value = self.qtmpl._evaluate(iterstr, self.context) or 0
+        value = self.qtmpl._evaluate(iterstr, self.context)
         if isinstance(value, str):
             raise Exception(f"Lookup iterstr '{iterstr}' failed.")
         iter = range(value) if isinstance(value, int) else value

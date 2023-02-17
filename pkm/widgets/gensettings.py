@@ -2,19 +2,19 @@
 import os
 from pkm import ROOT, utils, log
 from pkm.qtemplate import QTemplateWidget
+from PySide6.QtCore import QCoreApplication
 
 
 class SettingsWidget(QTemplateWidget):
     TMPL = os.path.normpath(f'{ROOT}/pkm/tmpl/gensettings.tmpl')
 
-    def __init__(self, app, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(SettingsWidget, self).__init__(*args, **kwargs)
-        self.app = app
-        self._initData()
     
     def _initData(self):
         monitors = []
-        for i, screen in enumerate(self.app.screens()):
+        app = QCoreApplication.instance()
+        for i, screen in enumerate(app.screens()):
             monitor = utils.Bunch()
             monitor.value = i
             monitor.text = f'#{i} ({screen.name()})'

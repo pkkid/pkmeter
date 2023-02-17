@@ -11,8 +11,7 @@ CONFIG_LOCATION = QStandardPaths.writableLocation(QStandardPaths.ConfigLocation)
 
 class Plugin:
 
-    def __init__(self, app, rootdir, manifest):
-        self.app = app                                          # Reference to main app
+    def __init__(self, rootdir, manifest):
         self.rootdir = rootdir                                  # Root directory of this plugin
         self.name = manifest['name']                            # Required: Plugin name
         self.version = manifest['version']                      # Required: Plugin version
@@ -30,7 +29,7 @@ class Plugin:
         spec = importlib.util.spec_from_file_location(modname, modpath)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        return getattr(module, clsname)(self.app, self)
+        return getattr(module, clsname)(self)
     
     def _createId(self):
         """ Create a unique id for this plugin. """
@@ -59,7 +58,7 @@ def loadPlugins(app, plugindirs=None):
                     try:
                         with open(manifestpath) as handle:
                             manifest = utils.Bunch(json5.load(handle))
-                        plugin = Plugin(app, rootdir, manifest)
+                        plugin = Plugin(rootdir, manifest)
                         plugins[plugin.id] = plugin
                         log.info(f'  Found plugin {plugin.id}')
                     except Exception as err:
@@ -78,30 +77,3 @@ def getThemes(plugins):
     for theme in themes:
         themes[theme] = sorted(themes[theme], key=lambda x: x.name)
     return themes
-
-
-# def _loadPlugins(self):
-#     """ Find and load all plugins. """
-#     plugins = {}
-#     plugindir = normpath(f'{ROOT}/pkm/plugins')
-#     for dir in os.listdir(plugindir):
-#         try:
-#             log.info(f"Loading {dir} plugin")
-#             pluginid = utils.cleanName(dir)
-#             plugin = utils.Bunch(id=pluginid)
-#             dirpath = normpath(f'{plugindir}/{dir}')
-#             if isdir(dirpath):
-#                 modules = utils.loadModules(dirpath)
-#                 for module in modules:
-#                     if module.__name__ == 'settings':
-#                         plugin.settings = module.SettingsWidget(self)
-#                     if module.__name__ == 'widget':
-#                         plugin.widget = module.DesktopWidget(self)
-#                         plugin.name = plugin.widget.NAME
-#             if plugin.widget is None:
-#                 raise Exception(f'{dir} plugin does not contain widget.py')
-#             plugins[pluginid] = plugin
-#         except Exception as err:
-#             log.warning('Error loading plugin %s: %s', dir, err)
-#             log.debug(err, exc_info=1)
-#     return plugins
