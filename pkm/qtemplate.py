@@ -63,7 +63,12 @@ REGEX_STRING = re.compile(r'^".+?"$')
 START_LIST, END_LIST, REGEX_LIST = '[', ']', re.compile(r'^\[.*?\]$')
 START_TUPLE, END_TUPLE, REGEX_TUPLE = '(', ')', re.compile(r'^\(.*?\)$')
 EMPTY_LIST, EMPTY_TUPLE = f'{START_LIST}{END_LIST}', f'{START_TUPLE}{END_TUPLE}'
-OPS = {'&':lambda a,b:a & b, '|':lambda a,b:a | b, '||':lambda a,b:a or b}
+OPS = {
+    '&': lambda a, b: a & b,
+    '+': lambda a, b: a + b,
+    '|': lambda a, b: a | b,
+    '||': lambda a, b: a or b,
+}
 
 
 class QTemplateWidget(QtWidgets.QWidget):
