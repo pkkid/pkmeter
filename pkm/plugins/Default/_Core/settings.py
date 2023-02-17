@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import os
+from os.path import dirname, normpath
 from pkm import ROOT, utils, log
 from pkm.qtemplate import QTemplateWidget
 from PySide6.QtCore import QCoreApplication
 
 
 class SettingsWidget(QTemplateWidget):
-    TMPL = os.path.normpath(f'{ROOT}/pkm/tmpl/gensettings.tmpl')
+    TMPL = normpath(f'{dirname(__file__)}/settings.tmpl')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, plugin, *args, **kwargs):
+        self.plugin = plugin
         super(SettingsWidget, self).__init__(*args, **kwargs)
     
     def _initData(self):

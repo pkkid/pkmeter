@@ -2,11 +2,10 @@
 from os.path import dirname, normpath
 from pkm import APPDATA, APPNAME, log, utils
 from pkm.qtemplate import QTemplateWidget
-from pkm.widgets import gensettings
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import QCoreApplication, QSettings, Qt
 
-GENERAL = 'General'  # General settings pluginid
+GENERALSETTINGS = 'default.generalsettings'
 
 
 class SettingsWindow(QTemplateWidget):
@@ -16,13 +15,12 @@ class SettingsWindow(QTemplateWidget):
         super(SettingsWindow, self).__init__()
         self.app = QCoreApplication.instance()
         self._initStorage()
-        self._initGeneralSettings()
     
     def show(self):
         """ Show this settings window. """
         self._initPlugins()
         utils.centerWindow(self)
-        self._swapContent(GENERAL)
+        self._swapContent(GENERALSETTINGS)
         super(SettingsWindow, self).show()
         
     def _initStorage(self):
@@ -31,23 +29,19 @@ class SettingsWindow(QTemplateWidget):
         self.storage.setPath(QSettings.IniFormat, QSettings.UserScope, str(APPDATA))
         log.info(f'Settings storage: {self.storage.fileName()}')
 
-    def _initGeneralSettings(self):
-        """ Create the general settings widget. """
-        widget = gensettings.SettingsWidget()
-        self._addSettingsContent(GENERAL, widget)
-
     def _initPlugins(self):
         """ Initialize the plugins list and settings content. """
         pluginlist = self.ids.pluginlist
         pluginlist.clear()
         for plugin in self.app.plugins.values():
-            item = QtWidgets.QListWidgetItem(f'{plugin.name}')
-            item.setData(Qt.UserRole, plugin.id)
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
-            item.setCheckState(Qt.Checked)
-            item.setSizeHint(QtCore.QSize(80, 30))
-            pluginlist.addItem(item)
             self._addSettingsContent(plugin.id, plugin.settings)
+            if plugin.id != GENERALSETTINGS:
+                item = QtWidgets.QListWidgetItem(f'{plugin.name}')
+                item.setData(Qt.UserRole, plugin.id)
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+                item.setCheckState(Qt.Checked)
+                item.setSizeHint(QtCore.QSize(80, 30))
+                pluginlist.addItem(item)
 
     def _addSettingsContent(self, pluginid, widget):
         """ Add settings content to the window. """
@@ -66,14 +60,12 @@ class SettingsWindow(QTemplateWidget):
             item.widget().setVisible(False)
         utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', '')
         # Display the newly selected plugin settings
-        title = f'{GENERAL} Settings'
-        if pluginid in self.app.plugins:
-            title = f'{self.app.plugins[pluginid].name} Settings'
+        title = f'{self.app.plugins[pluginid].name} Settings'
         self.ids.plugintitle.setText(title)
         self.ids[f'{pluginid}_settings'].setVisible(True)
-        # If the pluginid is general, delselect all items in the
+        # If the pluginid is general settings, delselect all items in the
         # QListWidget and set the button to be highlighted
-        if pluginid == GENERAL:
+        if pluginid == GENERALSETTINGS:
             self.ids.pluginlist.clearSelection()
             utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', 'selected')
 
@@ -97,7 +89,7 @@ class SettingsWindow(QTemplateWidget):
     
     def generalSettingsClicked(self):
         """ Callback when the general settings button is clicked. """
-        self._swapContent(GENERAL)
+        self._swapContent(GENERALSETTINGS)
 
     def closeEvent(self, event):
         """ Close this settings window. """

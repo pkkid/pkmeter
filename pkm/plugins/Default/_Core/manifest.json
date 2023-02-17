@@ -1,9 +1,8 @@
 {
-  "name": "Clock",
+  "name": "General Settings",
   "version": "1.0.0",
   "author": "Michael Shepanski",
   "theme": "Default",
-  "description": "Displays the local time.",
+  "description": "PKMeter general settings",
   "settings": "settings.SettingsWidget",
-  "widget": "widget.DesktopWidget",
 }

@@ -22,6 +22,7 @@ class PKMeter(QtWidgets.QApplication):
         self._initApplication()             # Setup OS environment
         self.settings = SettingsWindow()    # Settings window
         self.plugins = loadPlugins()        # Find and load plugins
+        print(self.plugins.keys())
         self.settings.show()                # TODO: Remove
 
     def _initApplication(self):

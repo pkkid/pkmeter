@@ -5,5 +5,5 @@
   theme: "Default",
   description: "Displays realtime CPU usage.",
   settings: "settings.SettingsWidget",
-  widget: "widget.DesktopWidget"
+  widget: "widget.DesktopWidget",
 }

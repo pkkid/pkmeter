@@ -38,7 +38,7 @@ class Plugin:
         return f'{theme}.{name}'
 
 
-def loadPlugins(app, plugindirs=None):
+def loadPlugins(plugindirs=None):
     """ Find and load all plugins. Returns a dict of {id: plugin}. """
     plugins = utils.Bunch()
     plugindirs = plugindirs or [
