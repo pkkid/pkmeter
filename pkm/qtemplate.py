@@ -47,20 +47,28 @@ sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import re
+from collections import namedtuple
 from os.path import basename
 from pkm import log, plugins, utils
 from pkm.datastore import DataStore
 from PySide6 import QtWidgets
 from xml.etree import ElementTree
 
-# Define tokens for parsing values in templates
-REGEX_INT = re.compile(r'^\d+$')
-REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
-REGEX_STRING = re.compile(r'^".+?"$')
-START_LIST, END_LIST, REGEX_LIST = '[', ']', re.compile(r'^\[.*?\]$')
-START_TUPLE, END_TUPLE, REGEX_TUPLE = '(', ')', re.compile(r'^\(.*?\)$')
-EMPTY_LIST, EMPTY_TUPLE = f'{START_LIST}{END_LIST}', f'{START_TUPLE}{END_TUPLE}'
-OPS = {
+# Define entities QTemplateWiget values can parse
+Collection = namedtuple('Collection', ('regex','start','end','delim','cast'))
+Type = namedtuple('Type', ('regex','cast'))
+COLLECTIONS = [
+    Collection(re.compile(r'^\[.*?\]$'), '[', ']', ',', list),
+    Collection(re.compile(r'^\(.*?\)$'), '(', ')', ',', tuple),
+]
+TYPES = [
+    Type(re.compile(r'(true|false)', re.IGNORECASE), lambda s: s.lower() == 'true'),
+    Type(re.compile(r'(none|null)', re.IGNORECASE), lambda s: None),
+    Type(re.compile(r'^\d+$'), int),
+    Type(re.compile(r'^\d+\.\d+$'), float),
+    Type(re.compile(r'^".+?"$'), lambda s: s[1:-1]),
+]
+OPERATIONS = {
     '&': lambda a, b: a & b,
     '+': lambda a, b: a + b,
     '|': lambda a, b: a | b,
@@ -172,87 +180,85 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _applyAttrs(self, qobj, elem, context, indent=0):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
+            valuestr = valuestr.strip()
             if attr == 'args': continue
             if attr.startswith('_'): continue
-            value = self._evaluate(valuestr, context)
-            if self._attrId(qobj, elem, attr, context, value, indent): continue      # id='myobject'
-            if self._attrLayout(qobj, elem, attr, context, value, indent): continue  # layout.<attr>='value'
-            if self._attrSet(qobj, elem, attr, context, value, indent): continue     # attr='value'
+            if self._attrId(qobj, elem, attr, valuestr, context, indent): continue      # id='myobject'
+            if self._attrLayout(qobj, elem, attr, valuestr, context, indent): continue  # layout.<attr>='value'
+            if self._attrSet(qobj, elem, attr, valuestr, context, indent): continue     # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
 
     def _attrArgs(self, elem, context, indent):
-        args = elem.attrib.get('args', '()')
-        args = self._evaluate(args, context)
+        valuestr = elem.attrib.get('args', '()')
+        args = self._evaluate(valuestr, context)
         return [args] if not isinstance(args, (list,tuple)) else args
 
-    def _attrId(self, qobj, elem, attr, context, value, indent=0):
+    def _attrId(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
-            qobj.setObjectName(value)
-            self.ids[value] = qobj
+            qobj.setObjectName(valuestr)
+            self.ids[valuestr] = qobj
             return True
     
-    def _attrLayout(self, qobj, elem, attr, context, value, indent=0):
+    def _attrLayout(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Sets the layout or layout.property(). Also reads the DEFAULT_LAYOUT_*
             properties on the class and applies those if specified.
         """
         if attr == 'layout':
-            self._attrSet(qobj, elem, attr, context, value, indent=0)
+            self._attrSet(qobj, elem, attr, valuestr, context, indent=0)
             if self.DEFAULT_LAYOUT_MARGINS is not None:
                 qobj.layout().setContentsMargins(*self.DEFAULT_LAYOUT_MARGINS)
             if self.DEFAULT_LAYOUT_SPACING is not None:
                 qobj.layout().setSpacing(self.DEFAULT_LAYOUT_SPACING)
             return True
         if attr.startswith('layout.'):
-            return self._attrSet(qobj.layout(), elem, attr[7:], context, value, indent)
+            return self._attrSet(qobj.layout(), elem, attr[7:], valuestr, context, indent)
 
-    def _attrSet(self, qobj, elem, attr, context, value, indent=0):
+    def _attrSet(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Calls set<attr>(<value>) on the qbject. """
         setattr = f'set{attr[0].upper()}{attr[1:]}'
         if self._loading:
             self.data._loading = self, qobj, elem, attr, context
         if hasattr(qobj, setattr):
-            if isinstance(value, (list, tuple)):
-                getattr(qobj, setattr)(*value)
-                return True
-            getattr(qobj, setattr)(value)
+            callback = getattr(qobj, setattr)
+            self._apply(callback, valuestr, context)
             return True
+    
+    def _apply(self, callback, valuestr, context=None):
+        """ Apply the specified valuestr to callback. """
+        value = self._evaluate(valuestr, context)
+        if isinstance(value, (list, tuple)):
+            return callback(*value)
+        return callback(value)
 
-    def _evaluate(self, expr, context=None, call=True):
+    def _evaluate(self, valuestr, context=None):
         """ Evaluate a given expression and return the result. Supports the operators
             and, or, add, sub, mul, div. Attempts to infer values types based on simple
             rtegex patterns. Supports types None, Bool, Int, Float. Will reference
             context and replace strings with their context counterparts. Order of
             operations is NOT supported.
         """
-        if re.findall(REGEX_LIST, expr):
-            if expr == EMPTY_LIST: return list()
-            return list(self._evaluate(x.strip(), context) for x in expr.strip('[]').split(','))
-        if re.findall(REGEX_TUPLE, expr):
-            if expr == EMPTY_TUPLE: return tuple()
-            return tuple(self._evaluate(x.strip(), context) for x in expr.strip('()').split(','))
-        tokens = utils.tokenize(expr, OPS)
-        tokens = self._parseValues(tokens, context, call)
-        while len(tokens) > 1:
-            tokens = [OPS[tokens[1]](tokens[0], tokens[2])] + tokens[3:]
-        return tokens[0]
+        for c in COLLECTIONS:
+            if re.findall(c.regex, valuestr):
+                if valuestr == f'{c.start}{c.end}': return c.cast()
+                valuestrs = valuestr.lstrip(c.start).rstrip(c.end).split(c.delim)
+                return c.cast(self._evaluate(x.strip(), context) for x in valuestrs)
+        tokens = utils.tokenize(valuestr, OPERATIONS)
+        values = [self._parse(t, context) for t in tokens]
+        while len(values) > 1:
+            values = [OPERATIONS[values[1]](values[0], values[2])] + values[3:]
+        return values[0]
     
-    def _parseValues(self, tokens, context=None, call=True):
-        """ Parse the values of a list of tokens and return the updated list. """
+    def _parse(self, token, context=None):
+        """ Parse the token string into a value. """
         context = context or {}
-        for i in range(len(tokens)):
-            if tokens[i].split('.')[0] in context:
-                tokens[i] = utils.rget(context, tokens[i])
-            elif tokens[i].lower() in ('yes', 'true'): tokens[i] = True
-            elif tokens[i].lower() in ('no', 'false'): tokens[i] = False
-            elif tokens[i].lower() in ('null', 'none'): tokens[i] = None
-            elif re.findall(REGEX_INT, tokens[i]): tokens[i] = int(tokens[i])
-            elif re.findall(REGEX_FLOAT, tokens[i]): tokens[i] = float(tokens[i])
-            elif re.findall(REGEX_STRING, tokens[i]): tokens[i] = tokens[i][1:-1]
-            # Build the object or call the function
-            if call and callable(tokens[i]):
-                tokens[i] = tokens[i]()
-        return tokens
+        if token.split('.')[0] in context:
+            value = utils.rget(context, token)
+            return value() if callable(value) else value
+        for t in TYPES:
+            if re.findall(t.regex, token):
+                return t.cast(token)
+        return token
 
 
 class Repeater:
@@ -266,15 +272,15 @@ class Repeater:
         self.parent = parent        # Parent qobj to add children to
         self.context = context      # Context for building the children
     
-    def setFor(self, valuestr):
+    def setFor(self, forstr):
         """ Rebuild the children elements on the parent. """
         # Delete all children of the parent
         utils.deleteChildren(self.parent)
         # Build the new template objects
-        varname, iterstr = [x.strip() for x in valuestr.split(' in ')]
-        value = self.qtmpl._evaluate(iterstr, self.context)
+        varname, valuestr = [x.strip() for x in forstr.split(' in ')]
+        value = self.qtmpl._evaluate(valuestr, self.context)
         if isinstance(value, str):
-            raise Exception(f"Lookup iterstr '{iterstr}' failed.")
+            raise Exception(f"Lookup iterstr '{valuestr}' failed.")
         iter = range(value) if isinstance(value, int) else value
         for item in iter:
             for echild in self.elem:

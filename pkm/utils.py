@@ -87,22 +87,23 @@ def rset(obj, attrstr, value, delim='.'):
     obj[attr] = value
 
 
-def tokenize(expr, ops):
+def tokenize(valuestr, operations=None):
     """ Tokenize a given expression into a list of tokens.
         expr (str): The expression to tokenize.
-        ops (dict{op:func}): Dict of operator strings and their resolving function.
+        operations (dict{op:func}): Dict of operator strings and their resolving function.
     """
+    operations = operations or {}
     tokens = []
     token, i = '', 0
-    while i < len(expr):
-        for op in sorted(ops, key=len, reverse=True):
-            if expr[i:].startswith(op):
+    while i < len(valuestr):
+        for op in sorted(operations, key=len, reverse=True):
+            if valuestr[i:].startswith(op):
                 tokens.append(token)
                 tokens.append(op)
                 token = ''
                 i += len(op)
                 continue
-        token += expr[i]
+        token += valuestr[i]
         i += 1
     if token:
         tokens.append(token.strip())
