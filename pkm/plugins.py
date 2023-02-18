@@ -5,7 +5,7 @@ import json5
 import os
 import pkgutil
 from collections import defaultdict
-from pkm import APPNAME, VERSION, PLUGIN_DIRS, log, utils
+from pkm import APPNAME, PLUGIN_DIRS, VERSION, log, utils
 from PySide6 import QtGui, QtWidgets
 
 _WIDGETS = None

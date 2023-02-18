@@ -3,13 +3,12 @@
 import os
 import signal
 import sys
-from os.path import dirname, normpath
 from argparse import ArgumentParser
+from os.path import dirname, normpath
 from PySide6 import QtGui, QtWidgets
 
 sys.path.append(dirname(__file__))
-from pkm import APPNAME, ROOT
-from pkm import log, plugins, utils  # noqa
+from pkm import APPNAME, ROOT, log, plugins, utils  # noqa
 from pkm.settings import SettingsWindow
 
 
