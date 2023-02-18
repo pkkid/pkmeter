@@ -78,18 +78,18 @@ OPERATIONS = {
 
 class QTemplateWidget(QtWidgets.QWidget):
     """ My interpreation of a less verbose Qt Template language. """
-    TMPL = None                     # Filepath of tmpl file to load
-    TMPLSTR = None                  # String template (if not using a file)
-    DEFAULT_LAYOUT_MARGINS = None   # Default values for qobj.layout().setContentsMargins()
-    DEFAULT_LAYOUT_SPACING = None   # Default values for qobj.layout().setSpacing()
+    TMPL = None                         # Filepath of tmpl file to load
+    TMPLSTR = None                      # String template (if not using a file)
+    DEFAULT_LAYOUT_MARGINS = None       # Default values for qobj.layout().setContentsMargins()
+    DEFAULT_LAYOUT_SPACING = None       # Default values for qobj.layout().setSpacing()
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
-        self.data = DataStore()         # Data store can register and apply updates to the ui
+        self.data = DataStore()         # Datastore can register and apply updates to the ui
         self.ids = utils.Bunch()        # Reference to QObject by id
         self._loading = True            # Set False after initial objects loaded
-        self._initData()
-        self._load()
+        self._initData()                # Initialize the data store
+        self._load()                    # Read the template string and convert to qobjects
 
     def _initData(self):
         """ Abstract method to initia DataStore with items. """
@@ -109,16 +109,18 @@ class QTemplateWidget(QtWidgets.QWidget):
         self.data._loading = None
     
     def _walk(self, elem, parent=None, context=None, indent=0):
+        """ Parse the specified element and it's children. """
         context = context or {}
         log.debug(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
-        if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />
-        if self._tagRepeater(elem, parent, context, indent): return   # Check this is a repeater
+        if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />; then recurse further
+        if self._tagRepeater(elem, parent, context, indent): return   # Repeats child elements
         if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
-        if self._tagAdd(elem, parent, context, indent): return        # add<Tag>(attr=value)
+        if self._tagAdd(elem, parent, context, indent): return        # add<Tag>(attr=value); no children
         if self._tagConnect(elem, parent, context, indent): return    # <connect slot='callback' />; no children
         raise Exception(f'Unknown tag "{elem.tag}" in element {parent.__class__.__name__}.')
     
     def _tagRepeater(self, elem, parent, context, indent):
+        """ Repeater element repeats child elements. """
         if elem.tag == Repeater.__name__:
             qobj = Repeater(self, elem, parent, context)
             self._applyAttrs(qobj, elem, context, indent+1)
@@ -181,17 +183,20 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
             valuestr = valuestr.strip()
-            if attr == 'args': continue
-            if attr.startswith('_'): continue
+            if attr == 'args': continue                                                 # Ignore args, we read that earlier
+            if attr.startswith('_'): continue                                           # Ignore attrs with underscore
             if self._attrId(qobj, elem, attr, valuestr, context, indent): continue      # id='myobject'
             if self._attrLayout(qobj, elem, attr, valuestr, context, indent): continue  # layout.<attr>='value'
             if self._attrSet(qobj, elem, attr, valuestr, context, indent): continue     # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
 
     def _attrArgs(self, elem, context, indent):
-        valuestr = elem.attrib.get('args', '()')
-        args = self._evaluate(valuestr, context)
-        return [args] if not isinstance(args, (list,tuple)) else args
+        """ Reads the args attribute before creating the qobject. """
+        if 'args' in elem.attrib:
+            valuestr = elem.attrib['args']
+            args = self._evaluate(valuestr, context)
+            return [args] if not isinstance(args, (list,tuple)) else args
+        return ()
 
     def _attrId(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
