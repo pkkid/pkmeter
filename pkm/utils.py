@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import pkgutil
 import re
 from pkm import log
 from PySide6.QtWidgets import QApplication
@@ -26,18 +25,6 @@ def centerWindow(window):
     x = (screen_rect.width() - window_rect.width()) / 2
     y = (screen_rect.height() - window_rect.height()) / 2
     window.move(x, y)
-
-
-def loadModules(dirpath):
-    """ Load and return modules in the specified directory. """
-    modules = []
-    for loader, name, ispkg in pkgutil.iter_modules([dirpath]):
-        try:
-            modules.append(loader.find_module(name).load_module(name))
-        except Exception as err:
-            log.warn('Error loading module %s: %s', name, err)
-            log.debug(err, exc_info=1)
-    return modules
 
 
 def setPropertyAndRedraw(qobj, name, value):

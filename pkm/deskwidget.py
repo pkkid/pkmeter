@@ -5,13 +5,13 @@ from PySide6 import QtGui
 from PySide6.QtCore import Qt
 
 
-class DesktopWidget(QTemplateWidget):
+class DeskWidget(QTemplateWidget):
     # TMPL = normpath(f'{dirname(__file__)}/tmpl/desktop.tmpl')
     DEFAULT_LAYOUT_MARGINS = (0,0,0,0)
     DEFAULT_LAYOUT_SPACING = 0
 
     def __init__(self, plugin):
-        super(DesktopWidget, self).__init__()
+        super(DeskWidget, self).__init__()
         self.plugin = plugin
         # self.setAttribute(Qt.WA_TranslucentBackground)
         # self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)

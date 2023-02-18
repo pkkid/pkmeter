@@ -46,17 +46,14 @@ If the value looks like a list, each item will also be parsed. The values will
 sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
-import inspect
 import re
-from os.path import basename, normpath
-from pkm import APPNAME, ROOT, log, utils
+from os.path import basename
+from pkm import log, plugins, utils
 from pkm.datastore import DataStore
-from PySide6 import QtGui, QtWidgets
-from PySide6.QtCore import Qt
+from PySide6 import QtWidgets
 from xml.etree import ElementTree
 
 # Define tokens for parsing values in templates
-_QOBJECTS = None
 REGEX_INT = re.compile(r'^\d+$')
 REGEX_FLOAT = re.compile(r'^\d+\.\d+$')
 REGEX_STRING = re.compile(r'^".+?"$')
@@ -85,33 +82,20 @@ class QTemplateWidget(QtWidgets.QWidget):
         self._loading = True            # Set False after initial objects loaded
         self._initData()
         self._load()
-    
-    def _initData(self):
-        """ Abstract method to initialize the DataStore object with items
-            required for rendering the UI.
-        """
-        pass
 
-    def _initQObjects(self):
-        global _QOBJECTS
-        if not _QOBJECTS:
-            _QOBJECTS = {'APPNAME':APPNAME, 'Qt':Qt}
-            modules = [QtGui, QtWidgets]
-            modules += utils.loadModules(normpath(f'{ROOT}/pkm/widgets'))
-            for module in modules:
-                members = dict(inspect.getmembers(module, inspect.isclass))
-                _QOBJECTS.update({k:v for k,v in members.items()})
+    def _initData(self):
+        """ Abstract method to initia DataStore with items. """
+        pass
 
     def _load(self, filepath=TMPL):
         """ Reads the template and walks the xml tree to build the Qt UI. """
-        self._initQObjects()
         if self.TMPL is not None:
             log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
             root = ElementTree.parse(self.TMPL).getroot()
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
-        context = dict(**_QOBJECTS, **{'self':self})
+        context = dict(**plugins.widgets(), **{'self':self})
         self._walk(root, context=context)
         self._loading = False
         self.data._loading = None

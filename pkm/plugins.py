@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import importlib
+import inspect
 import json5
 import os
+import pkgutil
 from collections import defaultdict
-from pkm import ROOT, log, utils
-from PySide6.QtCore import QStandardPaths
+from pkm import APPNAME, VERSION, PLUGIN_DIRS, log, utils
+from PySide6 import QtGui, QtWidgets
 
-CONFIG_LOCATION = QStandardPaths.writableLocation(QStandardPaths.ConfigLocation)
+_WIDGETS = None
 
 
 class Plugin:
@@ -38,36 +40,7 @@ class Plugin:
         return f'{theme}.{name}'
 
 
-def loadPlugins(plugindirs=None):
-    """ Find and load all plugins. Returns a dict of {id: plugin}. """
-    plugins = utils.Bunch()
-    plugindirs = plugindirs or [
-        os.path.normpath(f'{ROOT}/pkm/plugins'),
-        os.path.normpath(f'{CONFIG_LOCATION}/plugins'),
-    ]
-    for plugindir in plugindirs:
-        log.info(f"Looking for plugins at {plugindir}")
-        if not os.path.isdir(plugindir):
-            continue
-        for subdir1 in os.listdir(plugindir):
-            dirpath = os.path.normpath(f'{plugindir}/{subdir1}')
-            for subdir2 in os.listdir(dirpath):
-                rootdir = os.path.normpath(f'{dirpath}/{subdir2}')
-                manifestpath = os.path.normpath(f'{rootdir}/manifest.json')
-                if os.path.isfile(manifestpath):
-                    try:
-                        with open(manifestpath) as handle:
-                            manifest = utils.Bunch(json5.load(handle))
-                        plugin = Plugin(rootdir, manifest)
-                        plugins[plugin.id] = plugin
-                        log.info(f'  Found plugin {plugin.id}')
-                    except Exception as err:
-                        log.warning(f'Error loading plugin {subdir1}.{subdir2}')
-                        log.debug(err, exc_info=1)
-    return plugins
-
-
-def getThemes(plugins):
+def themes(plugins):
     """ Loops through all plugins to create a themes dict. Returns a
         dict of {theme: [plugins]}.
     """
@@ -77,3 +50,63 @@ def getThemes(plugins):
     for theme in themes:
         themes[theme] = sorted(themes[theme], key=lambda x: x.name)
     return themes
+
+
+def plugins(plugindirs=PLUGIN_DIRS, depth=0):
+    """ Find and load all plugins. Returns a dict of {id: plugin}. """
+    plugins = utils.Bunch()
+    pathfilter = lambda path: os.path.isfile(path) and os.path.basename(path) == 'manifest.json'
+    for filepath in _iterDirectories(plugindirs, pathfilter):
+        try:
+            with open(filepath) as handle:
+                manifest = utils.Bunch(json5.load(handle))
+            plugin = Plugin(os.path.dirname(filepath), manifest)
+            log.info(f'Loading plugin {plugin.id}')
+            plugins[plugin.id] = plugin
+        except Exception as err:
+            name = '.'.join(filepath.split(os.path.sep)[-2:-1])
+            log.warning(f'Error loading plugin {name}')
+            log.debug(err, exc_info=1)
+    return plugins
+
+
+def widgets(plugindirs=PLUGIN_DIRS):
+    """ Load widgets from the plugin directories as well as the Qt libraries. """
+    global _WIDGETS
+    if _WIDGETS is None:
+        # Load widgets from the Qt libraries; This section should probably live in
+        # the qtemplate module, but I feel like keeping it together with the plugin
+        # widget loader makes more sense than spreading it around.
+        _WIDGETS = {'APPNAME':APPNAME, 'VERSION':VERSION}
+        for module in (QtGui, QtWidgets):
+            members = dict(inspect.getmembers(module, inspect.isclass))
+            _WIDGETS.update({k:v for k,v in members.items()})
+        # Load widgets from the plugin dirtectories
+        dirfilter = lambda path: os.path.isdir(path) and os.path.basename(path) == 'widgets'
+        clsfilter = lambda obj: (inspect.isclass(obj) and obj.__module__ == module.__name__
+            and issubclass(obj, QtWidgets.QWidget))
+        for dirpath in _iterDirectories(PLUGIN_DIRS, dirfilter):
+            for loader, name, ispkg in pkgutil.iter_modules([dirpath]):
+                try:
+                    module = loader.find_module(name).load_module(name)
+                    members = dict(inspect.getmembers(module, clsfilter))
+                    for clsname, cls in members.items():
+                        log.info(f'Loading widget {clsname}')
+                        _WIDGETS[clsname] = cls
+                except Exception as err:
+                    log.warn('Error loading module %s: %s', name, err)
+                    log.debug(err, exc_info=1)
+    return _WIDGETS
+
+
+def _iterDirectories(dirpaths, predicate, maxdepth=2, depth=0):
+    for dirpath in dirpaths:
+        if not os.path.isdir(dirpath) or depth > maxdepth:
+            continue
+        for filename in os.listdir(dirpath):
+            filepath = os.path.join(dirpath, filename)
+            if predicate(filepath):
+                yield filepath
+            elif os.path.isdir(filepath):
+                for result in _iterDirectories([filepath], predicate, maxdepth, depth+1):
+                    yield result

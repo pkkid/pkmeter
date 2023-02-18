@@ -9,21 +9,19 @@ from PySide6 import QtGui, QtWidgets
 
 sys.path.append(dirname(__file__))
 from pkm import APPNAME, ROOT
-from pkm import log, utils  # noqa
+from pkm import log, plugins, utils  # noqa
 from pkm.settings import SettingsWindow
-from pkm.plugins import loadPlugins
 
 
 class PKMeter(QtWidgets.QApplication):
 
     def __init__(self, opts):
         super(PKMeter, self).__init__()
-        self.opts = opts                    # Command line options
-        self._initApplication()             # Setup OS environment
-        self.settings = SettingsWindow()    # Settings window
-        self.plugins = loadPlugins()        # Find and load plugins
-        print(self.plugins.keys())
-        self.settings.show()                # TODO: Remove
+        self.opts = opts                        # Command line options
+        self._initApplication()                 # Setup OS environment
+        self.settings = SettingsWindow()        # Settings window
+        self.plugins = plugins.plugins()        # Find and load plugins
+        self.settings.show()                    # TODO: Remove
 
     def _initApplication(self):
         """ Setup the application environment. """
@@ -34,7 +32,7 @@ class PKMeter(QtWidgets.QApplication):
                 filepath = normpath(f'{resources}/{filename}')
                 fontid = QtGui.QFontDatabase.addApplicationFont(filepath)
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
-                log.info(f"Loading font '{fontname}'")
+                log.info(f'Loading font {fontname}')
         # Application stylesheet
         self.setStyle('Fusion')
         styles = open(normpath(f'{ROOT}/resources/styles.qss')).read()

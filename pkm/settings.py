@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
-from pkm import APPDATA, APPNAME, log, utils
+from pkm import CONFIG_LOCATION, APPNAME, log, utils
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import QCoreApplication, QSettings, Qt
@@ -26,8 +26,8 @@ class SettingsWindow(QTemplateWidget):
     def _initStorage(self):
         """ Initialize the settings storage file. """
         self.storage = QSettings(QSettings.IniFormat, QSettings.UserScope, APPNAME, APPNAME.lower())
-        self.storage.setPath(QSettings.IniFormat, QSettings.UserScope, str(APPDATA))
-        log.info(f'Settings storage: {self.storage.fileName()}')
+        self.storage.setPath(QSettings.IniFormat, QSettings.UserScope, str(CONFIG_LOCATION))
+        log.info(f'Settings storage: {normpath(self.storage.fileName())}')
 
     def _initPlugins(self):
         """ Initialize the plugins list and settings content. """

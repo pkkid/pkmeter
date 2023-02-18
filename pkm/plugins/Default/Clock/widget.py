@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from pkm.widgets.desktopwidget import DesktopWidget
+from pkm.deskwidget import DeskWidget
 
 
-class DesktopWidget(DesktopWidget):
+class DesktopWidget(DeskWidget):
     NAME = 'Clock'
     TMPLSTR = """
       <QWidget layout='QHBoxLayout'>
