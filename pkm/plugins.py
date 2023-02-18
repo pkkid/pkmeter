@@ -6,7 +6,7 @@ import os
 import pkgutil
 from collections import defaultdict
 from pkm import APPNAME, PLUGIN_DIRS, VERSION, log, utils
-from PySide6 import QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 _WIDGETS = None
 
@@ -14,15 +14,28 @@ _WIDGETS = None
 class Plugin:
 
     def __init__(self, rootdir, manifest):
-        self.rootdir = rootdir                                  # Root directory of this plugin
-        self.name = manifest['name']                            # Required: Plugin name
-        self.version = manifest['version']                      # Required: Plugin version
-        self.theme = manifest['theme']                          # Required: Plugin theme
-        self.id = self._createId()                              # Unique ID and namespace
-        self.description = manifest.description                 # Optional: Plugin description
-        self.settings = self._loadModule(manifest.settings)     # Optional: Settings QObject
-        self.widget = self._loadModule(manifest.widget)         # Optional: Widget QObject
+        self.manifest = manifest                    # Reference to the manifest
+        self.rootdir = rootdir                      # Root directory of this plugin
+        self.name = manifest['name']                # Required: Plugin name
+        self.version = manifest['version']          # Required: Plugin version
+        self.theme = manifest['theme']              # Required: Plugin theme
+        self.id = self._createId()                  # Unique ID and namespace
+        self.description = manifest.description     # Optional: Plugin description
+        self._settings = None
+        self._widget = None
     
+    @property
+    def settings(self):
+        if not self._settings:
+            self._settings = self._loadModule(self.manifest.settings)
+        return self._settings
+    
+    @property
+    def widget(self):
+        if not self._widget:
+            self._widget = self._loadModule(self.manifest.widget)
+        return self._widget
+
     def _loadModule(self, modpath):
         """ Load the specified module. """
         if not modpath: return None
@@ -74,10 +87,12 @@ def widgets(plugindirs=PLUGIN_DIRS):
     """ Load widgets from the plugin directories as well as the Qt libraries. """
     global _WIDGETS
     if _WIDGETS is None:
+        # Start with a few constants
+        app = QtCore.QCoreApplication.instance()
+        _WIDGETS = {'APPNAME':APPNAME, 'VERSION':VERSION, 'app':app}
         # Load widgets from the Qt libraries; This section should probably live in
         # the qtemplate module, but I feel like keeping it together with the plugin
         # widget loader makes more sense than spreading it around.
-        _WIDGETS = {'APPNAME':APPNAME, 'VERSION':VERSION}
         for module in (QtGui, QtWidgets):
             members = dict(inspect.getmembers(module, inspect.isclass))
             _WIDGETS.update({k:v for k,v in members.items()})

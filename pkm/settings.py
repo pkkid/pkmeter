@@ -3,7 +3,7 @@ from os.path import dirname, normpath
 from pkm import APPNAME, CONFIG_LOCATION, log, utils
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QCoreApplication, QSettings, Qt
+from PySide6.QtCore import QSettings, Qt
 
 GENERALSETTINGS = 'default.generalsettings'
 
@@ -13,7 +13,7 @@ class SettingsWindow(QTemplateWidget):
 
     def __init__(self):
         super(SettingsWindow, self).__init__()
-        self.app = QCoreApplication.instance()
+        self.app = QtCore.QCoreApplication.instance()
         self._initStorage()
     
     def show(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict, namedtuple
-from pkm import log, utils
+from pkm import log, utils, qtemplate
 
 # Needs to match self.data._loading line in qtemplate.py
 Sync = namedtuple('Callback', ('qtmpl', 'qobj', 'elem', 'attr', 'context'))
@@ -27,7 +27,7 @@ class DataStore(dict):
     def register(self, sync):
         valuestr = sync.elem.attrib.get(sync.attr, '')
         valuestr = valuestr.split(' in ')[1] if ' in ' in valuestr else valuestr
-        tokens = utils.tokenize(valuestr)
+        tokens = utils.tokenize(valuestr, qtemplate.OPS)
         tokens = [t[5:] for t in tokens if t.startswith('data.')]
         for token in tokens:
             log.info(f'register[{token}].append({sync.elem.tag}, {sync.attr})')

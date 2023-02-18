@@ -70,15 +70,15 @@ OPS = {
 
 class QTemplateWidget(QtWidgets.QWidget):
     """ My interpreation of a less verbose Qt Template language. """
-    TMPL = None  # filepath of tmpl file to load
-    TMPLSTR = None   # string template (if not using a file)
-    DEFAULT_LAYOUT_MARGINS = None  # default values for qobj.layout().setContentsMargins()
-    DEFAULT_LAYOUT_SPACING = None  # default values for qobj.layout().setSpacing()
+    TMPL = None                     # Filepath of tmpl file to load
+    TMPLSTR = None                  # String template (if not using a file)
+    DEFAULT_LAYOUT_MARGINS = None   # Default values for qobj.layout().setContentsMargins()
+    DEFAULT_LAYOUT_SPACING = None   # Default values for qobj.layout().setSpacing()
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
         self.data = DataStore()         # Data store can register and apply updates to the ui
-        self.ids = utils.Bunch()
+        self.ids = utils.Bunch()        # Reference to QObject by id
         self._loading = True            # Set False after initial objects loaded
         self._initData()
         self._load()
@@ -95,12 +95,14 @@ class QTemplateWidget(QtWidgets.QWidget):
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
-        context = dict(**plugins.widgets(), **{'self':self})
+        context = dict(**plugins.widgets(), **{'self':self, 'data':self.data})
         self._walk(root, context=context)
         self._loading = False
         self.data._loading = None
     
     def _walk(self, elem, parent=None, context=None, indent=0):
+        context = context or {}
+        log.debug(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
         if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />
         if self._tagRepeater(elem, parent, context, indent): return   # Check this is a repeater
         if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
@@ -120,7 +122,6 @@ class QTemplateWidget(QtWidgets.QWidget):
             qcls = utils.rget(context, elem.tag)
             args = self._attrArgs(elem, context, indent)
             qobj = self if parent is None else qcls(*args, parent=parent)
-            log.debug(f'{" "*indent}{qobj.__class__.__name__}')
             self._applyAttrs(qobj, elem, context, indent+1)
             if parent is not None:
                 parent.layout().addWidget(qobj)
@@ -135,7 +136,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         callback = getattr(parent, addfunc, getattr(parent.layout(), addfunc, None))
         if callback:
             args = self._attrArgs(elem, context, indent)
-            log.debug(f'{" "*indent}{addfunc}(*{args})')
             callback(*args)
             return True
 
@@ -188,7 +188,6 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _attrId(self, qobj, elem, attr, context, value, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
-            log.debug(f'{" "*indent}setObjectName({value})')
             qobj.setObjectName(value)
             self.ids[value] = qobj
             return True
@@ -213,7 +212,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         if self._loading:
             self.data._loading = self, qobj, elem, attr, context
         if hasattr(qobj, setattr):
-            log.debug(f'{" "*indent}{setattr}({elem.attrib.get(attr,"")})')
             if isinstance(value, (list, tuple)):
                 getattr(qobj, setattr)(*value)
                 return True

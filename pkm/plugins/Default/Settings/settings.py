@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
-from pkm import ROOT, utils, log
+from pkm import log, utils
 from pkm.qtemplate import QTemplateWidget
-from PySide6.QtCore import QCoreApplication
+from PySide6 import QtCore
 
 
 class SettingsWidget(QTemplateWidget):
@@ -14,7 +14,7 @@ class SettingsWidget(QTemplateWidget):
     
     def _initData(self):
         monitors = []
-        app = QCoreApplication.instance()
+        app = QtCore.QCoreApplication.instance()
         for i, screen in enumerate(app.screens()):
             monitor = utils.Bunch()
             monitor.value = i
