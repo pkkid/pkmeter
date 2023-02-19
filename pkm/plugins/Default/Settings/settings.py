@@ -24,8 +24,9 @@ class SettingsWidget(QTemplateWidget):
     
     def setValue(self, key, value):
         """ Save a settigns value. """
-        log.info(f'Saving generalsettings/{key} = {value}')
+        # log.info(f'Saving generalsettings/{key} = {value}')
         # self.app.settings.storage.setValue(f'generalsettings/{key}', value)
+        pass
 
     def setMonitor(self, index):
         """ Save new monitor value. """

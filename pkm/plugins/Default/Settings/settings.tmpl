@@ -6,7 +6,7 @@
     <QLabel text='Monitor'/>
     <QComboBox>
       <Connect currentIndexChanged='setMonitor'/>
-      <Repeater for='monitor in data.generalsettings.monitors'>
+      <Repeater for='monitor' in='data.generalsettings.monitors'>
         <Item args='monitor.text'/>
       </Repeater>
     </QComboBox>

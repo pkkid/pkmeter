@@ -232,7 +232,10 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _apply(self, callback, valuestr, context=None):
         """ Apply the specified valuestr to callback. """
         value = self._evaluate(valuestr, context)
-        if isinstance(value, (list, tuple)):
+        # TODO: THIS IS WHERE I WANT TO REGISTER WITH DATASTORE -----------
+        # But I am missing the list tokens!
+        # -----------------------------------------------------------------
+        if valuestr.startswith('(') or valuestr.startswith('['):
             return callback(*value)
         return callback(value)
 
@@ -268,7 +271,7 @@ class QTemplateWidget(QtWidgets.QWidget):
 
 class Repeater:
     """ Widget-like object used for repeatng child elements in QTemplate.
-        <Repeater for='i in 3'>...</Repeater>
+        <Repeater for='i' in='3'>...</Repeater>
     """
 
     def __init__(self, qtmpl, elem, parent, context):
@@ -276,18 +279,19 @@ class Repeater:
         self.elem = elem            # Current etree item to render children
         self.parent = parent        # Parent qobj to add children to
         self.context = context      # Context for building the children
+        self.varname = None         # Var name for subcontext
     
-    def setFor(self, forstr):
+    def setFor(self, varname):
+        self.varname = varname
+
+    def setIn(self, iterable):
         """ Rebuild the children elements on the parent. """
-        # Delete all children of the parent
+        if self.varname is None:
+            raise Exception('Repeater must specify the attribute for before in.')
+        if isinstance(iter, str):
+            raise Exception(f"Iterable lookup {iterable} failed.")
         utils.deleteChildren(self.parent)
-        # Build the new template objects
-        varname, valuestr = [x.strip() for x in forstr.split(' in ')]
-        value = self.qtmpl._evaluate(valuestr, self.context)
-        if isinstance(value, str):
-            raise Exception(f"Lookup iterstr '{valuestr}' failed.")
-        iter = range(value) if isinstance(value, int) else value
-        for item in iter:
+        for item in iterable:
             for echild in self.elem:
-                subcontext = dict(**self.context, **{varname:item})
+                subcontext = dict(**self.context, **{self.varname:item})
                 self.qtmpl._walk(echild, self.parent, subcontext)
