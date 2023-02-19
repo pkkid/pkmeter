@@ -8,7 +8,8 @@ from os.path import dirname, normpath
 from PySide6 import QtGui, QtWidgets
 
 sys.path.append(dirname(__file__))
-from pkm import APPNAME, ROOT, log, plugins, utils  # noqa
+from pkm import APPNAME, CONFIG_STORAGE, ROOT
+from pkm import log, logfile, plugins, utils
 from pkm.settings import SettingsWindow
 
 
@@ -21,16 +22,11 @@ class PKMeter(QtWidgets.QApplication):
         self.settings = SettingsWindow()        # Settings window
         self.plugins = plugins.plugins()        # Find and load plugins
         self.settings.show()                    # TODO: Remove
-        # TEST ----
-        from PySide6.QtCore import QTimer
-        QTimer.singleShot(2000, self.test_update_monitors)
-
-    def test_update_monitors(self):
-        self.settings.data.update('generalsettings.monitors', [{'value': 0, 'text': '#0 (Dell AW3418DW)'},{'value': 1, 'text': '#1 (TEST)'}])
-    # END TEST ----
 
     def _initApplication(self):
         """ Setup the application environment. """
+        log.info(f'Logging: {logfile}')
+        log.info(f'Settings: {normpath(CONFIG_STORAGE.fileName())}')
         # Application fonts
         resources = normpath(f'{ROOT}/resources')
         for filename in os.listdir(resources):

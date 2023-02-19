@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
-from pkm import APPNAME, CONFIG_LOCATION, log, utils
+from pkm import CONFIG_STORAGE, log, utils
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtWidgets
-from PySide6.QtCore import QSettings, Qt
+from PySide6.QtCore import Qt
 
 GENERALSETTINGS = 'default.generalsettings'
 
@@ -14,7 +14,7 @@ class SettingsWindow(QTemplateWidget):
     def __init__(self):
         super(SettingsWindow, self).__init__()
         self.app = QtCore.QCoreApplication.instance()
-        self._initStorage()
+        self.storage = CONFIG_STORAGE
     
     def show(self):
         """ Show this settings window. """
@@ -22,12 +22,6 @@ class SettingsWindow(QTemplateWidget):
         utils.centerWindow(self)
         self._swapContent(GENERALSETTINGS)
         super(SettingsWindow, self).show()
-        
-    def _initStorage(self):
-        """ Initialize the settings storage file. """
-        self.storage = QSettings(QSettings.IniFormat, QSettings.UserScope, APPNAME, APPNAME.lower())
-        self.storage.setPath(QSettings.IniFormat, QSettings.UserScope, str(CONFIG_LOCATION))
-        log.info(f'Settings storage: {normpath(self.storage.fileName())}')
 
     def _initPlugins(self):
         """ Initialize the plugins list and settings content. """
