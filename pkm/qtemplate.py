@@ -55,8 +55,8 @@ from PySide6 import QtWidgets
 from xml.etree import ElementTree
 
 # Define entities QTemplateWiget values can parse
-Collection = namedtuple('Collection', ('regex','start','end','delim','cast'))
-Type = namedtuple('Type', ('regex','cast'))
+Collection = namedtuple('Collection', 'regex, start, end, delim, cast')
+Type = namedtuple('Type', 'regex, cast')
 COLLECTIONS = [
     Collection(re.compile(r'^\[.*?\]$'), '[', ']', ',', list),
     Collection(re.compile(r'^\(.*?\)$'), '(', ')', ',', tuple),
@@ -106,7 +106,6 @@ class QTemplateWidget(QtWidgets.QWidget):
         context = dict(**plugins.widgets(), **{'self':self, 'data':self.data})
         self._walk(root, context=context)
         self._loading = False
-        self.data._loading = None
     
     def _walk(self, elem, parent=None, context=None, indent=0):
         """ Parse the specified element and it's children. """
@@ -222,8 +221,6 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _attrSet(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Calls set<attr>(<value>) on the qbject. """
         setattr = f'set{attr[0].upper()}{attr[1:]}'
-        if self._loading:
-            self.data._loading = self, qobj, elem, attr, context
         if hasattr(qobj, setattr):
             callback = getattr(qobj, setattr)
             self._apply(callback, valuestr, context)
@@ -231,15 +228,12 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def _apply(self, callback, valuestr, context=None):
         """ Apply the specified valuestr to callback. """
-        value = self._evaluate(valuestr, context)
-        # TODO: THIS IS WHERE I WANT TO REGISTER WITH DATASTORE -----------
-        # But I am missing the list tokens!
-        # -----------------------------------------------------------------
+        value = self._evaluate(valuestr, context, callback)
         if valuestr.startswith('(') or valuestr.startswith('['):
             return callback(*value)
         return callback(value)
 
-    def _evaluate(self, valuestr, context=None):
+    def _evaluate(self, valuestr, context=None, callback=None):
         """ Evaluate a given expression and return the result. Supports the operators
             and, or, add, sub, mul, div. Attempts to infer values types based on simple
             rtegex patterns. Supports types None, Bool, Int, Float. Will reference
@@ -250,12 +244,21 @@ class QTemplateWidget(QtWidgets.QWidget):
             if re.findall(c.regex, valuestr):
                 if valuestr == f'{c.start}{c.end}': return c.cast()
                 valuestrs = valuestr.lstrip(c.start).rstrip(c.end).split(c.delim)
-                return c.cast(self._evaluate(x.strip(), context) for x in valuestrs)
+                return c.cast(self._evaluate(x.strip(), context, callback) for x in valuestrs)
         tokens = utils.tokenize(valuestr, OPERATIONS)
+        self._registerTokens(tokens, valuestr, context, callback)
         values = [self._parse(t, context) for t in tokens]
         while len(values) > 1:
             values = [OPERATIONS[values[1]](values[0], values[2])] + values[3:]
         return values[0]
+    
+    def _registerTokens(self, tokens, valuestr, context=None, callback=None):
+        """ Check we need to register any of the specified tokens in the datastore. """
+        if not self._loading or not callback: return
+        context = context or {}
+        tokens = [t[5:] for t in tokens if t.startswith('data.')]
+        for token in tokens:
+            self.data.register(self, token, callback, valuestr, context)
     
     def _parse(self, token, context=None):
         """ Parse the token string into a value. """

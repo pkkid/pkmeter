@@ -21,6 +21,13 @@ class PKMeter(QtWidgets.QApplication):
         self.settings = SettingsWindow()        # Settings window
         self.plugins = plugins.plugins()        # Find and load plugins
         self.settings.show()                    # TODO: Remove
+        # TEST ----
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(2000, self.test_update_monitors)
+
+    def test_update_monitors(self):
+        self.settings.data.update('generalsettings.monitors', [{'value': 0, 'text': '#0 (Dell AW3418DW)'},{'value': 1, 'text': '#1 (TEST)'}])
+    # END TEST ----
 
     def _initApplication(self):
         """ Setup the application environment. """
