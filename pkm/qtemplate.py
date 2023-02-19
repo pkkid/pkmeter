@@ -103,13 +103,12 @@ class QTemplateWidget(QtWidgets.QWidget):
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
-        context = dict(**plugins.widgets(), **{'self':self, 'data':self.data})
+        context = dict(self=self, data=self.data)
         self._walk(root, context=context)
         self._loading = False
     
     def _walk(self, elem, parent=None, context=None, indent=0):
         """ Parse the specified element and it's children. """
-        context = context or {}
         log.debug(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
         if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />; then recurse further
         if self._tagRepeater(elem, parent, context, indent): return   # Repeats child elements
@@ -127,8 +126,9 @@ class QTemplateWidget(QtWidgets.QWidget):
 
     def _tagQobject(self, elem, parent, context, indent):
         """ Creates a QObject and appends it to the layout of parent. """
-        if elem.tag in context:
-            qcls = utils.rget(context, elem.tag)
+        qwidgets = plugins.widgets()
+        if elem.tag in qwidgets:
+            qcls = utils.rget(qwidgets, elem.tag)
             args = self._attrArgs(elem, context, indent)
             qobj = self if parent is None else qcls(*args, parent=parent)
             self._applyAttrs(qobj, elem, context, indent+1)
@@ -226,14 +226,14 @@ class QTemplateWidget(QtWidgets.QWidget):
             self._apply(callback, valuestr, context)
             return True
     
-    def _apply(self, callback, valuestr, context=None):
+    def _apply(self, callback, valuestr, context):
         """ Apply the specified valuestr to callback. """
         value = self._evaluate(valuestr, context, callback)
         if valuestr.startswith('(') or valuestr.startswith('['):
             return callback(*value)
         return callback(value)
 
-    def _evaluate(self, valuestr, context=None, callback=None):
+    def _evaluate(self, valuestr, context, callback=None):
         """ Evaluate a given expression and return the result. Supports the operators
             and, or, add, sub, mul, div. Attempts to infer values types based on simple
             rtegex patterns. Supports types None, Bool, Int, Float. Will reference
@@ -252,10 +252,9 @@ class QTemplateWidget(QtWidgets.QWidget):
             values = [OPERATIONS[values[1]](values[0], values[2])] + values[3:]
         return values[0]
     
-    def _registerTokens(self, tokens, valuestr, context=None, callback=None):
+    def _registerTokens(self, tokens, valuestr, context, callback=None):
         """ Check we need to register any of the specified tokens in the datastore. """
         if not self._loading or not callback: return
-        context = context or {}
         tokens = [t[5:] for t in tokens if t.startswith('data.')]
         for token in tokens:
             self.data.register(self, token, callback, valuestr, context)
@@ -263,9 +262,11 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _parse(self, token, context=None):
         """ Parse the token string into a value. """
         context = context or {}
-        if token.split('.')[0] in context:
-            value = utils.rget(context, token)
-            return value() if callable(value) else value
+        qwidgets = plugins.widgets()
+        for lookup in (context, qwidgets):
+            if token.split('.')[0] in lookup:
+                value = utils.rget(lookup, token)
+                return value() if callable(value) else value
         for t in TYPES:
             if re.findall(t.regex, token):
                 return t.cast(token)

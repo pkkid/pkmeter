@@ -79,8 +79,8 @@ def rset(obj, attrstr, value, delim='.'):
     parts = attrstr.split(delim, 1)
     attr = parts[0]
     attrstr = parts[1] if len(parts) == 2 else None
-    if attrstr and not isinstance(getattr(obj, attr), Bunch):
-        obj[attr] = Bunch()
+    if attrstr and not hasattr(obj, attr):
+        obj[attr] = {}
     if attrstr:
         rset(obj[attr], attrstr, value)
         return
