@@ -8,7 +8,7 @@ class TitleBar(QTemplateWidget):
       <QWidget id='titlebar' layout='QHBoxLayout'>
         <Set layout.contentsMargins='(0,0,0,15)' layout.spacing='8'/>
         <QLabel id='appicon'/>
-        <QLabel id='title' />
+        <QLabel id='title'/>
         <Stretch />
         <QPushButton text='󰅖'>
           <Connect clicked='close'/>

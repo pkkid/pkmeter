@@ -15,13 +15,13 @@
         <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
         <QPushButton id='generalbtn' text='General Settings'>
           <Set property='(class,selected)'/>
-          <Connect clicked='generalSettingsClicked' />
+          <Connect clicked='generalSettingsClicked'/>
         </QPushButton>
         <Spacing args='20'/>
-        <QLabel text='Available Plugins' />
+        <QLabel text='Available Plugins'/>
         <QListWidget id='pluginlist' dragDropMode='QAbstractItemView.InternalMove'>
-          <Connect dropEvent='pluginDropEvent' />
-          <Connect mouseReleaseEvent='pluginMouseReleaseEvent' />
+          <Connect dropEvent='pluginDropEvent'/>
+          <Connect mouseReleaseEvent='pluginMouseReleaseEvent'/>
         </QListWidget>
         <Spacing args='5'/>
         <QLabel text='Drag to reorder plugins.' property='(class,subtext)'/>
@@ -29,10 +29,10 @@
 
       <!-- Settings -->
       <QWidget id='contentwrap' layout='QVBoxLayout'>
-        <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0' />
-        <QLabel id='plugintitle' />
+        <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
+        <QLabel id='plugintitle'/>
         <QWidget id='content' layout='QVBoxLayout'>
-          <Set layout.contentsMargins='(0,0,0,0)' />
+          <Set layout.contentsMargins='(0,0,0,0)'/>
         </QWidget>
         <Stretch/>
       </QWidget>
