@@ -21,7 +21,7 @@ class PKMeter(QtWidgets.QApplication):
         self._initApplication()                 # Setup OS environment
         self.settings = SettingsWindow()        # Settings window
         self.plugins = plugins.plugins()        # Find and load plugins
-        self.settings.show()                    # TODO: Remove
+        self._showPlugins()
 
     def _initApplication(self):
         """ Setup the application environment. """
@@ -41,6 +41,13 @@ class PKMeter(QtWidgets.QApplication):
         if opts.outline:
             styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
         self.setStyleSheet(utils.render(styles))
+
+    def _showPlugins(self):
+        """ Display all enabled plugins. """
+        for id, plugin in self.plugins.items():
+            log.info(f'{plugin.widget=}')
+            if plugin.widget:
+                plugin.widget.show()
 
     @classmethod
     def start(cls, opts):

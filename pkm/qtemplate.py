@@ -95,7 +95,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Abstract method to initia DataStore with items. """
         pass
 
-    def _load(self, filepath=TMPL):
+    def _load(self):
         """ Reads the template and walks the xml tree to build the Qt UI. """
         if self.TMPL is not None:
             log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')

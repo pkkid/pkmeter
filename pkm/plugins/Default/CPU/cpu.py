@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
+from os.path import dirname, normpath
+from pkm.deskwidget import DeskWidget
 from pkm.qtemplate import QTemplateWidget
 
+
+class DesktopWidget(DeskWidget):
+    TMPL = normpath(f'{dirname(__file__)}/cpu.tmpl')
+    NAME = 'CPU'
+    
 
 class SettingsWidget(QTemplateWidget):
     TMPLSTR = """
       <QWidget layout='QHBoxLayout'>
-        <QLabel text='Clock Settings'/>
+        <QLabel text='CPU Settings'/>
       </QWidget>
     """
 

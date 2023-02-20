@@ -89,4 +89,3 @@ class SettingsWindow(QTemplateWidget):
         """ Close this settings window. """
         self.hide()
         event.ignore()
-        self.app.quit()  # TODO: REMOVE

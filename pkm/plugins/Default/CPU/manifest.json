@@ -4,6 +4,6 @@
   author: "Michael Shepanski",
   theme: "Default",
   description: "Displays realtime CPU usage.",
-  settings: "settings.SettingsWidget",
-  widget: "widget.DesktopWidget",
+  settings: "cpu.SettingsWidget",
+  widget: "cpu.DesktopWidget",
 }

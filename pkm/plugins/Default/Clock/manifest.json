@@ -4,6 +4,6 @@
   "author": "Michael Shepanski",
   "theme": "Default",
   "description": "Displays the local time.",
-  "settings": "settings.SettingsWidget",
-  "widget": "widget.DesktopWidget",
+  "settings": "clock.SettingsWidget",
+  "widget": "clock.DesktopWidget",
 }

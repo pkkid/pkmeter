@@ -171,22 +171,11 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
 
 
 /* DESKTOP WIDGET */
-/* #desktop {
+#deskwidget,
+QWidget[class=deskwidget] {
   background-color: rgba(0,0,0,0.5);
   border-radius: 5px;
 }
-#desktop QLabel {
+QWidget[class=deskwidget] QLabel {
   color: #ffffff;
 }
-#desktop #toolbar QPushButton {
-  border: rgba(0,0,0,0);
-  color: #ffffff;
-  font-family: 'Material Design Icons';
-  font-size: 16px;
-  margin: 0px;
-}
-#desktop #toolbar QPushButton:hover {
-  color: #dddddd; 
-} */
-
-
