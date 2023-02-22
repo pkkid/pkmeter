@@ -28,12 +28,6 @@ QLabel {
   background-color: rgba(0,0,0,0);
 }
 
-/* QPushButton */
-QPushButton {
-  text-transform: none;
-  font-weight: normal;
-}
-
 /* QListWidget */
 QListWidget {
   border: 0px solid rgba(0,0,0,0);
@@ -62,6 +56,32 @@ QListView::indicator:checked,
 QListView::indicator:checked:selected,
 QListView::indicator:checked:focus {
   /* image: url(resources/icons/checkbox-marked-outline.svg); */
+}
+
+/* QPushButton */
+QPushButton {
+  text-transform: none;
+  font-weight: normal;
+}
+
+/* QSlider */
+QSlider::groove:horizontal {
+  height: 2px;
+  background-color: $secondarydark;
+}
+QSlider::handle:horizontal {
+  background-color: $secondarylight;
+  border: 1px solid $secondarydark;
+  height: 20px;
+  margin: -6px 0;
+  width: 20px;
+  border-radius: 2px;
+}
+
+/* QSpinBox */
+QSpinBox {
+  padding: 5px 5px 0px 5px;;
+  background-color: $secondarydark;
 }
 
 
@@ -167,6 +187,9 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
 }
 #settings #content QLabel {
   max-width: 100px;
+}
+#settings #content QLabel[class=formlabel] {
+  margin-right: 20px;
 }
 
 

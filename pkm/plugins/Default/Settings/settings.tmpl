@@ -2,14 +2,11 @@
 <QWidget layout='QVBoxLayout' layout.spacing='20'>
 
   <!-- Monitor -->
-  <QWidget layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)'>
-    <QLabel text='Monitor'/>
-    <QComboBox>
-      <Connect currentIndexChanged='setMonitor'/>
-      <Repeater for='monitor' in='data.generalsettings.monitors'>
-        <Item args='monitor.text'/>
-      </Repeater>
-    </QComboBox>
+  <QWidget layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)' layout.spacing='20'>
+    <QLabel text='Widget Width'/>
+    <NumSlider range='(100,300)' value='180'>
+      <Connect valueChanged='_widthChanged'/>
+    </NumSlider>
   </QWidget>
   
   <!-- Position -->

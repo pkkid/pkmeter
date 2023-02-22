@@ -21,17 +21,7 @@ class SettingsWidget(QTemplateWidget):
             monitor.text = f'#{i} ({screen.name()})'
             monitors.append(monitor)
         self.data.update('generalsettings.monitors', monitors)
-    
-    def setValue(self, key, value):
-        """ Save a settigns value. """
-        # log.info(f'Saving generalsettings/{key} = {value}')
-        # self.app.settings.storage.setValue(f'generalsettings/{key}', value)
-        pass
 
-    def setMonitor(self, index):
+    def _widthChanged(self, value):
         """ Save new monitor value. """
-        self.setValue('monitor', 'Hi Mom!')
-
-    def setPosition(self, index):
-        """ Save the new position value. """
-        self.setValue('position', 'Hi Dad!')
+        log.info(f'_widthChanged({value=})')

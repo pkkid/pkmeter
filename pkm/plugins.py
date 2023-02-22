@@ -5,7 +5,8 @@ import json5
 import os
 import pkgutil
 from collections import defaultdict
-from pkm import APPNAME, PLUGIN_DIRS, VERSION, log, utils
+from functools import cached_property
+from pkm import APPNAME, CONFIG_STORAGE, PLUGIN_DIRS, VERSION, log, utils
 from PySide6 import QtCore, QtGui, QtWidgets
 
 _WIDGETS = None
@@ -19,22 +20,35 @@ class Plugin:
         self.name = manifest['name']                # Required: Plugin name
         self.version = manifest['version']          # Required: Plugin version
         self.theme = manifest['theme']              # Required: Plugin theme
-        self.id = self._createId()                  # Unique ID and namespace
         self.description = manifest.description     # Optional: Plugin description
-        self._settings = None
-        self._widget = None
     
-    @property
+    @cached_property
     def settings(self):
-        if not self._settings:
-            self._settings = self._loadModule(self.manifest.settings)
-        return self._settings
-    
-    @property
+        return self._loadModule(self.manifest.settings)
+
+    @cached_property
     def widget(self):
-        if not self._widget:
-            self._widget = self._loadModule(self.manifest.widget)
-        return self._widget
+        return self._loadModule(self.manifest.widget)
+    
+    @cached_property
+    def themevar(self):
+        return ''.join(c for c in self.theme.lower() if c.isalnum() or c == "_")
+    
+    @cached_property
+    def namevar(self):
+        return ''.join(c for c in self.name.lower() if c.isalnum() or c == "_")
+
+    @cached_property
+    def id(self):
+        return f'{self.themevar}.{self.namevar}'
+
+    def saveValue(self, varname, value):
+        location = f'{self.themevar}/{self.namevar}.{varname}'
+        CONFIG_STORAGE.setValue(location, value)
+    
+    def getValue(self, varname, default=None):
+        location = f'{self.themevar}/{self.namevar}.{varname}'
+        return CONFIG_STORAGE.value(location, default)
 
     def _loadModule(self, modpath):
         """ Load the specified module. """
@@ -45,12 +59,6 @@ class Plugin:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return getattr(module, clsname)(self)
-    
-    def _createId(self):
-        """ Create a unique id for this plugin. """
-        theme = ''.join(c for c in self.theme.lower() if c.isalnum() or c == "_")
-        name = ''.join(c for c in self.name.lower() if c.isalnum() or c == "_")
-        return f'{theme}.{name}'
 
 
 def themes(plugins):
