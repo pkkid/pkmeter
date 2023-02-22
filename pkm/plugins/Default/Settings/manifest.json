@@ -1,8 +1,0 @@
-{
-  "name": "General Settings",
-  "version": "1.0.0",
-  "author": "Michael Shepanski",
-  "theme": "Default",
-  "description": "PKMeter general settings",
-  "settings": "settings.SettingsWidget",
-}

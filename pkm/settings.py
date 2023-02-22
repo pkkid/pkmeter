@@ -27,15 +27,15 @@ class SettingsWindow(QTemplateWidget):
         """ Initialize the plugins list and settings content. """
         pluginlist = self.ids.pluginlist
         pluginlist.clear()
-        for plugin in self.app.plugins.values():
-            self._addSettingsContent(plugin.id, plugin.settings)
-            if plugin.id != GENERALSETTINGS:
-                item = QtWidgets.QListWidgetItem(f'{plugin.name}')
-                item.setData(Qt.UserRole, plugin.id)
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
-                item.setCheckState(Qt.Checked)
-                item.setSizeHint(QtCore.QSize(80, 30))
-                pluginlist.addItem(item)
+        # for plugin in self.app.plugins.values():
+        #     self._addSettingsContent(plugin.id, plugin.settings)
+        #     if plugin.id != GENERALSETTINGS:
+        #         item = QtWidgets.QListWidgetItem(f'{plugin.name}')
+        #         item.setData(Qt.UserRole, plugin.id)
+        #         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+        #         item.setCheckState(Qt.Checked)
+        #         item.setSizeHint(QtCore.QSize(80, 30))
+        #         pluginlist.addItem(item)
 
     def _addSettingsContent(self, pluginid, widget):
         """ Add settings content to the window. """

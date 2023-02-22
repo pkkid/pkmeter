@@ -12,7 +12,7 @@ VERSION = '0.1'
 ROOT = dirname(dirname(__file__))
 CONFIG_LOCATION = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
 CONFIG_STORAGE = QSettings(QSettings.IniFormat, QSettings.UserScope, APPNAME, APPNAME.lower())
-PLUGIN_DIRS = [
+PLUGIN_DIRECTORIES = [
     os.path.normpath(f'{ROOT}/pkm/plugins'),
     os.path.normpath(f'{CONFIG_LOCATION}/{APPNAME}/plugins'),
 ]

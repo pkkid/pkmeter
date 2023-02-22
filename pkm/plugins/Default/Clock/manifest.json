@@ -1,9 +1,0 @@
-{
-  "name": "Clock",
-  "version": "1.0.0",
-  "author": "Michael Shepanski",
-  "theme": "Default",
-  "description": "Displays the local time.",
-  "settings": "clock.SettingsWidget",
-  "widget": "clock.DesktopWidget",
-}

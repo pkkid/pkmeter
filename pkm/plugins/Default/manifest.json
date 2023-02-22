@@ -1,18 +1,17 @@
 {
-  theme: "Default",
+  name: "Default",
   version: "1.0.0",
   author: "Michael Shepanski",
   description: "Collection of default themes for PKMeter.",
-  Widgets: [{
-    name: "Settings",
-    settings: "Settings.settings.SettingsWidget",
-  },{
+  commonwidgets: "_widgets",
+  commonsettings: "_settings.settings.SettingsWidget",
+  components: [{
     name: "Clock",
-    settings: "Clock.clock.SettingsWidget",
-    widget: "Clock.clock.DesktopWidget",
+    settings: "clock.clock.SettingsWidget",
+    widget: "clock.clock.DesktopWidget",
   },{
     name: "CPU",
-    settings: "CPU.cpu.SettingsWidget",
-    widget: "CPU.cpu.DesktopWidget",
+    settings: "cpu.cpu.SettingsWidget",
+    widget: "cpu.cpu.DesktopWidget",
   }]
 }

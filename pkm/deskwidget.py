@@ -10,15 +10,15 @@ class DeskWidget(Draggable, QTemplateWidget):
     DEFAULT_LAYOUT_MARGINS = (30,30,30,30)
     DEFAULT_LAYOUT_SPACING = 0
 
-    def __init__(self, plugin):
+    def __init__(self, component):
         QTemplateWidget.__init__(self)
         Draggable.__init__(self)
-        self.plugin = plugin
+        self.component = component
         self.app = QtCore.QCoreApplication.instance()
         self.setProperty('class', 'widget')
-        self.setProperty('theme', self.plugin.themevar)
-        self.setProperty('name', self.plugin.namevar)
-        self.setObjectName(self.plugin.id)
+        self.setProperty('plugin', self.component.plugin.varname)
+        self.setProperty('component', self.component.varname)
+        self.setObjectName(self.component.id)
         self._initWidget()
         self._initRightclickMenu()
 
@@ -26,7 +26,7 @@ class DeskWidget(Draggable, QTemplateWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
         # Set the position
-        pos = [int(x) for x in self.plugin.getValue('pos', '0,0').split(',')]
+        pos = [int(x) for x in self.component.getValue('pos', '0,0').split(',')]
         self.move(pos[0], pos[1])
     
     def _initRightclickMenu(self):
@@ -39,4 +39,4 @@ class DeskWidget(Draggable, QTemplateWidget):
     
     def widgetMoved(self, pos):
         log.info(f'Widget Moved: {pos=}')
-        self.plugin.saveValue('pos', f'{pos.x()},{pos.y()}')
+        self.component.saveValue('pos', f'{pos.x()},{pos.y()}')

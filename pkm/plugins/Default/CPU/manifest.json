@@ -1,9 +1,0 @@
-{
-  name: "CPU",
-  version: "1.0.0",
-  author: "Michael Shepanski",
-  theme: "Default",
-  description: "Displays realtime CPU usage.",
-  settings: "cpu.SettingsWidget",
-  widget: "cpu.DesktopWidget",
-}
