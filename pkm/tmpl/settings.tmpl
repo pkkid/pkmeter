@@ -13,18 +13,25 @@
       <Set layout.contentsMargins='(0,0,0,0)'/>
       <QWidget id='sidepanel' layout='QVBoxLayout'>
         <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
+        <!-- General Settings -->
         <QPushButton id='generalbtn' text='General Settings'>
           <Set property='(class,selected)'/>
           <Connect clicked='generalSettingsClicked'/>
         </QPushButton>
         <Spacing args='20'/>
+        <!-- Available Plugins -->
         <QLabel text='Available Plugins'/>
+        <Spacing args='3'/>
+        <QComboBox>
+          <Repeater for='plugin' in='app.plugins.values()'>
+            <Item args='plugin.name'/>
+          </Repeater>
+        </QComboBox>
+        <!-- Component List -->
         <QListWidget id='pluginlist' dragDropMode='QAbstractItemView.InternalMove'>
           <Connect dropEvent='pluginDropEvent'/>
           <Connect mouseReleaseEvent='pluginMouseReleaseEvent'/>
         </QListWidget>
-        <Spacing args='5'/>
-        <QLabel text='Drag to reorder plugins.' property='(class,subtext)'/>
       </QWidget>
 
       <!-- Settings -->

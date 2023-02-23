@@ -21,6 +21,7 @@ QWidget {
 QComboBox {
   padding: 5px 5px;
   background-color: $secondary;
+  margin: 0px -1px;
 }
 
 /* QLabel */

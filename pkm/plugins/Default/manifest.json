@@ -4,8 +4,10 @@
   author: "Michael Shepanski",
   description: "Collection of default themes for PKMeter.",
   commonwidgets: "_widgets",
-  commonsettings: "_settings.settings.SettingsWidget",
   components: [{
+    name: "General Settings",
+    settings: "settings.settings.SettingsWidget",
+  },{
     name: "Clock",
     settings: "clock.clock.SettingsWidget",
     widget: "clock.clock.DesktopWidget",

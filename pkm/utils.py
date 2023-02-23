@@ -60,17 +60,18 @@ def render(tmplstr, context=None):
 def rget(obj, attrstr, default=None, delim='.'):
     """ Recursively get a value from a nested dictionary. """
     try:
-        parts = attrstr.split(delim, 1)
-        attr = parts[0]
-        substr = parts[1] if len(parts) == 2 else None
-        if isinstance(obj, dict): value = obj[attr]
+        attr, *substr = attrstr.split(delim, 1)
+        if isinstance(obj, dict):
+            if attr == 'keys()': value = obj.keys()
+            elif attr == 'values()': value = obj.values()
+            else: value = obj[attr]
         elif isinstance(obj, list): value = obj[int(attr)]
         elif isinstance(obj, tuple): value = obj[int(attr)]
         elif isinstance(obj, object): value = getattr(obj, attr)
-        if substr: return rget(value, substr, default, delim)
+        if substr: return rget(value, '.'.join(substr), default, delim)
         return value
     except Exception as err:
-        log.warning(err)
+        log.warning(err, exc_info=True)
         return default
 
 

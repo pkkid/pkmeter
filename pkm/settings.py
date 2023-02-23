@@ -20,7 +20,7 @@ class SettingsWindow(QTemplateWidget):
         """ Show this settings window. """
         self._initPlugins()
         utils.centerWindow(self)
-        self._swapContent(GENERALSETTINGS)
+        # self._swapContent(GENERALSETTINGS)
         super(SettingsWindow, self).show()
 
     def _initPlugins(self):

@@ -46,7 +46,6 @@ class PKMeter(QtWidgets.QApplication):
         """ Display all enabled plugins. """
         for pid, plugin in self.plugins.items():
             for cid, component in plugin.components.items():
-                log.info(f'{cid=}')
                 if component.widget:
                     component.widget.show()
 

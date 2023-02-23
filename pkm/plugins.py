@@ -101,7 +101,7 @@ class Component:
 def loadmodule(rootdir, modpath, parent):
     """ Load the specified module. """
     if not modpath: return None
-    log.info(f'loadmodule({modpath=})')
+    log.debug(f'loadmodule({modpath=})')
     modname, clsname = modpath.rsplit('.', 1)
     modpath = os.path.normpath(f'{rootdir}/{modname.replace(".","/")}.py')
     spec = importlib.util.spec_from_file_location(modname, modpath)
