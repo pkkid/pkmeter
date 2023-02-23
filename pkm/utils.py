@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
+from collections import OrderedDict
 from pkm import log
 from PySide6.QtWidgets import QApplication
 from string import Template
 
 
-class Bunch(dict):
+class Bunch(OrderedDict):
     """ Allows dot notation to set and get dict values. """
     def __getattr__(self, item):
         try:
@@ -27,14 +28,6 @@ def centerWindow(window):
     window.move(x, y)
 
 
-def setPropertyAndRedraw(qobj, name, value):
-    """ After setting a property on a QtWidget, redraw it. """
-    qobj.setProperty(name, value)
-    qobj.style().unpolish(qobj)
-    qobj.style().polish(qobj)
-    qobj.update()
-
-
 def deleteChildren(qobj):
     """ Delete all children of the specified QObject. """
     if hasattr(qobj, 'clear'):
@@ -43,10 +36,17 @@ def deleteChildren(qobj):
     while layout.count():
         item = layout.takeAt(0)
         widget = item.widget()
-        if widget:
-            widget.deleteLater()
-        else:
-            deleteChildren(item.layout())
+        if widget: widget.deleteLater()
+        else: deleteChildren(item.layout())
+
+
+def removeChildren(qobj):
+    layout = qobj.layout()
+    for i in reversed(range(layout.count())):
+        widget = layout.itemAt(i).widget()
+        if widget is not None:
+            widget.setVisible(False)
+            layout.removeWidget(widget)
 
 
 def render(tmplstr, context=None):
@@ -86,6 +86,14 @@ def rset(obj, attrstr, value, delim='.'):
         rset(obj[attr], attrstr, value)
         return
     obj[attr] = value
+
+
+def setPropertyAndRedraw(qobj, name, value):
+    """ After setting a property on a QtWidget, redraw it. """
+    qobj.setProperty(name, value)
+    qobj.style().unpolish(qobj)
+    qobj.style().polish(qobj)
+    qobj.update()
 
 
 def tokenize(valuestr, operations=None):

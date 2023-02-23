@@ -14,7 +14,7 @@
       <QWidget id='sidepanel' layout='QVBoxLayout'>
         <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
         <!-- General Settings -->
-        <QPushButton id='generalbtn' text='General Settings'>
+        <QPushButton id='applicationsettings' text='Application Settings'>
           <Set property='(class,selected)'/>
           <Connect clicked='generalSettingsClicked'/>
         </QPushButton>
@@ -22,24 +22,27 @@
         <!-- Available Plugins -->
         <QLabel text='Available Plugins'/>
         <Spacing args='3'/>
-        <QComboBox>
+        <QComboBox id='pluginlist'>
+          <Connect currentIndexChanged='updateComponentList'/>
           <Repeater for='plugin' in='app.plugins.values()'>
-            <Item args='plugin.name'/>
+            <Item args='(plugin.name,plugin.varname)'/>
           </Repeater>
         </QComboBox>
         <!-- Component List -->
-        <QListWidget id='pluginlist' dragDropMode='QAbstractItemView.InternalMove'>
-          <Connect dropEvent='pluginDropEvent'/>
-          <Connect mouseReleaseEvent='pluginMouseReleaseEvent'/>
+        <QListWidget id='componentlist'>
+          <Connect itemClicked='updateContent'/>
         </QListWidget>
       </QWidget>
 
       <!-- Settings -->
       <QWidget id='contentwrap' layout='QVBoxLayout'>
         <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
-        <QLabel id='plugintitle'/>
         <QWidget id='content' layout='QVBoxLayout'>
           <Set layout.contentsMargins='(0,0,0,0)'/>
+          <!-- Application Settings - Content replaced when selecting a plugin and component. -->
+          <QWidget id='appsettings' layout='QVBoxLayout' layout.spacing='20'>
+            <QLabel text='Application settings not yet defined.'/>
+          </QWidget>
         </QWidget>
         <Stretch/>
       </QWidget>

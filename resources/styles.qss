@@ -186,10 +186,8 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
   color: $dimtext;
   padding-left: 2px;
 }
-#settings #content QLabel {
-  max-width: 100px;
-}
 #settings #content QLabel[class=formlabel] {
+  max-width: 100px;
   margin-right: 20px;
 }
 
