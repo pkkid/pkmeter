@@ -1,18 +1,31 @@
 
-<QWidget layout='QVBoxLayout' geometry='(0,0,600,500)'>
+<QWidget layout='QVBoxLayout' geometry='(0,0,700,500)'>
   <Set attribute='Qt.WA_TranslucentBackground'/>
   <Set layout.contentsMargins='(0,0,0,0)'/>
   <Set windowFlags='Qt.Dialog | Qt.FramelessWindowHint'/>
   <Set windowModality='Qt.ApplicationModal'/>
   <Set windowTitle='APPNAME+" Settings"'/>
-  <QWidget id='settings' layout='QVBoxLayout' layout.contentsMargins='(15,10,15,15)'>
-    <TitleBar id='titlebar' title='APPNAME+" Settings"'/>
+  <!-- <TitleBar id='titlebar' title='APPNAME+" Settings"'/> -->
+
+  <QWidget id='settings' layout='QHBoxLayout'>
+    <Set layout.contentsMargins='(1,1,1,1)' layout.spacing='0'/>
 
     <!-- Side Panel -->
-    <QWidget layout='QHBoxLayout' layout.spacing='20'>
+    <QWidget id='sidepanelwrap' layout='QVBoxLayout'>
       <Set layout.contentsMargins='(0,0,0,0)'/>
       <QWidget id='sidepanel' layout='QVBoxLayout'>
-        <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
+        <Set layout.contentsMargins='(15,15,15,15)' layout.spacing='0'/>
+        
+        <!-- Title -->
+        <QWidget id='sidepanelwrap' layout='QVBoxLayout' layout.contentsMargins='(0,0,0,0)' layout.spacing='0'>
+          <QWidget id='sidepanelwrap' layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)' layout.spacing='3'>
+            <QLabel id='title' text='APPNAME'/>
+            <QLabel id='version' text='"v"+VERSION'/>
+          </QWidget>
+          <QLabel text='github.com/pkkid/pkmeter' property='(class,subtext)'/>
+        </QWidget>
+        <Spacing args='20'/>
+        
         <!-- General Settings -->
         <QPushButton id='applicationsettings' text='Application Settings'>
           <Set property='(class,selected)'/>
@@ -33,20 +46,20 @@
           <Connect itemClicked='updateContent'/>
         </QListWidget>
       </QWidget>
-
-      <!-- Settings -->
-      <QWidget id='contentwrap' layout='QVBoxLayout'>
-        <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
-        <QWidget id='content' layout='QVBoxLayout'>
-          <Set layout.contentsMargins='(0,0,0,0)'/>
-          <!-- Application Settings - Content replaced when selecting a plugin and component. -->
-          <QWidget id='appsettings' layout='QVBoxLayout' layout.spacing='20'>
-            <QLabel text='Application settings not yet defined.'/>
-          </QWidget>
-        </QWidget>
-        <Stretch/>
-      </QWidget>
     </QWidget>
-  
+
+    <!-- Content Panel -->
+    <QWidget id='contentwrap' layout='QVBoxLayout'>
+      <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
+      <QWidget id='content' layout='QVBoxLayout'>
+        <Set layout.contentsMargins='(0,0,0,0)'/>
+        <!-- Application Settings - Content replaced when selecting a plugin and component. -->
+        <QWidget id='appsettings' layout='QVBoxLayout' layout.spacing='20'>
+          <QLabel text='Application settings not yet defined.'/>
+        </QWidget>
+      </QWidget>
+      <Stretch/>
+    </QWidget>
+
   </QWidget>
 </QWidget>

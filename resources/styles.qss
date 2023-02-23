@@ -7,8 +7,10 @@
 /*  $secondary      = '#333333'
 /*  $secondarylight = '#555555'
 /*  $secondarydark  = '#222222'
+/*  $secondarydark2 = '#111111'
 /*  $primarytext    = '#f8f2ec'
 /*  $secondarytext  = '#c5c0ba'
+/*  $highlighttext  = '#fabd2f'
 /*  $dimtext        = '#888480'
 */
 QWidget {
@@ -158,19 +160,44 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
 
 /* SETTINGS WINDOW */
 #settings {
-  border-radius: 8px;
-  border: 1px solid #444;
+  border-radius: 3px;
+  background-color: $secondarydark;
+}
+#settings #sidepanelwrap {
   background-color: $secondary;
+  max-width: 200px;
+  min-width: 200px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
-#settings #sidepanel {
-  max-width: 190px;
-  min-width: 190px;
+#settings #contentwrap {
+  background-color: $secondarydark2;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
+#settings #title {
+  font-size: 25px;
+  color: $primarytext;
+  margin-left: -8px;
+}
+#settings #version {
+  color: $highlighttext;
+  padding-top: 7px;
+}
+#settings QLabel[class=subtext] {
+  font-size: 11px;
+  color: $dimtext;
+}
+
 #settings #sidepanel QPushButton {
   background-color: $secondarydark;
   padding: 8px;
   border-radius: 3px;
 }
+
+
+
+/* 
 #settings #sidepanel QPushButton:hover {
   background-color: $secondarylight;
 }
@@ -181,15 +208,11 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
 #settings QLabel#plugintitle {
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-#settings QLabel[class=subtext] {
-  font-size: 10px;
-  color: $dimtext;
-  padding-left: 2px;
-}
+
 #settings #content QLabel[class=formlabel] {
   max-width: 100px;
   margin-right: 20px;
-}
+} */
 
 
 /* DESKTOP WIDGET */

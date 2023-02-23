@@ -2,7 +2,7 @@
 from os.path import dirname, normpath
 from pkm import CONFIG_STORAGE, log, utils
 from pkm.qtemplate import QTemplateWidget
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 
 
@@ -14,6 +14,12 @@ class SettingsWindow(QTemplateWidget):
         self.app = QtCore.QCoreApplication.instance()
         self.appsettings = self.ids.appsettings
         self.storage = CONFIG_STORAGE
+        # Add Shadow to contentwrap
+        shadow = QtWidgets.QGraphicsDropShadowEffect()
+        shadow.setColor(QtGui.QColor(0, 0, 0, 127))
+        shadow.setBlurRadius(8)
+        shadow.setOffset(-5, 0)
+        self.ids.contentwrap.setGraphicsEffect(shadow)
     
     def closeEvent(self, event):
         """ Close this settings window. """
