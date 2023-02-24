@@ -1,24 +1,20 @@
 
-<QWidget layout='QVBoxLayout' geometry='(0,0,700,500)'>
+<QWidget layout='QVBoxLayout' geometry='(0,0,700,500)' padding='0'>
   <Set attribute='Qt.WA_TranslucentBackground'/>
-  <Set layout.contentsMargins='(0,0,0,0)'/>
   <Set windowFlags='Qt.Dialog | Qt.FramelessWindowHint'/>
   <Set windowModality='Qt.ApplicationModal'/>
   <Set windowTitle='APPNAME+" Settings"'/>
   <!-- <TitleBar id='titlebar' title='APPNAME+" Settings"'/> -->
 
-  <QWidget id='settings' layout='QHBoxLayout'>
-    <Set layout.contentsMargins='(1,1,1,1)' layout.spacing='0'/>
+  <QWidget id='settings' layout='QHBoxLayout' padding='1' spacing='0'>
 
     <!-- Side Panel -->
-    <QWidget id='sidepanelwrap' layout='QVBoxLayout'>
-      <Set layout.contentsMargins='(0,0,0,0)'/>
-      <QWidget id='sidepanel' layout='QVBoxLayout'>
-        <Set layout.contentsMargins='(15,15,15,15)' layout.spacing='0'/>
+    <QWidget id='sidepanelwrap' layout='QVBoxLayout' padding='0'>
+      <QWidget id='sidepanel' layout='QVBoxLayout' padding='15' spacing='0'>
         
         <!-- Title -->
-        <QWidget id='sidepanelwrap' layout='QVBoxLayout' layout.contentsMargins='(0,0,0,0)' layout.spacing='0'>
-          <QWidget id='sidepanelwrap' layout='QHBoxLayout' layout.contentsMargins='(0,0,0,0)' layout.spacing='3'>
+        <QWidget id='sidepanelwrap' layout='QVBoxLayout' padding='0' spacing='0'>
+          <QWidget id='sidepanelwrap' layout='QHBoxLayout' padding='0' spacing='3'>
             <QLabel id='title' text='APPNAME'/>
             <QLabel id='version' text='"v"+VERSION'/>
           </QWidget>
@@ -49,12 +45,10 @@
     </QWidget>
 
     <!-- Content Panel -->
-    <QWidget id='contentwrap' layout='QVBoxLayout'>
-      <Set layout.contentsMargins='(0,0,0,0)' layout.spacing='0'/>
-      <QWidget id='content' layout='QVBoxLayout'>
-        <Set layout.contentsMargins='(0,0,0,0)'/>
+    <QWidget id='contentwrap' layout='QVBoxLayout' padding='0' spacing='0'>
+      <QWidget id='content' layout='QVBoxLayout' padding='0'>
         <!-- Application Settings - Content replaced when selecting a plugin and component. -->
-        <QWidget id='appsettings' layout='QVBoxLayout' layout.spacing='20'>
+        <QWidget id='appsettings' layout='QVBoxLayout' spacing='20'>
           <QLabel text='Application settings not yet defined.'/>
         </QWidget>
       </QWidget>

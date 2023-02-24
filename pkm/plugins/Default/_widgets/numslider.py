@@ -6,7 +6,7 @@ from PySide6.QtCore import Signal
 class NumSlider(QTemplateWidget):
     """ Window titlebar with custom styles. """
     TMPLSTR = r"""
-      <QWidget layout='QHBoxLayout' layout.spacing='20'>
+      <QWidget layout='QHBoxLayout' spacing='20'>
         <QSlider id='slider' args='(Qt.Horizontal)'>
           <Connect valueChanged='_valueChanged'/>
         </QSlider>

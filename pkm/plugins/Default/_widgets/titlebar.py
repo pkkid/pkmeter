@@ -5,8 +5,7 @@ from pkm.qtemplate import QTemplateWidget
 class TitleBar(QTemplateWidget):
     """ Window titlebar with custom styles. """
     TMPLSTR = r"""
-      <QWidget id='titlebar' layout='QHBoxLayout'>
-        <Set layout.contentsMargins='(0,0,0,15)' layout.spacing='8'/>
+      <QWidget id='titlebar' layout='QHBoxLayout' padding='(0,0,0,15)' spacing='8'>
         <QLabel id='appicon'/>
         <QLabel id='title'/>
         <Stretch />

@@ -80,8 +80,6 @@ class QTemplateWidget(QtWidgets.QWidget):
     """ My interpreation of a less verbose Qt Template language. """
     TMPL = None                         # Filepath of tmpl file to load
     TMPLSTR = None                      # String template (if not using a file)
-    DEFAULT_LAYOUT_MARGINS = None       # Default values for qobj.layout().setContentsMargins()
-    DEFAULT_LAYOUT_SPACING = None       # Default values for qobj.layout().setSpacing()
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
@@ -182,11 +180,13 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Applies attributes of elem to qobj. """
         for attr, valuestr in elem.attrib.items():
             valuestr = valuestr.strip()
-            if attr == 'args': continue                                                 # Ignore args, we read that earlier
-            if attr.startswith('_'): continue                                           # Ignore attrs with underscore
-            if self._attrId(qobj, elem, attr, valuestr, context, indent): continue      # id='myobject'
-            if self._attrLayout(qobj, elem, attr, valuestr, context, indent): continue  # layout.<attr>='value'
-            if self._attrSet(qobj, elem, attr, valuestr, context, indent): continue     # attr='value'
+            if attr == 'args': continue                                                     # Ignore args; read earlier
+            if attr.startswith('_'): continue                                               # Ignore attrs with underscore
+            if self._attrId(qobj, elem, attr, valuestr, context, indent): continue          # id='myobject'
+            if self._attrPadding(qobj, elem, attr, valuestr, context, indent): continue     # padding=setContentsMargins
+            if self._attrSpacing(qobj, elem, attr, valuestr, context, indent): continue     # spacing=layout().setSpacing
+            if self._attrLayout(qobj, elem, attr, valuestr, context, indent): continue      # layout.<attr>='value'
+            if self._attrSet(qobj, elem, attr, valuestr, context, indent): continue         # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
 
     def _attrArgs(self, elem, context, indent):
@@ -204,19 +204,32 @@ class QTemplateWidget(QtWidgets.QWidget):
             self.ids[valuestr] = qobj
             return True
     
+    def _attrPadding(self, qobj, elem, attr, valuestr, context, indent=0):
+        """ Sets contentsMargin on the layout. """
+        if attr.lower() == 'padding':
+            value = self._evaluate(valuestr, context)
+            if isinstance(value, int): value = (value,) * 4
+            elif len(value) == 2: value = value * 2
+            qobj.layout().setContentsMargins(*value)
+            return True
+    
+    def _attrSpacing(self, qobj, elem, attr, valuestr, context, indent=0):
+        """ Sets contentsMargin on the layout. """
+        if attr.lower() == 'spacing':
+            value = self._evaluate(valuestr, context)
+            qobj.layout().setSpacing(value)
+            return True
+    
     def _attrLayout(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Sets the layout or layout.property(). Also reads the DEFAULT_LAYOUT_*
             properties on the class and applies those if specified.
         """
         if attr == 'layout':
             self._attrSet(qobj, elem, attr, valuestr, context, indent=0)
-            if self.DEFAULT_LAYOUT_MARGINS is not None:
-                qobj.layout().setContentsMargins(*self.DEFAULT_LAYOUT_MARGINS)
-            if self.DEFAULT_LAYOUT_SPACING is not None:
-                qobj.layout().setSpacing(self.DEFAULT_LAYOUT_SPACING)
             return True
         if attr.startswith('layout.'):
-            return self._attrSet(qobj.layout(), elem, attr[7:], valuestr, context, indent)
+            self._attrSet(qobj.layout(), elem, attr[7:], valuestr, context, indent)
+            return True
 
     def _attrSet(self, qobj, elem, attr, valuestr, context, indent=0):
         """ Calls set<attr>(<value>) on the qbject. """
