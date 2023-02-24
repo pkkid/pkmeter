@@ -16,7 +16,7 @@
 QWidget {
   color: $secondarytext;
   font-family: 'Josefin Sans';
-  font-size: 13px;
+  font-size: 14px;
 }
 
 /* QComboBox */
@@ -124,37 +124,14 @@ QScrollBar::sub-page:vertical {
   /* background: none; */
 }
 
-
-/* QCheckBox */
-/* QCheckBox::indicator,
-QListWidget::item:!selected:!active:checkbox::indicator {
-  width: 16px;
-  height: 16px;
-}
-QCheckBox::indicator:unchecked,
-QListWidget::item:!selected:!active:checkbox::indicator:unchecked {
-  image: url(:icons/checkbox-blank-outline.png);
-} */
-/* QCheckBox::indicator:checked,
-QListWidget::item:!selected:!active:checkbox::indicator:checked {
-  image: url(':/icons/checked.png');
-} */
-
-
-/* TITLEBAR */
-#titlebar #appicon {
-  border-image: url('resources/icons/chart-box.png') 0 0 0 0 stretch stretch;
-  min-width: 20px;
-  max-width: 20px;
-  min-height: 20px;
-  max-height: 20px;
-}
-#titlebar QPushButton {
+/* CLOSE BUTTON */
+QPushButton[class=close] {
   border: rgba(0,0,0,0);
   color: $secondarytext;
   font-size: 18px;
+  background-color: rgba(0,0,0,0);
 }
-#titlebar QPushButton:hover {
+QPushButton[class=close]:hover {
   color: $primarytext;
 }
 
@@ -170,15 +147,9 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
 }
-#settings #contentwrap {
-  background-color: $secondarydark2;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
 #settings #title {
   font-size: 25px;
   color: $primarytext;
-  margin-left: -8px;
 }
 #settings #version {
   color: $highlighttext;
@@ -188,13 +159,48 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
   font-size: 11px;
   color: $dimtext;
 }
-
 #settings #sidepanel QPushButton {
   background-color: $secondarydark;
   padding: 8px;
   border-radius: 3px;
 }
+#settings #contentwrap {
+  background-color: $secondarydark2;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
 
+/* FORM FIELD */
+QWidget[class=formfield] QLabel {
+  max-width: 120px;
+  min-width: 120px;
+}
+
+/* DESKTOP WIDGET */
+#deskwidget,
+QWidget[class=deskwidget] {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 5px;
+}
+QWidget[class=deskwidget] QLabel {
+  color: #ffffff;
+}
+
+
+/* QCheckBox */
+/* QCheckBox::indicator,
+QListWidget::item:!selected:!active:checkbox::indicator {
+  width: 16px;
+  height: 16px;
+}
+QCheckBox::indicator:unchecked,
+QListWidget::item:!selected:!active:checkbox::indicator:unchecked {
+  image: url(:icons/checkbox-blank-outline.png);
+} */
+/* QCheckBox::indicator:checked,
+QListWidget::item:!selected:!active:checkbox::indicator:checked {
+  image: url(':/icons/checked.png');
+} */
 
 
 /* 
@@ -215,12 +221,4 @@ QListWidget::item:!selected:!active:checkbox::indicator:checked {
 } */
 
 
-/* DESKTOP WIDGET */
-#deskwidget,
-QWidget[class=deskwidget] {
-  background-color: rgba(0,0,0,0.5);
-  border-radius: 5px;
-}
-QWidget[class=deskwidget] QLabel {
-  color: #ffffff;
-}
+

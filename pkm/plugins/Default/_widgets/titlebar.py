@@ -1,40 +1,27 @@
 # -*- coding: utf-8 -*-
-from pkm.qtemplate import QTemplateWidget
+from PySide6 import QtWidgets
+from PySide6.QtCore import Qt
 
 
-class TitleBar(QTemplateWidget):
-    """ Window titlebar with custom styles. """
-    TMPLSTR = r"""
-      <QWidget id='titlebar' layout='QHBoxLayout' padding='(0,0,0,15)' spacing='8'>
-        <QLabel id='appicon'/>
-        <QLabel id='title'/>
-        <Stretch />
-        <QPushButton text='󰅖'>
-          <Connect clicked='close'/>
-        </QPushButton>
-      </QWidget>
-    """
+class TitleBar(QtWidgets.QWidget):
+    """ Allows dragging the parent window. """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, window, *args, **kwargs):
         super(TitleBar, self).__init__(*args, **kwargs)
-        self.mousepos = None
-        self.widgetpos = None
-    
-    def setTitle(self, title):
-        self.ids.title.setText(title)
-
-    def close(self):
-        self.parent().parent().close()
+        self._dragMousePos = None
+        self._dragWidgetPos = None
+        self.window = window
 
     def mousePressEvent(self, event):
-        self.mousepos = event.globalPos()
-        self.widgetpos = self.parent().parent().pos()
+        if event.button() == Qt.LeftButton:
+            self._dragMousePos = event.globalPos()
+            self._dragWidgetPos = self.window.pos()
 
     def mouseMoveEvent(self, event):
-        if self.mousepos:
-            delta = event.globalPos() - self.mousepos
-            self.parent().parent().move(self.widgetpos + delta)
+        if self._dragMousePos:
+            delta = event.globalPos() - self._dragMousePos
+            self.window.move(self._dragWidgetPos + delta)
 
     def mouseReleaseEvent(self, event):
-        self.mousepos = None
-        self.widgetpos = None
+        self._dragMousePos = None
+        self._dragWidgetPos = None

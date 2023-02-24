@@ -22,10 +22,9 @@ class SettingsWindow(QTemplateWidget):
         shadow.setOffset(-5, 0)
         self.ids.contentwrap.setGraphicsEffect(shadow)
     
-    def closeEvent(self, event):
+    def close(self, event):
         """ Close this settings window. """
         self.hide()
-        event.ignore()
     
     def generalSettingsClicked(self):
         """ Callback when the general settings button is clicked. """

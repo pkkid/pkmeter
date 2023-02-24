@@ -4,51 +4,55 @@
   <Set windowFlags='Qt.Dialog | Qt.FramelessWindowHint'/>
   <Set windowModality='Qt.ApplicationModal'/>
   <Set windowTitle='APPNAME+" Settings"'/>
-  <!-- <TitleBar id='titlebar' title='APPNAME+" Settings"'/> -->
-
   <QWidget id='settings' layout='QHBoxLayout' padding='1' spacing='0'>
 
-    <!-- Side Panel -->
+    <!-- Sidepanel -->
     <QWidget id='sidepanelwrap' layout='QVBoxLayout' padding='0'>
-      <QWidget id='sidepanel' layout='QVBoxLayout' padding='15' spacing='0'>
-        
+      <QWidget id='sidepanel' layout='QVBoxLayout' padding='0' spacing='0'>
         <!-- Title -->
-        <QWidget id='sidepanelwrap' layout='QVBoxLayout' padding='0' spacing='0'>
-          <QWidget id='sidepanelwrap' layout='QHBoxLayout' padding='0' spacing='3'>
+        <TitleBar args='self' layout='QVBoxLayout' padding='(15,15,15,0)' spacing='0'>
+          <QWidget layout='QHBoxLayout' padding='0' spacing='3'>
             <QLabel id='title' text='APPNAME'/>
-            <QLabel id='version' text='"v"+VERSION'/>
+            <QLabel id='version' text='"v"+VERSION' styleSheet='width:40px;'/>
+            <Stretch/>
           </QWidget>
           <QLabel text='github.com/pkkid/pkmeter' property='(class,subtext)'/>
+        </TitleBar>
+        <QWidget id='sidepanelcontent' layout='QVBoxLayout' padding='15'>
+          <!-- General Settings -->
+          <QPushButton id='applicationsettings' text='Application Settings'>
+            <Set property='(class,selected)'/>
+            <Connect clicked='generalSettingsClicked'/>
+          </QPushButton>
+          <Spacing args='20'/>
+          <!-- Available Plugins -->
+          <QLabel text='Available Plugins'/>
+          <Spacing args='3'/>
+          <QComboBox id='pluginlist'>
+            <Connect currentIndexChanged='updateComponentList'/>
+            <Repeater for='plugin' in='app.plugins.values()'>
+              <Item args='(plugin.name,plugin.varname)'/>
+            </Repeater>
+          </QComboBox>
+          <!-- Component List -->
+          <QListWidget id='componentlist'>
+            <Connect itemClicked='updateContent'/>
+          </QListWidget>
         </QWidget>
-        <Spacing args='20'/>
-        
-        <!-- General Settings -->
-        <QPushButton id='applicationsettings' text='Application Settings'>
-          <Set property='(class,selected)'/>
-          <Connect clicked='generalSettingsClicked'/>
-        </QPushButton>
-        <Spacing args='20'/>
-        <!-- Available Plugins -->
-        <QLabel text='Available Plugins'/>
-        <Spacing args='3'/>
-        <QComboBox id='pluginlist'>
-          <Connect currentIndexChanged='updateComponentList'/>
-          <Repeater for='plugin' in='app.plugins.values()'>
-            <Item args='(plugin.name,plugin.varname)'/>
-          </Repeater>
-        </QComboBox>
-        <!-- Component List -->
-        <QListWidget id='componentlist'>
-          <Connect itemClicked='updateContent'/>
-        </QListWidget>
       </QWidget>
     </QWidget>
 
     <!-- Content Panel -->
     <QWidget id='contentwrap' layout='QVBoxLayout' padding='0' spacing='0'>
-      <QWidget id='content' layout='QVBoxLayout' padding='0'>
-        <!-- Application Settings - Content replaced when selecting a plugin and component. -->
-        <QWidget id='appsettings' layout='QVBoxLayout' spacing='20'>
+      <TitleBar args='self' layout='QHBoxLayout' padding='(10,10,10,0)'>
+        <Stretch/>
+        <QPushButton text='󰅖' property='(class,close)'>
+          <Connect clicked='close'/>
+        </QPushButton>
+      </TitleBar>
+      <!-- Content - Content inside replaced when selecting component. -->
+      <QWidget id='content' layout='QVBoxLayout' padding='15' spacing='0'>
+        <QWidget id='appsettings' layout='QVBoxLayout' padding='0'>
           <QLabel text='Application settings not yet defined.'/>
         </QWidget>
       </QWidget>
