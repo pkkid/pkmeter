@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
-from pkm import CONFIG_STORAGE, log, utils
+from pkm import CONFIG_STORAGE
+from pkm import log, utils  # noqa
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
