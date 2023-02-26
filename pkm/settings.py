@@ -26,17 +26,16 @@ class SettingsWindow(QTemplateWidget):
         """ Close this settings window. """
         self.hide()
     
-    def generalSettingsClicked(self):
-        """ Callback when the general settings button is clicked. """
-        pass
-        # self._swapContent(GENERALSETTINGS)
-
     def show(self):
         """ Show this settings window. """
         self.updateComponentList('default')
         utils.centerWindow(self)
         # self.updateContent(GENERALSETTINGS)
         super(SettingsWindow, self).show()
+    
+    def showAppSettings(self):
+        """ Callback when Application Settings is clicked. """
+        self.updateContent()
 
     def updateComponentList(self, pluginid=None):
         if self._loading: return
@@ -47,27 +46,28 @@ class SettingsWindow(QTemplateWidget):
             item = QtWidgets.QListWidgetItem(f'{component.name}')
             item.setData(Qt.UserRole, component.varname)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+            item.setSizeHint(QtCore.QSize(80, 30))
             if component.widget is not None:
                 item.setCheckState(Qt.Checked)
-            item.setSizeHint(QtCore.QSize(80, 30))
             self.ids.componentlist.addItem(item)
     
-    def updateContent(self, pluginid=None, componentid=None):
+    def updateContent(self, item=None):
         if self._loading: return
-        if str(pluginid) not in self.app.plugins:
-            pluginid = self.ids.pluginlist.currentData()
-        if str(componentid) not in self.app.plugins[pluginid].components:
-            item = self.ids.componentlist.currentItem()
-            componentid = item.data(Qt.UserRole)
-        # Hide currently displayed settings
-        content = self.ids.content
-        utils.removeChildren(content)
-        # Insert the new component settings
-        plugin = self.app.plugins[pluginid]
-        component = plugin.components[componentid]
-        if component.settings is not None:
-            content.layout().addWidget(component.settings)
-            component.settings.setVisible(True)
+        # Figure out which settings to display and update appsettingsbtn
+        settings = self.ids.appsettings
+        if item is not None:
+            pid = self.ids.pluginlist.currentData() if item else None
+            cid = item.data(Qt.UserRole) if item else None
+            settings = self.app.plugins[pid].components[cid].settings
+            utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
+        else:
+            self.ids.componentlist.clearSelection()
+            utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', 'selected')
+        # Hide current settings and show the new ones
+        utils.removeChildren(self.ids.content)
+        if settings is not None:
+            self.ids.content.layout().addWidget(settings)
+            settings.setVisible(True)
         self.ids.content.update()
 
     # def _swapContent(self, pluginid):

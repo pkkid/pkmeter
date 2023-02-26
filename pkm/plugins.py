@@ -110,13 +110,13 @@ def loadmodule(rootdir, modpath, parent):
     return getattr(module, clsname)(parent)
     
 
-def plugins(themedirs=PLUGIN_DIRECTORIES):
+def plugins(plugindirs=PLUGIN_DIRECTORIES):
     """ Find and load all plugins. Returns a dict of {id: plugin}. """
     plugins = utils.Bunch()
-    for themedir in themedirs:
-        if not os.path.isdir(themedir): continue
-        for dirname in os.listdir(themedir):
-            dirpath = os.path.normpath(f'{themedir}/{dirname}')
+    for plugindir in plugindirs:
+        if not os.path.isdir(plugindir): continue
+        for dirname in os.listdir(plugindir):
+            dirpath = os.path.normpath(f'{plugindir}/{dirname}')
             if not os.path.isdir(dirpath): continue
             for filename in os.listdir(dirpath):
                 filepath = os.path.normpath(f'{dirpath}/{filename}')

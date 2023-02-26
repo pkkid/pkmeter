@@ -37,7 +37,7 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f'Loading font {fontname}')
         # Application stylesheet
-        self.setStyle('Fusion')
+        # self.setStyle('Fusion')
         styles = open(normpath(f'{ROOT}/resources/styles.qss')).read()
         if opts.outline:
             styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'

@@ -90,7 +90,8 @@ def rset(obj, attrstr, value, delim='.'):
 
 def setPropertyAndRedraw(qobj, name, value):
     """ After setting a property on a QtWidget, redraw it. """
-    qobj.setProperty(name, value)
+    if value is None: delattr(qobj, name)
+    else: qobj.setProperty(name, value)
     qobj.style().unpolish(qobj)
     qobj.style().polish(qobj)
     qobj.update()

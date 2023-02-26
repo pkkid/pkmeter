@@ -17,13 +17,27 @@ QWidget {
   color: $secondarytext;
   font-family: 'Josefin Sans';
   font-size: 14px;
+  outline: 0;
 }
 
 /* QComboBox */
 QComboBox {
   padding: 5px 5px;
-  background-color: $secondary;
+  background-color: rgba(0,0,0,0);
   margin: 0px -1px;
+}
+QComboBox QAbstractItemView {
+  padding: 0px;
+  background-color: $secondary;
+}
+QComboBox QAbstractItemView::item {
+  background-color: $secondary;
+  border: 0px solid rgba(0,0,0,0);
+  border-left: 2px solid $secondarydark;
+  padding: 8px 3px;
+}
+QComboBox QAbstractItemView::item:selected {
+  background-color: $secondarylight;
 }
 
 /* QLabel */
@@ -37,7 +51,7 @@ QListWidget {
   background-color: $secondarydark;
   border-radius: 5px;
   margin-top: 5px;
-  padding: 5px;
+  padding: 2px;
   selection-color: #ffffff;
   font-size: 13px;
   outline: 0;
@@ -140,35 +154,60 @@ QPushButton[class=close]:hover {
   border-radius: 3px;
   background-color: $secondarydark;
 }
-#settings #sidepanelwrap {
-  background-color: $secondary;
-  max-width: 200px;
-  min-width: 200px;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
+
 #settings #title {
   font-size: 25px;
   color: $primarytext;
 }
 #settings #version {
   color: $highlighttext;
-  padding-top: 7px;
+  padding-top: 5px;
 }
 #settings QLabel[class=subtext] {
   font-size: 11px;
   color: $dimtext;
-}
-#settings #sidepanel QPushButton {
-  background-color: $secondarydark;
-  padding: 8px;
-  border-radius: 3px;
 }
 #settings #contentwrap {
   background-color: $secondarydark2;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
 }
+
+/* SIDEPANEL */
+#sidepanelwrap {
+  background-color: $secondary;
+  max-width: 200px;
+  min-width: 200px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+#sidepanel QPushButton {
+  background-color: rgba(0,0,0,0);
+  border: 0px solid rgba(0,0,0,0);
+  color: $secondarytext;
+  padding: 8px 0px;
+  text-align: left;
+}
+#sidepanel QPushButton[class=selected] {
+  color: $highlighttext;
+}
+#sidepanel QPushButton:hover {
+  color: $primarytext;
+}
+#sidepanel QComboBox {
+  /* background-color: $secondary; */
+  border: 0px solid rgba(0,0,0,0);
+  border-bottom: 2px solid $secondarydark;
+  color: $secondarytext;
+  padding: 5px 1px 3px 1px;
+  text-align: left;
+}
+#sidepanel QComboBox:hover {
+  border-bottom: 2px solid $secondarydark;
+  color: $primarytext;
+}
+
+
 
 /* FORM FIELD */
 QWidget[class=formfield] QLabel {

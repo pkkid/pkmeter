@@ -1,0 +1,21 @@
+
+<QWidget layout='QVBoxLayout' spacing='20'>
+
+  <!-- Monitor -->
+  <QWidget layout='QHBoxLayout' padding='0' spacing='20' property='(class,formfield)'>
+    <QLabel text='Widget Width'/>
+    <NumSlider range='(100,300)' value='180'>
+      <Connect valueChanged='_widthChanged'/>
+    </NumSlider>
+  </QWidget>
+  
+  <!-- Position -->
+  <QWidget layout='QHBoxLayout' padding='0' property='(class,formfield)'>
+    <QLabel text='Position'/>
+    <QComboBox>
+      <Item args='Left'/>
+      <Item args='Right'/>
+    </QComboBox>
+  </QWidget>
+
+</QWidget>

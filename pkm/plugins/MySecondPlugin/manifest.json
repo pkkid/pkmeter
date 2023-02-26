@@ -1,0 +1,19 @@
+{
+  name: "Second Plugin",
+  version: "1.0.0",
+  author: "Michael Shepanski",
+  description: "Collection of default themes for PKMeter.",
+  commonwidgets: "_widgets",
+  components: [{
+    name: "General Settings",
+    settings: "settings.settings.SettingsWidget",
+  },{
+    name: "Clock",
+    settings: "clock.clock.SettingsWidget",
+    widget: "clock.clock.DesktopWidget",
+  },{
+    name: "CPU",
+    settings: "cpu.cpu.SettingsWidget",
+    widget: "cpu.cpu.DesktopWidget",
+  }]
+}

@@ -18,16 +18,15 @@
           </QWidget>
           <QLabel text='github.com/pkkid/pkmeter' property='(class,subtext)'/>
         </TitleBar>
-        <QWidget id='sidepanelcontent' layout='QVBoxLayout' padding='15'>
+        <QWidget id='sidepanelcontent' layout='QVBoxLayout' padding='15' spacing='2'>
           <!-- General Settings -->
-          <QPushButton id='applicationsettings' text='Application Settings'>
+          <QPushButton id='appsettingsbtn' text='Application Settings'>
             <Set property='(class,selected)'/>
-            <Connect clicked='generalSettingsClicked'/>
+            <Connect clicked='showAppSettings'/>
           </QPushButton>
-          <Spacing args='20'/>
+          <Spacing args='15'/>
           <!-- Available Plugins -->
-          <QLabel text='Available Plugins'/>
-          <Spacing args='3'/>
+          <QLabel text='Available Plugins' property='(class,subtext)'/>
           <QComboBox id='pluginlist'>
             <Connect currentIndexChanged='updateComponentList'/>
             <Repeater for='plugin' in='app.plugins.values()'>
