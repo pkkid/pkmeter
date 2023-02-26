@@ -49,13 +49,15 @@
           <Connect clicked='close'/>
         </QPushButton>
       </TitleBar>
-      <!-- Content - Content inside replaced when selecting component. -->
+      <!-- Content Header -->
+      <QWidget id='content' layout='QVBoxLayout' padding='(23,0)' spacing='0'>
+        <QLabel id='contentheader' text='Application Settings'/>
+      </QWidget>
+      <!-- Content - Replaced when selecting component. -->
       <QWidget id='content' layout='QVBoxLayout' padding='15' spacing='0'>
-
         <QWidget id='appsettings' layout='QHBoxLayout'>
           <QLabel text='Application settings not yet defined.'/>
         </QWidget>
-
       </QWidget>
       <Stretch/>
     </QWidget>

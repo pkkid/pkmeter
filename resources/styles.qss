@@ -167,6 +167,10 @@ QPushButton[class=close]:hover {
   font-size: 11px;
   color: $dimtext;
 }
+#settings #contentheader {
+  border-bottom: 1px solid $secondary;
+  padding: 2px 0px;
+}
 #settings #contentwrap {
   background-color: $secondarydark2;
   border-top-right-radius: 3px;

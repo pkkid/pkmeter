@@ -58,10 +58,16 @@ class SettingsWindow(QTemplateWidget):
         if item is not None:
             pid = self.ids.pluginlist.currentData() if item else None
             cid = item.data(Qt.UserRole) if item else None
-            settings = self.app.plugins[pid].components[cid].settings
+            plugin = self.app.plugins[pid]
+            component = self.app.plugins[pid].components[cid]
+            settings = component.settings
             utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
+            title = f'{plugin.name} {component.name.replace(" Settings","")}'
+            title += ' Settings' if 'Settings' not in title else ''
+            self.ids.contentheader.setText(title)
         else:
             self.ids.componentlist.clearSelection()
+            self.ids.contentheader.setText('Application Settings')
             utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', 'selected')
         # Hide current settings and show the new ones
         utils.removeChildren(self.ids.content)
