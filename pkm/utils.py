@@ -18,14 +18,13 @@ class Bunch(OrderedDict):
         return self.__setitem__(item, value)
 
 
-def centerWindow(window):
+def centerWindow(qobj):
     """ Move the specified widget to the center of the screen. """
+    geometry = qobj.frameGeometry()
     screen = QApplication.screenAt(QtGui.QCursor.pos())
-    screen_rect = screen.availableGeometry()
-    window_rect = window.geometry()
-    x = (screen_rect.width() - window_rect.width()) / 2
-    y = (screen_rect.height() - window_rect.height()) / 2
-    window.move(x, y)
+    centerpos = screen.geometry().center()
+    geometry.moveCenter(centerpos)
+    qobj.move(geometry.topLeft())
 
 
 def deleteChildren(qobj):
