@@ -1,0 +1,239 @@
+// Qt Widget Styles
+// https://doc.qt.io/qt-6/stylesheet-reference.html
+// https://sass-lang.com/guide
+// https://github.com/morhetz/gruvbox
+
+//--------------------------
+// Theme
+//--------------------------
+$primary: #458588;
+$primarylight: #83a598;
+$secondary: #333333;
+$secondarylight: #555555;
+$secondarydark: #222222;
+$secondarydark2: #111111;
+$primarytext: #f8f2ec;
+$secondarytext: #c5c0ba;
+$highlighttext: #fabd2f;
+$dimtext: #888480;
+
+
+//--------------------------
+// Core Elements
+//--------------------------
+QWidget {
+  color: $secondarytext;
+  font-family: 'Josefin Sans';
+  font-size: 14px;
+  outline: 0;
+}
+
+QComboBox {
+  padding: 5px 5px;
+  background-color: rgba(0,0,0,0);
+  margin: 0px -1px;
+  QAbstractItemView {
+    padding: 0px;
+    background-color: $secondary;
+    &::item {
+      background-color: $secondary;
+      border: 0px solid rgba(0,0,0,0);
+      border-left: 2px solid $secondarydark;
+      padding: 8px 3px;
+      &:selected {
+        background-color: $secondarylight;
+      }
+    }
+  }
+}
+
+QLabel {
+  background-color: rgba(0,0,0,0);
+}
+
+QListWidget {
+  border: 0px solid rgba(0,0,0,0);
+  background-color: $secondarydark;
+  border-radius: 5px;
+  margin-top: 5px;
+  padding: 2px;
+  selection-color: #ffffff;
+  font-size: 13px;
+  outline: 0;
+  &::item {
+    border-radius: 3px;
+    padding: 2px 5px;
+    margin-bottom: 1px;
+    &:selected,
+    &:hover {
+      background-color: $secondarylight;
+    }
+  }
+  &::indicator {
+    width: 14px;
+    height: 14px;
+    // &:checked,
+    // &:checked:selected,
+    // &:checked:focus {
+    //   image: url(resources/icons/checkbox-marked-outline.svg);
+    // }
+  }
+}
+
+QPushButton {
+  text-transform: none;
+  font-weight: normal;
+  // Close button
+  &[class=close] {
+    border: rgba(0,0,0,0);
+    color: $secondarytext;
+    font-size: 18px;
+    background-color: rgba(0,0,0,0);
+    &:hover {
+      color: $primarytext;
+    }
+  }
+}
+
+QSlider {
+  &::groove:horizontal {
+    height: 2px;
+    background-color: $secondarydark;
+  }
+  &::handle:horizontal {
+    background-color: $secondarylight;
+    border: 1px solid $secondarydark;
+    height: 20px;
+    margin: -6px 0;
+    width: 20px;
+    border-radius: 2px;
+  }
+}
+
+QSpinBox {
+  padding: 5px 5px 0px 5px;;
+  background-color: $secondarydark;
+}
+
+QMenu {
+  background-color: #222222;
+  &::item {
+    spacing: 3px;
+    padding: 8px 40px 8px 20px;
+    background: transparent;
+    border-radius: 5px;
+    &:selected {
+      color: #ffffff;
+      background-color: #181818;
+    }
+  }
+}
+
+QScrollBar:vertical {
+  border: 0px;
+  margin: 0px 0px;
+  width: 6px;
+  background: #222;
+  &::handle:vertical {
+    background: #444;
+    min-height: 0px;
+    max-height: 0px;
+    border-radius: 3px;
+  }
+  // &::add-line:vertical,
+  // &::sub-line:vertical,
+  // &::add-page:vertical,
+  // &::sub-page:vertical {
+  //   height: 0px;
+  //   background: none;
+  // }
+}
+
+
+//--------------------------
+// Settings Window
+//--------------------------
+#settings {
+  border-radius: 3px;
+  background-color: $secondarydark;
+
+  // Sidepanel
+  #sidepanelwrap {
+    background-color: $secondary;
+    max-width: 200px;
+    min-width: 200px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+
+    #title { color:$primarytext; font-size:25px; }
+    #version { color:$highlighttext; padding-top:5px; }
+
+    QPushButton {
+      background-color: rgba(0,0,0,0);
+      border: 0px solid rgba(0,0,0,0);
+      color: $secondarytext;
+      padding: 8px 0px;
+      text-align: left;
+      &[class=selected] { color:$highlighttext; }
+      &:hover { color:$primarytext; }
+    }
+    QComboBox {
+      border: 0px solid rgba(0,0,0,0);
+      border-bottom: 2px solid $secondarydark;
+      color: $secondarytext;
+      padding: 5px 1px 3px 1px;
+      text-align: left;
+      &:hover {
+        border-bottom: 2px solid $secondarydark;
+        color: $primarytext;
+      }
+    }
+  }
+
+  // Content
+  #contentwrap {
+    background-color:$secondarydark2;
+    border-top-right-radius:3px;
+    border-bottom-right-radius:3px;
+    #contentheader { border-bottom:1px solid $secondary; padding:2px 0px; }
+  
+    QWidget[class=formfield] QLabel {
+      max-width: 120px;
+      min-width: 120px;
+    }
+  }
+  
+  // Subtext
+  QLabel[class=subtext] {
+    font-size: 11px;
+    color: $dimtext;
+  }
+}
+
+
+//--------------------------
+// Desktop Widget
+//--------------------------
+#deskwidget,
+QWidget[class=deskwidget] {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 5px;
+}
+QWidget[class=deskwidget] QLabel {
+  color: #ffffff;
+}
+
+
+// QCheckBox::indicator,
+// QListWidget::item:!selected:!active:checkbox::indicator {
+//   width: 16px;
+//   height: 16px;
+// }
+// QCheckBox::indicator:unchecked,
+// QListWidget::item:!selected:!active:checkbox::indicator:unchecked {
+//   image: url(:icons/checkbox-blank-outline.png);
+// }
+// QCheckBox::indicator:checked,
+// QListWidget::item:!selected:!active:checkbox::indicator:checked {
+//   image: url(':/icons/checked.png');
+// }

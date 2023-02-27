@@ -38,10 +38,8 @@ class PKMeter(QtWidgets.QApplication):
                 log.info(f'Loading font {fontname}')
         # Application stylesheet
         # self.setStyle('Fusion')
-        styles = open(normpath(f'{ROOT}/resources/styles.qss')).read()
-        if opts.outline:
-            styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
-        self.setStyleSheet(utils.render(styles))
+        filepath = normpath(f'{ROOT}/resources/styles.sass')
+        utils.setStyleSheet(self, filepath)
 
     def _showWidgets(self):
         """ Display all enabled plugins. """

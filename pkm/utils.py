@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import sass
 from collections import OrderedDict
 from pkm import log
 from PySide6.QtWidgets import QApplication
@@ -49,14 +50,6 @@ def removeChildren(qobj):
             layout.removeWidget(widget)
 
 
-def render(tmplstr, context=None):
-    """ Read variables from the file. Poor mans template with constants. """
-    tmplvars = dict(re.findall(r"\$(\w+)\s*\=\s*'(.+?)'", tmplstr))
-    context = context if context else {}
-    context.update(tmplvars)
-    return Template(tmplstr).substitute(context)
-
-
 def rget(obj, attrstr, default=None, delim='.'):
     """ Recursively get a value from a nested dictionary. """
     try:
@@ -95,6 +88,15 @@ def setPropertyAndRedraw(qobj, name, value):
     qobj.style().unpolish(qobj)
     qobj.style().polish(qobj)
     qobj.update()
+
+
+def setStyleSheet(qobj, filepath, context=None, outline=False):
+    """ Load the specified stylesheet via libsass and add it to qobj. """
+    styles = open(filepath).read()
+    styles = sass.compile(string=styles)
+    if outline:
+        styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
+    qobj.setStyleSheet(styles)
 
 
 def tokenize(valuestr, operations=None):
