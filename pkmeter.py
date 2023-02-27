@@ -37,6 +37,7 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f'Loading font {fontname}')
         # Application stylesheet
+        
         filepath = normpath(f'{ROOT}/resources/styles.sass')
         utils.setStyleSheet(self, filepath)
 
@@ -49,9 +50,12 @@ class PKMeter(QtWidgets.QApplication):
 
     @classmethod
     def start(cls, opts):
+        """ Start the application.
+            We set base style OSes have same starting point.
+        """
         log.info(f'--- Starting {APPNAME} ---')
-        app = PKMeter(opts)
-        app.exec()
+        QtWidgets.QApplication.setStyle('windows')
+        PKMeter(opts).exec()
         log.info('Quitting.')
 
 
