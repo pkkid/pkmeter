@@ -2,6 +2,7 @@
 import sass
 from collections import OrderedDict
 from pkm import log
+from PySide6 import QtGui
 from PySide6.QtWidgets import QApplication
 
 
@@ -19,7 +20,7 @@ class Bunch(OrderedDict):
 
 def centerWindow(window):
     """ Move the specified widget to the center of the screen. """
-    screen = QApplication.primaryScreen()
+    screen = QApplication.screenAt(QtGui.QCursor.pos())
     screen_rect = screen.availableGeometry()
     window_rect = window.geometry()
     x = (screen_rect.width() - window_rect.width()) / 2
