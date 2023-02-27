@@ -37,7 +37,6 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f'Loading font {fontname}')
         # Application stylesheet
-        # self.setStyle('Fusion')
         filepath = normpath(f'{ROOT}/resources/styles.sass')
         utils.setStyleSheet(self, filepath)
 
@@ -50,7 +49,7 @@ class PKMeter(QtWidgets.QApplication):
 
     @classmethod
     def start(cls, opts):
-        log.info(f'--- Starting {APPNAME} application ---')
+        log.info(f'--- Starting {APPNAME} ---')
         app = PKMeter(opts)
         app.exec()
         log.info('Quitting.')

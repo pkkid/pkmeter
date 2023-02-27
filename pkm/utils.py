@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import re
 import sass
 from collections import OrderedDict
 from pkm import log
 from PySide6.QtWidgets import QApplication
-from string import Template
 
 
 class Bunch(OrderedDict):
