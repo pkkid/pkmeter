@@ -7,9 +7,10 @@ from pkm.qtemplate import QTemplateWidget
 class SettingsWidget(QTemplateWidget):
     TMPL = normpath(f'{dirname(__file__)}/settings.tmpl')
 
-    def __init__(self, plugin, *args, **kwargs):
-        self.plugin = plugin
+    def __init__(self, component, *args, **kwargs):
         super(SettingsWidget, self).__init__(*args, **kwargs)
+        self.plugin = component.plugin
+        self.component = component
 
     def widthChanged(self, value):
         """ Save new monitor value. """

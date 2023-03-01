@@ -13,6 +13,7 @@ class BaseWidget(Draggable, QTemplateWidget):
     def __init__(self, component):
         QTemplateWidget.__init__(self)
         Draggable.__init__(self)
+        self.plugin = component.plugin
         self.component = component
         self.app = QtCore.QCoreApplication.instance()
         self.setProperty('class', 'widget')

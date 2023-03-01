@@ -106,7 +106,7 @@ class Component:
         CONFIG_STORAGE.setValue(location, value)
 
 
-def loadmodule(rootdir, modpath, parent):
+def loadmodule(rootdir, modpath, component):
     """ Load the specified module. """
     if not modpath: return None
     log.debug(f'loadmodule({modpath=})')
@@ -115,7 +115,7 @@ def loadmodule(rootdir, modpath, parent):
     spec = importlib.util.spec_from_file_location(modname, modpath)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return getattr(module, clsname)(parent)
+    return getattr(module, clsname)(component)
     
 
 def plugins(plugindirs=PLUGIN_DIRECTORIES):

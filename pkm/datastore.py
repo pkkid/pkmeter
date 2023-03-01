@@ -6,15 +6,17 @@ Sync = namedtuple('Sync', 'qtmpl, callback, valuestr, context')
 
 
 class DataStore(dict):
+    """ Singleton DataStore """
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not isinstance(cls._instance, cls):
+            cls._instance = dict.__new__(cls, *args, **kwargs)
+        return cls._instance
 
     def __init__(self, *args, **kwargs):
         super(DataStore, self).__init__(*args, **kwargs)
         self._registry = defaultdict(list)      # Dict of {token: [Callbacks]}
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(DataStore, cls).__new__(cls, *args, **kwargs)
-        return cls.instance
     
     def register(self, qtmpl, token, callback, valuestr, context):
         log.debug(f'Registering {token} -> {callback.__self__.__class__.__name__}.{callback.__name__}()')

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
+from pkm import log
 from pkm.basedatasource import BaseDataSource
 from pkm.basesettings import BaseSettings
 from pkm.basewidget import BaseWidget
@@ -18,4 +19,6 @@ class SettingsWidget(BaseSettings):
 
 
 class DataSource(BaseDataSource):
-    pass
+    
+    def update(self):
+        log.info(f'Updating {self.component.id} data.')
