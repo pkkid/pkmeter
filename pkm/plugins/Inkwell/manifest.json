@@ -3,11 +3,11 @@
   version: "1.0.0",
   author: "Michael Shepanski",
   description: "Default theme collection for PKMeter.",
-  commonwidgets: "_widgets",
+  commonwidgets: "widgets",
   namespace: "inkwell",
   components: [{
     name: "General Settings",
-    settings: "settings.settings.SettingsWidget",
+    settings: "settings.SettingsWidget",
   },{
     name: "Clock",
     settings: "clock.clock.SettingsWidget",

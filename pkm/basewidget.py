@@ -6,7 +6,7 @@ from PySide6 import QtGui, QtCore
 from PySide6.QtCore import Qt
 
 
-class DeskWidget(Draggable, QTemplateWidget):
+class BaseWidget(Draggable, QTemplateWidget):
     DEFAULT_LAYOUT_MARGINS = (30,30,30,30)
     DEFAULT_LAYOUT_SPACING = 0
 

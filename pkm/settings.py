@@ -74,29 +74,3 @@ class SettingsWindow(QTemplateWidget):
             self.ids.content.layout().addWidget(settings)
             settings.setVisible(True)
         self.ids.content.update()
-
-    # def _swapContent(self, pluginid):
-    #     """ Show the specified settings content. """
-    #     # Hide all currently displayed settings
-    #     layout = self.ids.content.layout()
-    #     for i in range(layout.count()):
-    #         item = layout.itemAt(i)
-    #         item.widget().setVisible(False)
-    #     utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', '')
-    #     # Display the newly selected plugin settings
-    #     title = f'{self.app.plugins[pluginid].name} Settings'
-    #     self.ids.plugintitle.setText(title)
-    #     self.ids[f'{pluginid}_settings'].setVisible(True)
-    #     # If the pluginid is general settings, delselect all items in the
-    #     # QListWidget and set the button to be highlighted
-    #     if pluginid == GENERALSETTINGS:
-    #         self.ids.pluginlist.clearSelection()
-    #         utils.setPropertyAndRedraw(self.ids.generalbtn, 'class', 'selected')
-
-    # def _addSettingsContent(self, pluginid, widget):
-    #     """ Add settings content to the window. """
-    #     widget.setObjectName(f'{pluginid}_settings')
-    #     widget.layout().setContentsMargins(0,15,0,20)
-    #     self.ids[widget.objectName()] = widget
-    #     self.ids.content.layout().addWidget(widget)
-    #     widget.hide()

@@ -19,6 +19,7 @@ class NumSlider(QTemplateWidget):
 
     def __init__(self, *args, **kwargs):
         super(NumSlider, self).__init__(*args, **kwargs)
+        self._value = None
     
     def setRange(self, minValue, maxValue):
         self.ids.slider.setMinimum(minValue)
@@ -30,5 +31,7 @@ class NumSlider(QTemplateWidget):
         self.ids.spinbox.setValue(value)
     
     def _valueChanged(self, value):
-        self.setValue(value)
-        self.valueChanged.emit(value)
+        if value != self._value:
+            self._value = value
+            self.setValue(value)
+            self.valueChanged.emit(value)

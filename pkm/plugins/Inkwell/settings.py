@@ -13,15 +13,8 @@ class SettingsWidget(QTemplateWidget):
         super(SettingsWidget, self).__init__(*args, **kwargs)
     
     def _initData(self):
-        monitors = []
-        app = QtCore.QCoreApplication.instance()
-        for i, screen in enumerate(app.screens()):
-            monitor = utils.Bunch()
-            monitor.value = i
-            monitor.text = f'#{i} ({screen.name()})'
-            monitors.append(monitor)
-        self.data.update('generalsettings.monitors', monitors)
+        pass
 
-    def _widthChanged(self, value):
+    def widthChanged(self, value):
         """ Save new monitor value. """
-        log.info(f'_widthChanged({value=})')
+        self.plugin.saveValue('width', value)
