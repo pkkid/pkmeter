@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt
 
 
 class SettingsWindow(QTemplateWidget):
-    TMPL = normpath(f'{dirname(__file__)}/tmpl/settings.tmpl')
+    TMPL = normpath(f'{dirname(__file__)}/settings.tmpl')
 
     def __init__(self):
         super(SettingsWindow, self).__init__()

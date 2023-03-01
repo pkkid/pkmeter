@@ -87,12 +87,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         self.data = DataStore()         # Datastore can register and apply updates to the ui
         self.ids = utils.Bunch()        # Reference to QObject by id
         self._loading = True            # Set False after initial objects loaded
-        self._initData()                # Initialize the data store
         self._load()                    # Read the template string and convert to qobjects
-
-    def _initData(self):
-        """ Abstract method to initia DataStore with items. """
-        pass
 
     def _load(self):
         """ Reads the template and walks the xml tree to build the Qt UI. """
