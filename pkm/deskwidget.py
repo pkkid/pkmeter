@@ -16,8 +16,8 @@ class DeskWidget(Draggable, QTemplateWidget):
         self.component = component
         self.app = QtCore.QCoreApplication.instance()
         self.setProperty('class', 'widget')
-        self.setProperty('plugin', self.component.plugin.varname)
-        self.setProperty('component', self.component.varname)
+        self.setProperty('plugin', self.component.plugin.id)
+        self.setProperty('component', self.component.id)
         self.setObjectName(self.component.id)
         self._initWidget()
         self._initRightclickMenu()

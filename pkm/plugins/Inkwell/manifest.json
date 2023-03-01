@@ -4,6 +4,7 @@
   author: "Michael Shepanski",
   description: "Default theme collection for PKMeter.",
   commonwidgets: "_widgets",
+  namespace: "inkwell",
   components: [{
     name: "General Settings",
     settings: "settings.settings.SettingsWidget",

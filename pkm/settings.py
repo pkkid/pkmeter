@@ -43,7 +43,7 @@ class SettingsWindow(QTemplateWidget):
             pluginid = self.ids.pluginlist.currentData()
         for component in self.app.plugins[pluginid].components.values():
             item = QtWidgets.QListWidgetItem(f'{component.name}')
-            item.setData(Qt.UserRole, component.varname)
+            item.setData(Qt.UserRole, component.id)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
             item.setSizeHint(QtCore.QSize(80, 30))
             if component.widget is not None:
