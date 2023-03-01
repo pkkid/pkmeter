@@ -2,8 +2,8 @@
 from pkm.qtemplate import QTemplateWidget
 
 
-class BaseSettings(QTemplateWidget):
+class BaseDataSource(QTemplateWidget):
     
     def __init__(self, plugin):
-        super(BaseSettings, self).__init__()
+        super(BaseDataSource, self).__init__()
         self.plugin = plugin

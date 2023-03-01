@@ -26,7 +26,7 @@ class BaseWidget(Draggable, QTemplateWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
         # Set the position
-        pos = [int(x) for x in self.component.getValue('pos', '0,0').split(',')]
+        pos = [int(x) for x in self.component.getSetting('pos', '0,0').split(',')]
         self.move(pos[0], pos[1])
     
     def _initRightclickMenu(self):
@@ -39,4 +39,4 @@ class BaseWidget(Draggable, QTemplateWidget):
     
     def widgetMoved(self, pos):
         log.info(f'Widget Moved: {pos=}')
-        self.component.saveValue('pos', f'{pos.x()},{pos.y()}')
+        self.component.saveSetting('pos', f'{pos.x()},{pos.y()}')

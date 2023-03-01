@@ -13,4 +13,4 @@ class SettingsWidget(QTemplateWidget):
 
     def widthChanged(self, value):
         """ Save new monitor value. """
-        self.plugin.saveValue('width', value)
+        self.plugin.saveSetting('width', value)

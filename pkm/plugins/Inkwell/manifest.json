@@ -12,6 +12,7 @@
     name: "Clock",
     settings: "clock.clock.SettingsWidget",
     widget: "clock.clock.DesktopWidget",
+    datasource: "clock.clock.DataSource",
   },{
     name: "CPU",
     settings: "cpu.cpu.SettingsWidget",

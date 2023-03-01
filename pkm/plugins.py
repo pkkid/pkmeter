@@ -55,11 +55,11 @@ class Plugin:
             components[component.id] = component
         return components
     
-    def getValue(self, name, default=None):
+    def getSetting(self, name, default=None):
         location = f'{self.id}/{name}'
         return CONFIG_STORAGE.value(location, default)
     
-    def saveValue(self, name, value):
+    def saveSetting(self, name, value):
         location = f'{self.id}/{name}'
         CONFIG_STORAGE.setValue(location, value)
     
@@ -83,18 +83,25 @@ class Component:
         return f'{self.plugin.id}.{self.id}'
 
     @cached_property
+    def datasource(self):
+        clspath = self.manifest.get('datasource')
+        return loadmodule(self.plugin.rootdir, clspath, self)
+    
+    @cached_property
     def settings(self):
-        return loadmodule(self.plugin.rootdir, self.manifest.get('settings'), self)
+        clspath = self.manifest.get('settings')
+        return loadmodule(self.plugin.rootdir, clspath, self)
     
     @cached_property
     def widget(self):
-        return loadmodule(self.plugin.rootdir, self.manifest.get('widget'), self)
+        clspath = self.manifest.get('widget')
+        return loadmodule(self.plugin.rootdir, clspath, self)
     
-    def getValue(self, name, default=None):
+    def getSetting(self, name, default=None):
         location = f"{self.plugin.id}/{self.id}.{name}"
         return CONFIG_STORAGE.value(location, default)
     
-    def saveValue(self, name, value):
+    def saveSetting(self, name, value):
         location = f"{self.plugin.id}/{self.id}.{name}"
         CONFIG_STORAGE.setValue(location, value)
 
