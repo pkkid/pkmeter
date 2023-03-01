@@ -30,7 +30,7 @@
           <QComboBox id='pluginlist'>
             <Connect currentIndexChanged='updateComponentList'/>
             <Repeater for='plugin' in='app.plugins.values()'>
-              <Item args='(plugin.id,plugin.id)'/>
+              <Item args='(plugin.name,plugin.id)'/>
             </Repeater>
           </QComboBox>
           <!-- Component List -->
