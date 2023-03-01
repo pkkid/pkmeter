@@ -30,7 +30,6 @@ class SettingsWindow(QTemplateWidget):
         """ Show this settings window. """
         self.updateComponentList('default')
         utils.centerWindow(self)
-        # self.updateContent(GENERALSETTINGS)
         super(SettingsWindow, self).show()
     
     def showAppSettings(self):

@@ -1,8 +1,8 @@
 {
-  name: "Second Plugin",
+  name: "Stylish",
   version: "1.0.0",
   author: "Michael Shepanski",
-  description: "Collection of default themes for PKMeter.",
+  description: "Stylish desktop widgets",
   commonwidgets: "_widgets",
   components: [{
     name: "General Settings",

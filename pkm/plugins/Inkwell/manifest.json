@@ -1,8 +1,8 @@
 {
-  name: "Default",
+  name: "Inkwell",
   version: "1.0.0",
   author: "Michael Shepanski",
-  description: "Collection of default themes for PKMeter.",
+  description: "Default theme collection for PKMeter.",
   commonwidgets: "_widgets",
   components: [{
     name: "General Settings",

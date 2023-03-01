@@ -48,10 +48,10 @@ supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
 import re
 from collections import namedtuple
-from os.path import basename
+from os.path import abspath, basename, dirname, normpath
 from pkm import log, plugins, utils
 from pkm.datastore import DataStore
-from PySide6 import QtWidgets
+from PySide6 import QtCore, QtWidgets
 from xml.etree import ElementTree
 
 # Define entities QTemplateWiget values can parse
@@ -83,6 +83,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
+        self.filepath = None            # Filepath of tmpl file (for relative imports)
         self.data = DataStore()         # Datastore can register and apply updates to the ui
         self.ids = utils.Bunch()        # Reference to QObject by id
         self._loading = True            # Set False after initial objects loaded
@@ -98,9 +99,11 @@ class QTemplateWidget(QtWidgets.QWidget):
         if self.TMPL is not None:
             log.debug(f'Reading {basename(self.TMPL)} for {self.__class__.__name__}')
             root = ElementTree.parse(self.TMPL).getroot()
+            self.filepath = self.TMPL
         elif self.TMPLSTR is not None:
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
+            self.filepath = abspath(__file__)
         context = dict(self=self, data=self.data)
         self._walk(root, context=context)
         self._loading = False
@@ -109,18 +112,11 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Parse the specified element and it's children. """
         log.debug(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
         if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />; then recurse further
-        if self._tagRepeater(elem, parent, context, indent): return   # Repeats child elements
+        if self._tagCustom(elem, parent, context, indent): return     # Custom tags defined below
         if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
         if self._tagAdd(elem, parent, context, indent): return        # add<Tag>(attr=value); no children
         if self._tagConnect(elem, parent, context, indent): return    # <connect slot='callback' />; no children
         raise Exception(f'Unknown tag "{elem.tag}" in element {parent.__class__.__name__}.')
-    
-    def _tagRepeater(self, elem, parent, context, indent):
-        """ Repeater element repeats child elements. """
-        if elem.tag == Repeater.__name__:
-            qobj = Repeater(self, elem, parent, context)
-            self._applyAttrs(qobj, elem, context, indent+1)
-            return True
 
     def _tagQobject(self, elem, parent, context, indent):
         """ Creates a QObject and appends it to the layout of parent. """
@@ -136,6 +132,15 @@ class QTemplateWidget(QtWidgets.QWidget):
             for echild in elem:
                 self._walk(echild, qobj, context, indent+1)
             return True
+    
+    def _tagCustom(self, elem, parent, context, indent):
+        """ Repeater element repeats child elements. """
+        for cls in Repeater, StyleSheet:
+            if elem.tag == cls.__name__:
+                args = self._attrArgs(elem, context, indent)
+                qobj = cls(self, elem, parent, context, *args)
+                self._applyAttrs(qobj, elem, context, indent+1)
+                return True
     
     def _tagAdd(self, elem, parent, context, indent):
         """ Check we're adding an attribute to the parent. """
@@ -291,7 +296,7 @@ class Repeater:
         <Repeater for='i' in='3'>...</Repeater>
     """
 
-    def __init__(self, qtmpl, elem, parent, context):
+    def __init__(self, qtmpl, elem, parent, context, *args):
         self.qtmpl = qtmpl          # Ref to parent QTemplateWidget object
         self.elem = elem            # Current etree item to render children
         self.parent = parent        # Parent qobj to add children to
@@ -312,3 +317,24 @@ class Repeater:
             for echild in self.elem:
                 subcontext = dict(**self.context, **{self.varname:item})
                 self.qtmpl._walk(echild, self.parent, subcontext)
+
+
+class StyleSheet:
+    """ Widget-like object used for importing and applying stylesheets.
+        <StyleSheet args='<path>' context='<dict>'/>
+    """
+
+    def __init__(self, qtmpl, elem, parent, context, *args):
+        self.qtmpl = qtmpl          # Ref to parent QTemplateWidget object
+        self.elem = elem            # Current etree item to render children
+        self.parent = parent        # Parent qobj to add children to
+        self.context = context      # Context for building the children
+        self.filepath = args[0]     # Relative path to stylesheet (from tmpl)
+        if 'context' not in self.elem.attrib:
+            self.setContext()
+
+    def setContext(self, context=None):
+        context = context or None
+        filepath = normpath(f'{dirname(self.qtmpl.filepath)}/{self.filepath}')
+        outline = QtCore.QCoreApplication.instance().opts.outline
+        utils.setStyleSheet(self.parent, filepath, context, outline)
