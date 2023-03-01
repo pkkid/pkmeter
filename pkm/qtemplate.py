@@ -51,7 +51,7 @@ from collections import namedtuple
 from os.path import abspath, basename, dirname, normpath
 from pkm import log, plugins, utils
 from pkm.datastore import DataStore
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 from xml.etree import ElementTree
 
 # Define entities QTemplateWiget values can parse
@@ -130,7 +130,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def _tagCustom(self, elem, parent, context, indent):
         """ Repeater element repeats child elements. """
-        for cls in Repeater, StyleSheet:
+        for cls in Repeater, StyleSheet, DropShadow:
             if elem.tag == cls.__name__:
                 args = self._attrArgs(elem, context, indent)
                 qobj = cls(self, elem, parent, context, *args)
@@ -285,6 +285,25 @@ class QTemplateWidget(QtWidgets.QWidget):
                 return t.cast(token)
         return token
 
+
+class DropShadow:
+    """ Applies a dropshadow to the parent element. """
+    
+    def __init__(self, qtmpl, elem, parent, context, *args):
+        # Args are x, y, blur, opacity(0-255)
+        # Color hardcoded to black
+        x = args[0] if len(args) >= 1 else 0
+        y = args[1] if len(args) >= 2 else 0
+        blur = args[2] if len(args) >= 3 else 0
+        opacity = args[3] if len(args) >= 4 else 255
+        shadow = QtWidgets.QGraphicsDropShadowEffect()
+        shadow.setOffset(x, y)
+        shadow.setBlurRadius(blur)
+        shadow.setColor(QtGui.QColor(0, 0, 0, opacity))
+        log.info('APPLYING SHADOW')
+        parent.setGraphicsEffect(shadow)
+        qtmpl._dropshadow = shadow
+        
 
 class Repeater:
     """ Widget-like object used for repeatng child elements in QTemplate.
