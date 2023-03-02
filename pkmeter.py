@@ -10,6 +10,7 @@ from PySide6 import QtGui, QtWidgets
 sys.path.append(dirname(__file__))
 from pkm import APPNAME, CONFIG_STORAGE, ROOT
 from pkm import log, logfile, plugins, utils
+from pkm.datastore import DataStore
 from pkm.settings import SettingsWindow
 
 
@@ -19,10 +20,11 @@ class PKMeter(QtWidgets.QApplication):
         super(PKMeter, self).__init__()
         self.opts = opts                        # Command line options
         self._initApplication()                 # Setup OS environment
+        self.data = DataStore()                 # Globally shared datastore
         self.plugins = plugins.plugins()        # Find and load plugins
         self.settings = SettingsWindow()        # Settings window
         self._showWidgets()
-        self.settings.show()
+        # self.settings.show()
 
     def _initApplication(self):
         """ Setup the application environment. """
@@ -37,7 +39,6 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f'Loading font {fontname}')
         # Application stylesheet
-        
         filepath = normpath(f'{ROOT}/resources/styles.sass')
         utils.setStyleSheet(self, filepath)
 
@@ -45,6 +46,8 @@ class PKMeter(QtWidgets.QApplication):
         """ Display all enabled plugins. """
         for pid, plugin in self.plugins.items():
             for cid, component in plugin.components.items():
+                if component.datasource:
+                    component.datasource.start()
                 if component.widget:
                     component.widget.show()
 
@@ -62,7 +65,8 @@ class PKMeter(QtWidgets.QApplication):
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     parser = ArgumentParser(description=f'{APPNAME} - Desktop System Monitor')
-    parser.add_argument('--debug', action='store_true', help='Enable debug logging.')
+    parser.add_argument('--debug', action='store_true', help='Enable debug logging')
+    parser.add_argument('--verbose', action='store_true', help='Even more verbose logging')
     parser.add_argument('--outline', action='store_true', help='Add outline to QWidgets')
     opts = parser.parse_args()
     if opts.debug:

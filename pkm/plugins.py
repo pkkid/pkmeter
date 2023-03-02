@@ -70,31 +70,38 @@ class Plugin:
 class Component:
 
     def __init__(self, plugin, manifest):
-        self.plugin = plugin                # Reference to Plugin object
-        self.manifest = manifest            # Reference to the manifest
-        self.name = manifest['name']        # Required: Plugin name
+        self.plugin = plugin                                    # Reference to Plugin object
+        self.manifest = manifest                                # Reference to the manifest
+        self.name = manifest['name']                            # Required: Plugin name
 
-    @cached_property
-    def id(self):
-        return ''.join(c for c in self.name.lower() if c.isalnum() or c == '_')
-    
     @cached_property
     def fullid(self):
         return f'{self.plugin.id}.{self.id}'
 
     @cached_property
+    def id(self):
+        return ''.join(c for c in self.name.lower() if c.isalnum() or c == '_')
+
+    @cached_property
+    def namespace(self):
+        return self.manifest.get('namespace', self.id)
+
+    @cached_property
     def datasource(self):
         clspath = self.manifest.get('datasource')
+        if not clspath: return None
         return loadmodule(self.plugin.rootdir, clspath, self)
-    
+
     @cached_property
     def settings(self):
         clspath = self.manifest.get('settings')
+        if not clspath: return None
         return loadmodule(self.plugin.rootdir, clspath, self)
     
     @cached_property
     def widget(self):
         clspath = self.manifest.get('widget')
+        if not clspath: return None
         return loadmodule(self.plugin.rootdir, clspath, self)
     
     def getSetting(self, name, default=None):
@@ -146,7 +153,7 @@ def widgets():
     if _WIDGETS is None:
         # Add application constants
         app = QtCore.QCoreApplication.instance()
-        _WIDGETS = {'APPNAME':APPNAME, 'VERSION':VERSION, 'app':app}
+        _WIDGETS = {'APPNAME':APPNAME, 'VERSION':VERSION, 'app':app, 'data':app.data}
         # Load widgets from the Qt libraries; This section should probably live in
         # the qtemplate module, but I feel like keeping it together with the plugin
         # widget loader makes more sense than spreading it around.

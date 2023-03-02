@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
-from pkm import log
-from pkm.qtemplate import QTemplateWidget
-from PySide6.QtCore import QTimer
+from pkm import log, utils
+from PySide6 import QtCore
 
 
-class BaseDataSource(QTemplateWidget):
+class BaseDataSource:
     
     def __init__(self, component):
         super(BaseDataSource, self).__init__()
-        self.plugin = component.plugin      # Plugin
-        self.component = component          # Plugin component
-        self.interval = 1000                # Interval to update the data
-        self.timer = None                   # QTimer used to update the data
-        self.watchers = []                  # Desktop widgets watching this datasource
+        self.plugin = component.plugin                  # Plugin
+        self.component = component                      # Plugin component
+        self.app = QtCore.QCoreApplication.instance()   # QtCore application
+        self.interval = 1000                            # Interval to update the data
+        self.timer = None                               # QTimer used to update the data
+        self.watchers = []                              # Desktop widgets watching this datasource
     
     def start(self):
         if self.timer is None:
-            self.timer = QTimer()
+            self.timer = QtCore.QTimer()
             self.timer.timeout.connect(self.update)
+            self.update()
         self.timer.start(self.interval)
 
     def stop(self):
@@ -25,3 +26,11 @@ class BaseDataSource(QTemplateWidget):
 
     def update(self):
         log.warning(f'{self.plugin.id} timer running with no update() function.')
+    
+    def getValue(self, name, default=None):
+        datapath = f'{self.component.namespace}.{name}'
+        utils.rget(self.app.data, datapath, default=default)
+
+    def setValue(self, name, value):
+        datapath = f'{self.component.namespace}.{name}'
+        self.app.data.setValue(datapath, value)

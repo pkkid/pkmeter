@@ -6,13 +6,7 @@ Sync = namedtuple('Sync', 'qtmpl, callback, valuestr, context')
 
 
 class DataStore(dict):
-    """ Singleton DataStore """
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not isinstance(cls._instance, cls):
-            cls._instance = dict.__new__(cls, *args, **kwargs)
-        return cls._instance
+    """ Datastore used to auto update widget values. """
 
     def __init__(self, *args, **kwargs):
         super(DataStore, self).__init__(*args, **kwargs)
@@ -22,8 +16,7 @@ class DataStore(dict):
         log.debug(f'Registering {token} -> {callback.__self__.__class__.__name__}.{callback.__name__}()')
         self._registry[token].append(Sync(qtmpl, callback, valuestr, context))
 
-    def update(self, item, value):
-        log.debug(f'Updating {item} = {value}')
+    def setValue(self, item, value):
         utils.rset(self, item, value)
         for token in sorted(k for k in self._registry.keys() if k.startswith(item)):
             for qtmpl, callback, valuestr, context in self._registry[token]:

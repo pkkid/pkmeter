@@ -83,8 +83,8 @@ class QTemplateWidget(QtWidgets.QWidget):
     
     def __init__(self, *args, **kwargs):
         super(QTemplateWidget, self).__init__(*args, **kwargs)
+        self.app = QtCore.QCoreApplication.instance()
         self.filepath = None            # Filepath of tmpl file (for relative imports)
-        self.data = DataStore()         # Datastore can register and apply updates to the ui
         self.ids = utils.Bunch()        # Reference to QObject by id
         self._loading = True            # Set False after initial objects loaded
         self._load()                    # Read the template string and convert to qobjects
@@ -99,13 +99,14 @@ class QTemplateWidget(QtWidgets.QWidget):
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
             self.filepath = abspath(__file__)
-        context = dict(self=self, data=self.data)
+        context = dict(self=self)
         self._walk(root, context=context)
         self._loading = False
     
     def _walk(self, elem, parent=None, context=None, indent=0):
         """ Parse the specified element and it's children. """
-        log.debug(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
+        if self.app.opts.verbose:
+            log.info(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
         if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />; then recurse further
         if self._tagCustom(elem, parent, context, indent): return     # Custom tags defined below
         if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
@@ -270,7 +271,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         if not self._loading or not callback: return
         tokens = [t[5:] for t in tokens if t.startswith('data.')]
         for token in tokens:
-            self.data.register(self, token, callback, valuestr, context)
+            self.app.data.register(self, token, callback, valuestr, context)
     
     def _parse(self, token, context=None):
         """ Parse the token string into a value. """
@@ -278,7 +279,7 @@ class QTemplateWidget(QtWidgets.QWidget):
         qwidgets = plugins.widgets()
         for lookup in (context, qwidgets):
             if token.split('.')[0] in lookup:
-                value = utils.rget(lookup, token)
+                value = utils.rget(lookup, token, '')
                 return value() if callable(value) else value
         for t in TYPES:
             if re.findall(t.regex, token):
