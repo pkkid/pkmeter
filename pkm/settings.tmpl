@@ -17,17 +17,16 @@
             <QLabel id='version' text='"v"+VERSION' styleSheet='width:40px;'/>
             <Stretch/>
           </QWidget>
-          <QLabel text='github.com/pkkid/pkmeter' property='(class,subtext)'/>
+          <QLabel text='github.com/pkkid/pkmeter' class='subtext'/>
         </TitleBar>
         <QWidget id='sidepanelcontent' layout='QVBoxLayout' padding='15' spacing='2'>
           <!-- General Settings -->
-          <QPushButton id='appsettingsbtn' text='Application Settings'>
-            <Set property='(class,selected)'/>
+          <QPushButton id='appsettingsbtn' class='selected' text='Application Settings'>
             <Connect clicked='showAppSettings'/>
           </QPushButton>
           <Spacing args='15'/>
           <!-- Available Plugins -->
-          <QLabel text='Available Plugins' property='(class,subtext)'/>
+          <QLabel text='Available Plugins' class='subtext'/>
           <QComboBox id='pluginlist'>
             <Connect currentIndexChanged='updateComponentList'/>
             <Repeater for='plugin' in='app.plugins.values()'>
@@ -46,7 +45,7 @@
     <QWidget id='contentwrap' layout='QVBoxLayout' padding='0' spacing='0'>
       <TitleBar args='self' layout='QHBoxLayout' padding='(10,10,10,0)'>
         <Stretch/>
-        <QPushButton text='󰅖' property='(class,close)'>
+        <QPushButton text='󰅖' class='close'>
           <Connect clicked='close'/>
         </QPushButton>
       </TitleBar>

@@ -50,7 +50,6 @@ import re
 from collections import namedtuple
 from os.path import abspath, basename, dirname, normpath
 from pkm import log, plugins, utils
-from pkm.datastore import DataStore
 from PySide6 import QtCore, QtGui, QtWidgets
 from xml.etree import ElementTree
 
@@ -184,6 +183,7 @@ class QTemplateWidget(QtWidgets.QWidget):
             if attr == 'args': continue                                                     # Ignore args; read earlier
             if attr.startswith('_'): continue                                               # Ignore attrs with underscore
             if self._attrId(qobj, elem, attr, valuestr, context, indent): continue          # id='myobject'
+            if self._attrClass(qobj, elem, attr, valuestr, context, indent): continue       # class=primarybutton
             if self._attrPadding(qobj, elem, attr, valuestr, context, indent): continue     # padding=setContentsMargins
             if self._attrSpacing(qobj, elem, attr, valuestr, context, indent): continue     # spacing=layout().setSpacing
             if self._attrLayout(qobj, elem, attr, valuestr, context, indent): continue      # layout.<attr>='value'
@@ -203,6 +203,12 @@ class QTemplateWidget(QtWidgets.QWidget):
         if attr.lower() == 'id':
             qobj.setObjectName(valuestr)
             self.ids[valuestr] = qobj
+            return True
+    
+    def _attrClass(self, qobj, elem, attr, valuestr, context, indent=0):
+        """ Saves a reference to qobj as self.ids.<value> """
+        if attr.lower() == 'class':
+            qobj.setProperty('class', valuestr)
             return True
     
     def _attrPadding(self, qobj, elem, attr, valuestr, context, indent=0):
