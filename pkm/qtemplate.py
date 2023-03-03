@@ -159,8 +159,8 @@ class QTemplateWidget(QtWidgets.QWidget):
             for the specified attribute name to self.<value>().
         """
         if elem.tag == 'Connect':
-            for attr, valuestr in elem.attrib.items():
-                callback = utils.rget(self, valuestr)
+            for attr, expr in elem.attrib.items():
+                callback = utils.rget(self, expr)
                 try:
                     # First try connecting to a signal event using via
                     # parent.<signal>.connect(callback)
@@ -178,82 +178,82 @@ class QTemplateWidget(QtWidgets.QWidget):
 
     def _applyAttrs(self, qobj, elem, context, indent=0):
         """ Applies attributes of elem to qobj. """
-        for attr, valuestr in elem.attrib.items():
-            valuestr = valuestr.strip()
+        for attr, expr in elem.attrib.items():
+            expr = expr.strip()
             if attr == 'args': continue                                                     # Ignore args; read earlier
             if attr.startswith('_'): continue                                               # Ignore attrs with underscore
-            if self._attrId(qobj, elem, attr, valuestr, context, indent): continue          # id='myobject'
-            if self._attrClass(qobj, elem, attr, valuestr, context, indent): continue       # class=primarybutton
-            if self._attrPadding(qobj, elem, attr, valuestr, context, indent): continue     # padding=setContentsMargins
-            if self._attrSpacing(qobj, elem, attr, valuestr, context, indent): continue     # spacing=layout().setSpacing
-            if self._attrLayout(qobj, elem, attr, valuestr, context, indent): continue      # layout.<attr>='value'
-            if self._attrSet(qobj, elem, attr, valuestr, context, indent): continue         # attr='value'
+            if self._attrId(qobj, elem, attr, expr, context, indent): continue          # id='myobject'
+            if self._attrClass(qobj, elem, attr, expr, context, indent): continue       # class=primarybutton
+            if self._attrPadding(qobj, elem, attr, expr, context, indent): continue     # padding=setContentsMargins
+            if self._attrSpacing(qobj, elem, attr, expr, context, indent): continue     # spacing=layout().setSpacing
+            if self._attrLayout(qobj, elem, attr, expr, context, indent): continue      # layout.<attr>='value'
+            if self._attrSet(qobj, elem, attr, expr, context, indent): continue         # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
 
     def _attrArgs(self, elem, context, indent):
         """ Reads the args attribute before creating the qobject. """
         if 'args' in elem.attrib:
-            valuestr = elem.attrib['args']
-            args = self._evaluate(valuestr, context)
+            expr = elem.attrib['args']
+            args = self._evaluate(expr, context)
             return [args] if not isinstance(args, (list,tuple)) else args
         return ()
 
-    def _attrId(self, qobj, elem, attr, valuestr, context, indent=0):
+    def _attrId(self, qobj, elem, attr, expr, context, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'id':
-            qobj.setObjectName(valuestr)
-            self.ids[valuestr] = qobj
+            qobj.setObjectName(expr)
+            self.ids[expr] = qobj
             return True
     
-    def _attrClass(self, qobj, elem, attr, valuestr, context, indent=0):
+    def _attrClass(self, qobj, elem, attr, expr, context, indent=0):
         """ Saves a reference to qobj as self.ids.<value> """
         if attr.lower() == 'class':
-            qobj.setProperty('class', valuestr)
+            qobj.setProperty('class', expr)
             return True
     
-    def _attrPadding(self, qobj, elem, attr, valuestr, context, indent=0):
+    def _attrPadding(self, qobj, elem, attr, expr, context, indent=0):
         """ Sets contentsMargin on the layout. """
         if attr.lower() == 'padding':
-            value = self._evaluate(valuestr, context)
+            value = self._evaluate(expr, context)
             if isinstance(value, int): value = (value,) * 4
             elif len(value) == 2: value = value * 2
             qobj.layout().setContentsMargins(*value)
             return True
     
-    def _attrSpacing(self, qobj, elem, attr, valuestr, context, indent=0):
+    def _attrSpacing(self, qobj, elem, attr, expr, context, indent=0):
         """ Sets contentsMargin on the layout. """
         if attr.lower() == 'spacing':
-            value = self._evaluate(valuestr, context)
+            value = self._evaluate(expr, context)
             qobj.layout().setSpacing(value)
             return True
     
-    def _attrLayout(self, qobj, elem, attr, valuestr, context, indent=0):
+    def _attrLayout(self, qobj, elem, attr, expr, context, indent=0):
         """ Sets the layout or layout.property(). Also reads the DEFAULT_LAYOUT_*
             properties on the class and applies those if specified.
         """
         if attr == 'layout':
-            self._attrSet(qobj, elem, attr, valuestr, context, indent=0)
+            self._attrSet(qobj, elem, attr, expr, context, indent=0)
             return True
         if attr.startswith('layout.'):
-            self._attrSet(qobj.layout(), elem, attr[7:], valuestr, context, indent)
+            self._attrSet(qobj.layout(), elem, attr[7:], expr, context, indent)
             return True
 
-    def _attrSet(self, qobj, elem, attr, valuestr, context, indent=0):
+    def _attrSet(self, qobj, elem, attr, expr, context, indent=0):
         """ Calls set<attr>(<value>) on the qbject. """
         setattr = f'set{attr[0].upper()}{attr[1:]}'
         if hasattr(qobj, setattr):
             callback = getattr(qobj, setattr)
-            self._apply(callback, valuestr, context)
+            self._apply(callback, expr, context)
             return True
     
-    def _apply(self, callback, valuestr, context):
-        """ Apply the specified valuestr to callback. """
-        value = self._evaluate(valuestr, context, callback)
-        if valuestr.startswith('(') or valuestr.startswith('['):
+    def _apply(self, callback, expr, context):
+        """ Apply the specified expr to callback. """
+        value = self._evaluate(expr, context, callback)
+        if expr.startswith('(') or expr.startswith('['):
             return callback(*value)
         return callback(value)
 
-    def _evaluate(self, valuestr, context, callback=None):
+    def _evaluate(self, expr, context, callback=None):
         """ Evaluate a given expression and return the result. Supports the operators
             and, or, add, sub, mul, div. Attempts to infer values types based on simple
             rtegex patterns. Supports types None, Bool, Int, Float. Will reference
@@ -261,23 +261,23 @@ class QTemplateWidget(QtWidgets.QWidget):
             operations is NOT supported.
         """
         for c in COLLECTIONS:
-            if re.findall(c.regex, valuestr):
-                if valuestr == f'{c.start}{c.end}': return c.cast()
-                valuestrs = valuestr.lstrip(c.start).rstrip(c.end).split(c.delim)
-                return c.cast(self._evaluate(x.strip(), context, callback) for x in valuestrs)
-        tokens = utils.tokenize(valuestr, OPERATIONS)
-        self._registerTokens(tokens, valuestr, context, callback)
+            if re.findall(c.regex, expr):
+                if expr == f'{c.start}{c.end}': return c.cast()
+                exprs = expr.lstrip(c.start).rstrip(c.end).split(c.delim)
+                return c.cast(self._evaluate(x.strip(), context, callback) for x in exprs)
+        tokens = utils.tokenize(expr, OPERATIONS)
+        self._registerTokens(tokens, expr, context, callback)
         values = [self._parse(t, context) for t in tokens]
         while len(values) > 1:
             values = [OPERATIONS[values[1]](values[0], values[2])] + values[3:]
         return values[0]
     
-    def _registerTokens(self, tokens, valuestr, context, callback=None):
+    def _registerTokens(self, tokens, expr, context, callback=None):
         """ Check we need to register any of the specified tokens in the datastore. """
         if not self._loading or not callback: return
         tokens = [t[5:] for t in tokens if t.startswith('data.')]
         for token in tokens:
-            self.app.data.register(self, token, callback, valuestr, context)
+            self.app.data.register(self, token, callback, expr, context)
     
     def _parse(self, token, context=None):
         """ Parse the token string into a value. """

@@ -96,7 +96,7 @@ def setStyleSheet(qobj, filepath, context=None, outline=False):
     qobj.setStyleSheet(styles)
 
 
-def tokenize(valuestr, operations=None):
+def tokenize(expr, operations=None):
     """ Tokenize a given expression into a list of tokens.
         expr (str): The expression to tokenize.
         operations (dict{op:func}): Dict of operator strings and their resolving function.
@@ -104,15 +104,15 @@ def tokenize(valuestr, operations=None):
     operations = operations or {}
     tokens = []
     token, i = '', 0
-    while i < len(valuestr):
+    while i < len(expr):
         for op in sorted(operations, key=len, reverse=True):
-            if valuestr[i:].startswith(op):
+            if expr[i:].startswith(op):
                 tokens.append(token)
                 tokens.append(op)
                 token = ''
                 i += len(op)
                 continue
-        token += valuestr[i]
+        token += expr[i]
         i += 1
     if token:
         tokens.append(token.strip())
