@@ -17,10 +17,19 @@ PLUGIN_DIRECTORIES = [
     os.path.normpath(f'{CONFIG_LOCATION}/{APPNAME}/plugins'),
 ]
 
-# Logging Configuration
+
+# Custom logging formatter
+class MyFormatter(logging.Formatter):
+    def format(self, record):
+        if 'module' in record.__dict__.keys():
+            record.module = record.module[:10]
+        return super(MyFormatter, self).format(record)
+
+
+# Logging configuration
 log = logging.getLogger('pkm')
 logfile = normpath(f'{CONFIG_LOCATION}/{APPNAME}/pkmeter.log')
-logformat = logging.Formatter('%(asctime)s %(module)12s:%(lineno)-4s %(levelname)-9s %(message)s')
+logformat = MyFormatter('%(asctime)s %(module)10s:%(lineno)-4s %(levelname)-7s %(message)s')
 os.makedirs(dirname(logfile), exist_ok=True)
 filehandler = RotatingFileHandler(logfile, 'a', 512000, 3, 'utf-8')
 filehandler.setFormatter(logformat)
