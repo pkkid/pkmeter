@@ -5,7 +5,7 @@ from pkm import log, utils
 Sync = namedtuple('Sync', 'qtmpl, callback, valuestr, context')
 
 
-class DataStore(dict):
+class DataStore(utils.Bunch):
     """ Datastore used to auto update widget values. """
 
     def __init__(self, *args, **kwargs):
