@@ -1,25 +1,25 @@
 
-<QWidget layout='QVBoxLayout' geometry='(0,0,700,500)' padding='0'>
+<QWidget layout='QVBoxLayout()' geometry='(0,0,700,500)' padding='0'>
   <Set attribute='Qt.WA_TranslucentBackground'/>
   <Set windowFlags='Qt.Dialog | Qt.FramelessWindowHint'/>
   <Set windowModality='Qt.ApplicationModal'/>
   <Set windowTitle='APPNAME+" Settings"'/>
-  <QWidget id='settings' layout='QHBoxLayout' padding='1' spacing='0'>
+  <QWidget id='settings' layout='QHBoxLayout()' padding='1' spacing='0'>
     <DropShadow args='(0,5,25,128)'/>
 
     <!-- Sidepanel -->
-    <QWidget id='sidepanelwrap' layout='QVBoxLayout' padding='0'>
-      <QWidget id='sidepanel' layout='QVBoxLayout' padding='0' spacing='0'>
+    <QWidget id='sidepanelwrap' layout='QVBoxLayout()' padding='0'>
+      <QWidget id='sidepanel' layout='QVBoxLayout()' padding='0' spacing='0'>
         <!-- Title -->
-        <TitleBar args='self' layout='QVBoxLayout' padding='(15,15,15,0)' spacing='0'>
-          <QWidget layout='QHBoxLayout' padding='0' spacing='3'>
+        <TitleBar args='self' layout='QVBoxLayout()' padding='(15,15,15,0)' spacing='0'>
+          <QWidget layout='QHBoxLayout()' padding='0' spacing='3'>
             <QLabel id='title' text='APPNAME'/>
             <QLabel id='version' text='"v"+VERSION' styleSheet='width:40px;'/>
             <Stretch/>
           </QWidget>
           <QLabel text='github.com/pkkid/pkmeter' class='subtext'/>
         </TitleBar>
-        <QWidget id='sidepanelcontent' layout='QVBoxLayout' padding='15' spacing='2'>
+        <QWidget id='sidepanelcontent' layout='QVBoxLayout()' padding='15' spacing='2'>
           <!-- General Settings -->
           <QPushButton id='appsettingsbtn' class='selected' text='Application Settings'>
             <Connect clicked='showAppSettings'/>
@@ -42,20 +42,20 @@
     </QWidget>
 
     <!-- Content Panel -->
-    <QWidget id='contentwrap' layout='QVBoxLayout' padding='0' spacing='0'>
-      <TitleBar args='self' layout='QHBoxLayout' padding='(10,10,10,0)'>
+    <QWidget id='contentwrap' layout='QVBoxLayout()' padding='0' spacing='0'>
+      <TitleBar args='self' layout='QHBoxLayout()' padding='(10,10,10,0)'>
         <Stretch/>
         <QPushButton text='󰅖' class='close'>
           <Connect clicked='close'/>
         </QPushButton>
       </TitleBar>
       <!-- Content Header -->
-      <QWidget id='content' layout='QVBoxLayout' padding='(23,0)' spacing='0'>
+      <QWidget id='content' layout='QVBoxLayout()' padding='(23,0)' spacing='0'>
         <QLabel id='contentheader' text='Application Settings'/>
       </QWidget>
       <!-- Content - Replaced when selecting component. -->
-      <QWidget id='content' layout='QVBoxLayout' padding='15' spacing='0'>
-        <QWidget id='appsettings' layout='QHBoxLayout'>
+      <QWidget id='content' layout='QVBoxLayout()' padding='15' spacing='0'>
+        <QWidget id='appsettings' layout='QHBoxLayout()'>
           <QLabel text='Application settings not yet defined.'/>
         </QWidget>
       </QWidget>

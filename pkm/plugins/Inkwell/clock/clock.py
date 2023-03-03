@@ -12,7 +12,7 @@ class DesktopWidget(BaseWidget):
 
 class SettingsWidget(BaseSettings):
     TMPLSTR = """
-      <QWidget layout='QHBoxLayout'>
+      <QWidget layout='QHBoxLayout()'>
         <QLabel text='Clock Settings'/>
       </QWidget>
     """

@@ -19,6 +19,7 @@ class BaseDataSource:
             self.timer = QtCore.QTimer()
             self.timer.timeout.connect(self.update)
             self.update()
+        log.info(f'Starting {self.component.id} datasource with interval {self.interval}ms')
         self.timer.start(self.interval)
 
     def stop(self):

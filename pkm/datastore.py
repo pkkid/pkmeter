@@ -2,7 +2,7 @@
 from collections import defaultdict, namedtuple
 from pkm import log, utils
 
-Sync = namedtuple('Sync', 'qtmpl, callback, expr, context')
+Sync = namedtuple('Sync', 'qtmpl, expr, context, callback')
 
 
 class DataStore(utils.Bunch):
@@ -10,14 +10,14 @@ class DataStore(utils.Bunch):
 
     def __init__(self, *args, **kwargs):
         super(DataStore, self).__init__(*args, **kwargs)
-        self._registry = defaultdict(list)      # Dict of {token: [Callbacks]}
+        self._registry = defaultdict(list)  # Dict of {token: [Callbacks]}
     
-    def register(self, qtmpl, token, callback, expr, context):
+    def _register(self, qtmpl, token, callback, expr, context):
         log.debug(f'Registering {token} -> {callback.__self__.__class__.__name__}.{callback.__name__}()')
-        self._registry[token].append(Sync(qtmpl, callback, expr, context))
+        self._registry[token].append(Sync(qtmpl, expr, context, callback))
 
     def setValue(self, item, value):
         utils.rset(self, item, value)
         for token in sorted(k for k in self._registry.keys() if k.startswith(item)):
-            for qtmpl, callback, expr, context in self._registry[token]:
-                value = qtmpl._apply(callback, expr, context)
+            for sync in self._registry[token]:
+                value = sync.qtmpl._apply(sync.expr, sync.context, sync.callback)

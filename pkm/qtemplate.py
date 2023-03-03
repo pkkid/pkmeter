@@ -46,7 +46,9 @@ If the value looks like a list, each item will also be parsed. The values will
 sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
+import io
 import re
+import tokenize
 from collections import namedtuple
 from os.path import abspath, basename, dirname, normpath
 from pkm import log, plugins, utils
@@ -243,10 +245,10 @@ class QTemplateWidget(QtWidgets.QWidget):
         setattr = f'set{attr[0].upper()}{attr[1:]}'
         if hasattr(qobj, setattr):
             callback = getattr(qobj, setattr)
-            self._apply(callback, expr, context)
+            self._apply(expr, context, callback)
             return True
     
-    def _apply(self, callback, expr, context):
+    def _apply(self, expr, context, callback):
         """ Apply the specified expr to callback. """
         value = self._evaluate(expr, context, callback)
         if expr.startswith('(') or expr.startswith('['):
@@ -260,37 +262,29 @@ class QTemplateWidget(QtWidgets.QWidget):
             context and replace strings with their context counterparts. Order of
             operations is NOT supported.
         """
-        for c in COLLECTIONS:
-            if re.findall(c.regex, expr):
-                if expr == f'{c.start}{c.end}': return c.cast()
-                exprs = expr.lstrip(c.start).rstrip(c.end).split(c.delim)
-                return c.cast(self._evaluate(x.strip(), context, callback) for x in exprs)
-        tokens = utils.tokenize(expr, OPERATIONS)
-        self._registerTokens(tokens, expr, context, callback)
-        values = [self._parse(t, context) for t in tokens]
-        while len(values) > 1:
-            values = [OPERATIONS[values[1]](values[0], values[2])] + values[3:]
-        return values[0]
+        try:
+            fullcontext = utils.Bunch(**context, **plugins.widgets())
+            result = eval(expr, fullcontext)
+            if self._loading:
+                self._registerTokens(expr, context, callback)
+            return result
+        except Exception:
+            return expr
     
-    def _registerTokens(self, tokens, expr, context, callback=None):
+    def _registerTokens(self, expr, context, callback=None):
         """ Check we need to register any of the specified tokens in the datastore. """
-        if not self._loading or not callback: return
-        tokens = [t[5:] for t in tokens if t.startswith('data.')]
-        for token in tokens:
-            self.app.data.register(self, token, callback, expr, context)
-    
-    def _parse(self, token, context=None):
-        """ Parse the token string into a value. """
-        context = context or {}
-        qwidgets = plugins.widgets()
-        for lookup in (context, qwidgets):
-            if token.split('.')[0] in lookup:
-                value = utils.rget(lookup, token, '')
-                return value() if callable(value) else value
-        for t in TYPES:
-            if re.findall(t.regex, token):
-                return t.cast(token)
-        return token
+        try:
+            current = []
+            readline = io.BytesIO(expr.encode('utf8')).readline
+            for token in tokenize.tokenize(readline):
+                if token.type == tokenize.NAME or (token.type == tokenize.OP and token.string == '.'):
+                    current.append(token.string)
+                elif len(current) >= 3 and current[0] == 'data':
+                    token = ''.join(current)[5:]
+                    self.app.data._register(self, token, callback, expr, context)
+                    current = []
+        except Exception:
+            log.error(f'Error registering tokens for expr {expr}', exc_info=True)
 
 
 class DropShadow:

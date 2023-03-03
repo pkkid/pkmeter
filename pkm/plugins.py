@@ -40,7 +40,6 @@ class Plugin:
                 members = dict(inspect.getmembers(module, lambda obj: (inspect.isclass(obj)
                     and obj.__module__ == module.__name__ and issubclass(obj, QtWidgets.QWidget))))
                 for clsname, cls in members.items():
-                    log.info(f'Loading widget {clsname}')
                     widgets[clsname] = cls
             except Exception as err:
                 log.warn('Error loading module %s: %s', name, err)
@@ -116,7 +115,7 @@ class Component:
 def loadmodule(rootdir, modpath, component):
     """ Load the specified module. """
     if not modpath: return None
-    log.debug(f'loadmodule({modpath=})')
+    log.debug(f'  loading module {modpath}')
     modname, clsname = modpath.rsplit('.', 1)
     modpath = os.path.normpath(f'{rootdir}/{modname.replace(".","/")}.py')
     spec = importlib.util.spec_from_file_location(modname, modpath)
