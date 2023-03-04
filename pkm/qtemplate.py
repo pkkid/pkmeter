@@ -85,13 +85,13 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Parse the specified element and it's children. """
         if self.app.opts.verbose:
             log.info(f'{" "*indent}<{elem.tag} {" ".join(elem.attrib.keys())}>')
-        if self._tagQobject(elem, parent, context, indent): return    # <QWidget attr='value' />; then recurse further
+        if self._tagQObject(elem, parent, context, indent): return    # <QWidget attr='value' />; then recurse further
         if self._tagSet(elem, parent, context, indent): return        # <set attr='value' />; no children
         if self._tagAdd(elem, parent, context, indent): return        # add<Tag>(attr=value); no children
         if self._tagConnect(elem, parent, context, indent): return    # <connect slot='callback' />; no children
         raise Exception(f'Unknown tag "{elem.tag}" in element {parent.__class__.__name__}.')
 
-    def _tagQobject(self, elem, parent, context, indent):
+    def _tagQObject(self, elem, parent, context, indent):
         """ Creates a QObject and appends it to the layout of parent. """
         qwidgets = plugins.widgets()
         if elem.tag in qwidgets:
@@ -110,15 +110,6 @@ class QTemplateWidget(QtWidgets.QWidget):
             for echild in elem:
                 self._walk(echild, qobj, context, indent+1)
             return True
-    
-    # def _tagCustom(self, elem, parent, context, indent):
-    #     """ Repeater element repeats child elements. """
-    #     for cls in Repeater, StyleSheet, DropShadow:
-    #         if elem.tag == cls.__name__:
-    #             args = self._attrArgs(elem, context, indent)
-    #             qobj = cls(self, elem, parent, context, *args)
-    #             self._applyAttrs(qobj, elem, context, indent+1)
-    #             return True
     
     def _tagAdd(self, elem, parent, context, indent):
         """ Check we're adding an attribute to the parent. """
@@ -163,8 +154,8 @@ class QTemplateWidget(QtWidgets.QWidget):
         """ Applies attributes of elem to qobj. """
         for attr, expr in elem.attrib.items():
             expr = expr.strip()
-            if attr == 'args': continue                                                     # Ignore args; read earlier
-            if attr.startswith('_'): continue                                               # Ignore attrs with underscore
+            if attr == 'args': continue         # Ignore args; read earlier
+            if attr.startswith('_'): continue   # Ignore attrs with underscore
             if self._attrId(qobj, elem, attr, expr, context, indent): continue          # id='myobject'
             if self._attrClass(qobj, elem, attr, expr, context, indent): continue       # class=primarybutton
             if self._attrPadding(qobj, elem, attr, expr, context, indent): continue     # padding=setContentsMargins
