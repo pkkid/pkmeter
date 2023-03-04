@@ -37,8 +37,13 @@ class DataSource:
         utils.rget(self.app.data, datapath, default=default)
 
     def setValue(self, name, value):
-        datapath = f'{self.component.namespace}.{name}'
+        datapath = f'{self.plugin.id}.{self.component.namespace}.{name}'
         self.app.data.setValue(datapath, value)
+        # self.printValues()
+    
+    def printValues(self):
+        for path, valuestr, vtype in utils.flattenDataTree(self.app.data):
+            print(f'{path} = {valuestr} ({vtype})')
 
 
 class DesktopWidget(Draggable, QTemplateWidget):

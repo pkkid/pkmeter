@@ -22,11 +22,12 @@
         <QWidget id='sidepanelcontent' layout='QVBoxLayout()' padding='15' spacing='2'>
           <!-- General Settings -->
           <QPushButton id='appsettingsbtn' class='selected' text='Application Settings'>
-            <Connect clicked='showAppSettings'/>
+            <Connect clicked='settingsButtonClicked'/>
           </QPushButton>
-          <Spacing args='15'/>
+          <QPushButton id='datastorebtn' text='Data Store'>
+            <Connect clicked='settingsButtonClicked'/>
+          </QPushButton>
           <!-- Available Plugins -->
-          <QLabel text='Available Plugins' class='subtext'/>
           <QComboBox id='pluginlist'>
             <Connect currentIndexChanged='updateComponentList'/>
             <Repeater for='plugin' in='app.plugins.values()'>
@@ -35,7 +36,7 @@
           </QComboBox>
           <!-- Component List -->
           <QListWidget id='componentlist'>
-            <Connect itemClicked='updateContent'/>
+            <Connect itemClicked='componentSelected'/>
           </QListWidget>
         </QWidget>
       </QWidget>
@@ -55,8 +56,11 @@
       </QWidget>
       <!-- Content - Replaced when selecting component. -->
       <QWidget id='content' layout='QVBoxLayout()' padding='15' spacing='0'>
-        <QWidget id='appsettings' layout='QHBoxLayout()'>
+        <QWidget id='appsettings' layout='QHBoxLayout()' property='("title","Application Settings")'>
           <QLabel text='Application settings not yet defined.'/>
+        </QWidget>
+        <QWidget id='datastore' layout='QHBoxLayout()' visible='False' property='("title","Data Store")'>
+          <QLabel text='Data Store settings not yet defined.'/>
         </QWidget>
       </QWidget>
       <Stretch/>

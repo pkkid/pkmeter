@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import sass
 from collections import OrderedDict
 from pkm import log
@@ -37,6 +38,26 @@ def deleteChildren(qobj):
         widget = item.widget()
         if widget: widget.deleteLater()
         else: deleteChildren(item.layout())
+
+
+def flattenDataTree(root, path='data'):
+    if getattr(root, 'items', None) is None:
+        return [(path, str(root), typeStr(root))]
+    values = []
+    for key, value in root.items():
+        if key.startswith('_'): continue
+        subpath = '%s.%s' % (path, key)
+        vtype = typeStr(value)
+        if isinstance(value, dict):
+            values += flattenDataTree(value, subpath)
+        elif isinstance(value, (tuple, list)):
+            valuestr = '<%s: %s items>' % (vtype, len(value))
+            values.append((subpath, valuestr, vtype))
+            for i in range(len(value)):
+                values += flattenDataTree(value[i], '%s.%s' % (subpath, i))
+        else:
+            values.append((subpath, str(value), vtype))
+    return sorted(values, key=lambda x: x[0])
 
 
 def removeChildren(qobj):
@@ -78,10 +99,10 @@ def rset(obj, attrstr, value, delim='.'):
     obj[attr] = value
 
 
-def setPropertyAndRedraw(qobj, name, value):
+def setPropertyAndRedraw(qobj, name, value=None):
     """ After setting a property on a QtWidget, redraw it. """
-    if value is None: delattr(qobj, name)
-    else: qobj.setProperty(name, value)
+    if value is None and hasattr(qobj, name): delattr(qobj, name)
+    elif value is not None: qobj.setProperty(name, value)
     qobj.style().unpolish(qobj)
     qobj.style().polish(qobj)
     qobj.update()
@@ -94,3 +115,8 @@ def setStyleSheet(qobj, filepath, context=None, outline=False):
     if outline:
         styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
     qobj.setStyleSheet(styles)
+
+
+def typeStr(value):
+    """ Return the type of value as a string. """
+    return re.findall(r"(\w+?)\'", str(type(value)))[0].lower()

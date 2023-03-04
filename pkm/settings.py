@@ -28,15 +28,20 @@ class SettingsWindow(QTemplateWidget):
     
     def show(self):
         """ Show this settings window. """
-        self.updateComponentList('default')
+        self.updateComponentList(None)
         utils.centerWindow(self)
         super(SettingsWindow, self).show()
-    
-    def showAppSettings(self):
-        """ Callback when Application Settings is clicked. """
-        self.updateContent()
 
-    def updateComponentList(self, pluginid=None):
+    def settingsButtonClicked(self):
+        componentid = self.sender().objectName()[:-3]
+        self.updateContent(componentid)
+
+    def componentSelected(self, item):
+        componentid = item.data(Qt.UserRole)
+        pluginid = self.ids.pluginlist.currentData()
+        self.updateContent(componentid, pluginid)
+
+    def updateComponentList(self, pluginid):
         if self._loading: return
         self.ids.componentlist.clear()
         if str(pluginid) not in self.app.plugins:
@@ -50,27 +55,61 @@ class SettingsWindow(QTemplateWidget):
                 item.setCheckState(Qt.Checked)
             self.ids.componentlist.addItem(item)
     
-    def updateContent(self, item=None):
+    def updateContent(self, componentid, pluginid=None):
         if self._loading: return
-        # Figure out which settings to display and update appsettingsbtn
-        settings = self.ids.appsettings
-        if item is not None:
-            pid = self.ids.pluginlist.currentData() if item else None
-            cid = item.data(Qt.UserRole) if item else None
-            plugin = self.app.plugins[pid]
-            component = self.app.plugins[pid].components[cid]
-            settings = component.settings
-            utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
-            title = f'{plugin.name} {component.name.replace(" Settings","")}'
-            title += ' Settings' if 'Settings' not in title else ''
-            self.ids.contentheader.setText(title)
-        else:
-            self.ids.componentlist.clearSelection()
-            self.ids.contentheader.setText('Application Settings')
-            utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', 'selected')
-        # Hide current settings and show the new ones
+        log.info(f'{pluginid=}  {componentid=}')
+        # Remove Highlight on all sidepanel items
+        utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
+        utils.setPropertyAndRedraw(self.ids.datastorebtn, 'class', '')
+        utils.setPropertyAndRedraw(self.ids.pluginlist, 'class', '')
         utils.removeChildren(self.ids.content)
-        if settings is not None:
-            self.ids.content.layout().addWidget(settings)
-            settings.setVisible(True)
+        # Highlight the new sidepanel item and show updated settings
+        if pluginid:
+            plugin = self.app.plugins[pluginid]
+            component = plugin.components[componentid]
+            settings = component.settings
+            button = self.ids.pluginlist
+            title = f'{plugin.name} {component.name.replace(" Settings","")} Settings'
+            # utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
+            # title = f'{plugin.name} {component.name.replace(" Settings","")}'
+            # title += ' Settings' if 'Settings' not in title else ''
+            # self.ids.contentheader.setText(title)
+        else:
+            settings = self.ids[componentid]
+            button = self.ids[f'{componentid}btn']
+            title = settings.property('title')
+            self.ids.componentlist.clearSelection()
+        utils.setPropertyAndRedraw(button, 'class', 'selected')
+        self.ids.contentheader.setText(title)
+        self.ids.content.layout().addWidget(settings)
+        settings.setVisible(True)
         self.ids.content.update()
+        # ---
+        # # Hide current settings and show the new ones
+        # utils.removeChildren(self.ids.content)
+        # if settings is not None:
+        #     self.ids.content.layout().addWidget(settings)
+        #     settings.setVisible(True)
+        # self.ids.content.update()
+        # ----
+        # settings = self.ids.appsettings
+        # if item is not None:
+        #     pid = self.ids.pluginlist.currentData() if item else None
+        #     cid = item.data(Qt.UserRole) if item else None
+        #     plugin = self.app.plugins[pid]
+        #     component = self.app.plugins[pid].components[cid]
+        #     settings = component.settings
+        #     utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
+        #     title = f'{plugin.name} {component.name.replace(" Settings","")}'
+        #     title += ' Settings' if 'Settings' not in title else ''
+        #     self.ids.contentheader.setText(title)
+        # else:
+        #     self.ids.componentlist.clearSelection()
+        #     self.ids.contentheader.setText('Application Settings')
+        #     utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', 'selected')
+        # # Hide current settings and show the new ones
+        # utils.removeChildren(self.ids.content)
+        # if settings is not None:
+        #     self.ids.content.layout().addWidget(settings)
+        #     settings.setVisible(True)
+        # self.ids.content.update()

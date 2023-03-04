@@ -21,7 +21,7 @@ class DropShadow(QTemplateTag):
         shadow.setBlurRadius(blur)
         shadow.setColor(QtGui.QColor(0, 0, 0, opacity))
         parent.setGraphicsEffect(shadow)
-        parent._dropshadow = shadow
+        parent._dropshadow = shadow  # icky
         # Set grandparent's margins to allow space for dropshadow
         parent.parent().setContentsMargins(*[max(x,y)+blur]*4)
 

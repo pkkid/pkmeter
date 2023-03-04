@@ -7,7 +7,7 @@ from pkm import base
 class DataSource(base.DataSource):
     
     def update(self):
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        now = datetime.datetime.now()
         self.setValue('datetime', now)
 
 

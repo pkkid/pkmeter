@@ -168,7 +168,7 @@ QScrollBar:vertical {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 
-    #title { color:$primarytext; font-size:25px; }
+    #title { color:$primarytext; font-size:25px; padding:0px; }
     #version { color:$highlighttext; padding-top:5px; }
 
     QPushButton {
@@ -186,6 +186,7 @@ QScrollBar:vertical {
       color: $secondarytext;
       padding: 5px 1px 3px 1px;
       text-align: left;
+      // &[class=selected] { color:$highlighttext; }
       &:hover {
         border-bottom: 2px solid $secondarydark;
         color: $primarytext;

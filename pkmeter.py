@@ -39,8 +39,8 @@ class PKMeter(QtWidgets.QApplication):
                 fontname = QtGui.QFontDatabase.applicationFontFamilies(fontid)[0]
                 log.info(f'Loading font {fontname}')
         # Application stylesheet
-        filepath = normpath(f'{ROOT}/resources/styles.sass')
-        utils.setStyleSheet(self, filepath)
+        filepath = 'resources/styles.sass'
+        utils.setStyleSheet(self, filepath, None, self.opts.outline)
 
     def _showWidgets(self):
         """ Display all enabled plugins. """
