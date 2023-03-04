@@ -6,7 +6,7 @@ import os
 import pkgutil
 from functools import cached_property
 from pkm import APPNAME, CONFIG_STORAGE, PLUGIN_DIRECTORIES, VERSION
-from pkm import log, utils
+from pkm import base, log, utils
 from PySide6 import QtCore, QtGui, QtWidgets
 
 _WIDGETS = None
@@ -38,7 +38,9 @@ class Plugin:
             try:
                 module = loader.find_module(name).load_module(name)
                 members = dict(inspect.getmembers(module, lambda obj: (inspect.isclass(obj)
-                    and obj.__module__ == module.__name__ and issubclass(obj, QtWidgets.QWidget))))
+                    and obj.__module__ == module.__name__
+                    and issubclass(obj, (QtWidgets.QWidget, base.QTemplateTag))
+                )))
                 for clsname, cls in members.items():
                     widgets[clsname] = cls
             except Exception as err:

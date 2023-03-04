@@ -94,26 +94,3 @@ def setStyleSheet(qobj, filepath, context=None, outline=False):
     if outline:
         styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
     qobj.setStyleSheet(styles)
-
-
-def tokenize(expr, operations=None):
-    """ Tokenize a given expression into a list of tokens.
-        expr (str): The expression to tokenize.
-        operations (dict{op:func}): Dict of operator strings and their resolving function.
-    """
-    operations = operations or {}
-    tokens = []
-    token, i = '', 0
-    while i < len(expr):
-        for op in sorted(operations, key=len, reverse=True):
-            if expr[i:].startswith(op):
-                tokens.append(token)
-                tokens.append(op)
-                token = ''
-                i += len(op)
-                continue
-        token += expr[i]
-        i += 1
-    if token:
-        tokens.append(token.strip())
-    return [t.strip() for t in tokens if t]
