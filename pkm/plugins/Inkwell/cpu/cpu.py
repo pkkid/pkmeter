@@ -9,7 +9,8 @@ class DesktopWidget(base.DesktopWidget):
 
 class SettingsWidget(base.SettingsWidget):
     TMPLSTR = """
-      <QWidget layout='QHBoxLayout()'>
+      <QWidget layout='QVBoxLayout()'>
         <QLabel text='CPU Settings'/>
+        <Stretch/>
       </QWidget>
     """

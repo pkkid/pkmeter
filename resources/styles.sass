@@ -83,6 +83,20 @@ QListWidget {
   }
 }
 
+QMenu {
+  background-color: #222222;
+  &::item {
+    spacing: 3px;
+    padding: 8px 40px 8px 20px;
+    background: transparent;
+    border-radius: 5px;
+    &:selected {
+      color: #ffffff;
+      background-color: #181818;
+    }
+  }
+}
+
 QPushButton {
   text-transform: none;
   font-weight: normal;
@@ -118,20 +132,6 @@ QSpinBox {
   background-color: $secondarydark;
 }
 
-QMenu {
-  background-color: #222222;
-  &::item {
-    spacing: 3px;
-    padding: 8px 40px 8px 20px;
-    background: transparent;
-    border-radius: 5px;
-    &:selected {
-      color: #ffffff;
-      background-color: #181818;
-    }
-  }
-}
-
 QScrollBar:vertical {
   border: 0px;
   margin: 0px 0px;
@@ -150,6 +150,39 @@ QScrollBar:vertical {
   //   height: 0px;
   //   background: none;
   // }
+}
+
+QTableWidget {
+  font-size: 11px;
+  selection-background-color: $secondary;
+  background-color: rgba($secondary, 0.2);
+  gridline-color: rgba(0,0,0,0);
+  border-radius: 5px;
+  outline: 0;
+  &::item {
+    padding: 0px 3px;
+    border: 0px solid rgba(0,0,0,0);
+    color: $secondarytext;
+    &:selected { color:$primarytext; }
+  }
+}
+QHeaderView {
+  background-color: $secondary;
+  border: 0px solid rgba(0,0,0,0);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  text-align: left;
+  &::section {
+    border: 0px solid rgba(0,0,0,0);
+    background-color: $secondary;
+    font-size: 11px;
+    border-right: 1px solid $secondarydark;
+    border-bottom: 1px solid $secondarydark;
+    padding: 0px 5px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    font-weight: normal;
+  }
 }
 
 
@@ -177,8 +210,8 @@ QScrollBar:vertical {
       color: $secondarytext;
       padding: 8px 0px;
       text-align: left;
-      &[class=selected] { color:$highlighttext; }
       &:hover { color:$primarytext; }
+      &[class=selected] { color:$highlighttext; }
     }
     QComboBox {
       border: 0px solid rgba(0,0,0,0);

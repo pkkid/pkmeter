@@ -40,21 +40,21 @@ def deleteChildren(qobj):
         else: deleteChildren(item.layout())
 
 
-def flattenDataTree(root, path='data'):
+def flattenDataTree(root, path=''):
     if getattr(root, 'items', None) is None:
         return [(path, str(root), typeStr(root))]
     values = []
     for key, value in root.items():
         if key.startswith('_'): continue
-        subpath = '%s.%s' % (path, key)
+        subpath = f'{path}.{key}'.lstrip('.')
         vtype = typeStr(value)
         if isinstance(value, dict):
             values += flattenDataTree(value, subpath)
         elif isinstance(value, (tuple, list)):
-            valuestr = '<%s: %s items>' % (vtype, len(value))
+            valuestr = f'<{vtype}: {len(value)} items>'
             values.append((subpath, valuestr, vtype))
             for i in range(len(value)):
-                values += flattenDataTree(value[i], '%s.%s' % (subpath, i))
+                values += flattenDataTree(value[i], f'{subpath}.{i}')
         else:
             values.append((subpath, str(value), vtype))
     return sorted(values, key=lambda x: x[0])

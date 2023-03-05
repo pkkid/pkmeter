@@ -7,7 +7,7 @@ from pkm import base
 class DataSource(base.DataSource):
     
     def update(self):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().replace(microsecond=0)
         self.setValue('datetime', now)
 
 
@@ -17,7 +17,8 @@ class DesktopWidget(base.DesktopWidget):
 
 class SettingsWidget(base.SettingsWidget):
     TMPLSTR = """
-      <QWidget layout='QHBoxLayout()'>
+      <QWidget layout='QVBoxLayout()'>
         <QLabel text='Clock Settings'/>
+        <Stretch/>
       </QWidget>
     """

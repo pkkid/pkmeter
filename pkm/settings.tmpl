@@ -56,14 +56,17 @@
       </QWidget>
       <!-- Content - Replaced when selecting component. -->
       <QWidget id='content' layout='QVBoxLayout()' padding='15' spacing='0'>
-        <QWidget id='appsettings' layout='QHBoxLayout()' property='("title","Application Settings")'>
+        <QWidget id='appsettings' layout='QVBoxLayout()' property='("title","Application Settings")'>
           <QLabel text='Application settings not yet defined.'/>
+          <Stretch/>
         </QWidget>
-        <QWidget id='datastore' layout='QHBoxLayout()' visible='False' property='("title","Data Store")'>
-          <QLabel text='Data Store settings not yet defined.'/>
+        <QWidget id='datastore' layout='QVBoxLayout()' visible='False' property='("title","Data Store")'>
+          <QLabel text='The following metrics are enabled.'/>
+          <QTableWidget id='datatable' args='(0,3)'>
+          </QTableWidget>
         </QWidget>
       </QWidget>
-      <Stretch/>
+      
     </QWidget>
 
   </QWidget>

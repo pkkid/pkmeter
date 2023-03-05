@@ -3,7 +3,7 @@ from os.path import dirname, normpath
 from pkm import CONFIG_STORAGE
 from pkm import log, utils  # noqa
 from pkm.qtemplate import QTemplateWidget
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Qt
 
 
@@ -15,13 +15,26 @@ class SettingsWindow(QTemplateWidget):
         self.app = QtCore.QCoreApplication.instance()
         self.appsettings = self.ids.appsettings
         self.storage = CONFIG_STORAGE
-        # Add Shadow to contentwrap
-        shadow = QtWidgets.QGraphicsDropShadowEffect()
-        shadow.setColor(QtGui.QColor(0, 0, 0, 127))
-        shadow.setBlurRadius(8)
-        shadow.setOffset(-5, 0)
-        self.ids.contentwrap.setGraphicsEffect(shadow)
+        self._initDataTable()
     
+    def _initDataTable(self):
+        # Configure the datatable options
+        self.ids.datatable.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ids.datatable.setHorizontalHeaderLabels(['Variable', 'Value', 'Type   '])
+        self.ids.datatable.horizontalHeader().resizeSection(0, 170)
+        self.ids.datatable.horizontalHeader().setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.ids.datatable.horizontalHeader().setHighlightSections(False)
+        self.ids.datatable.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
+        self.ids.datatable.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        self.ids.datatable.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        self.ids.datatable.verticalHeader().setVisible(False)
+        self.ids.datatable.verticalHeader().setDefaultSectionSize(19)
+        self.ids.datatable.setWordWrap(False)
+        # Create the datatable update timer
+        self.dataTableTimer = QtCore.QTimer()
+        self.dataTableTimer.timeout.connect(self.updateDataTable)
+        self.dataTableTimer.start(1000)
+
     def close(self, event):
         """ Close this settings window. """
         self.hide()
@@ -70,10 +83,6 @@ class SettingsWindow(QTemplateWidget):
             settings = component.settings
             button = self.ids.pluginlist
             title = f'{plugin.name} {component.name.replace(" Settings","")} Settings'
-            # utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
-            # title = f'{plugin.name} {component.name.replace(" Settings","")}'
-            # title += ' Settings' if 'Settings' not in title else ''
-            # self.ids.contentheader.setText(title)
         else:
             settings = self.ids[componentid]
             button = self.ids[f'{componentid}btn']
@@ -84,32 +93,13 @@ class SettingsWindow(QTemplateWidget):
         self.ids.content.layout().addWidget(settings)
         settings.setVisible(True)
         self.ids.content.update()
-        # ---
-        # # Hide current settings and show the new ones
-        # utils.removeChildren(self.ids.content)
-        # if settings is not None:
-        #     self.ids.content.layout().addWidget(settings)
-        #     settings.setVisible(True)
-        # self.ids.content.update()
-        # ----
-        # settings = self.ids.appsettings
-        # if item is not None:
-        #     pid = self.ids.pluginlist.currentData() if item else None
-        #     cid = item.data(Qt.UserRole) if item else None
-        #     plugin = self.app.plugins[pid]
-        #     component = self.app.plugins[pid].components[cid]
-        #     settings = component.settings
-        #     utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
-        #     title = f'{plugin.name} {component.name.replace(" Settings","")}'
-        #     title += ' Settings' if 'Settings' not in title else ''
-        #     self.ids.contentheader.setText(title)
-        # else:
-        #     self.ids.componentlist.clearSelection()
-        #     self.ids.contentheader.setText('Application Settings')
-        #     utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', 'selected')
-        # # Hide current settings and show the new ones
-        # utils.removeChildren(self.ids.content)
-        # if settings is not None:
-        #     self.ids.content.layout().addWidget(settings)
-        #     settings.setVisible(True)
-        # self.ids.content.update()
+    
+    def updateDataTable(self):
+        if not self.ids.datastore.isVisible(): return
+        metrics = self.app.data.listMetrics()
+        self.ids.datatable.setRowCount(len(metrics))
+        for row in range(len(metrics)):
+            print(metrics[row])
+            for col in range(3):
+                item = QtWidgets.QTableWidgetItem(metrics[row][col], 0)
+                self.ids.datatable.setItem(row, col, item)

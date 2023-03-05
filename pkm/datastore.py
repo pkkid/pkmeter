@@ -16,8 +16,13 @@ class DataStore(utils.Bunch):
         log.debug(f'Registering {token} -> {callback.__self__.__class__.__name__}.{callback.__name__}()')
         self._registry[token].append(Sync(qtmpl, expr, context, callback))
 
+    def listMetrics(self):
+        return utils.flattenDataTree(self)
+
     def setValue(self, item, value):
         utils.rset(self, item, value)
         for token in sorted(k for k in self._registry.keys() if k.startswith(item)):
             for sync in self._registry[token]:
                 value = sync.qtmpl._apply(sync.expr, sync.context, sync.callback)
+    
+    
