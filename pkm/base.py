@@ -4,10 +4,12 @@ from pkm.mixins import Draggable
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt
+from functools import cached_property
 
 
 class DataSource:
     """ Base Data Source used to update data in the DataStore object. """
+    NAMESPACE = None
     
     def __init__(self, component):
         super(DataSource, self).__init__()
@@ -18,6 +20,12 @@ class DataSource:
         self.timer = None                               # QTimer used to update the data
         self.watchers = []                              # Desktop widgets watching this datasource
     
+    @cached_property
+    def namespace(self):
+        if self.NAMESPACE:
+            return f'{self.NAMESPACE}'
+        return f'{self.plugin.id}.{self.component.namespace}'
+
     def start(self):
         if self.timer is None:
             self.timer = QtCore.QTimer()
@@ -33,13 +41,12 @@ class DataSource:
         log.warning(f'{self.plugin.id} timer running with no update() function.')
     
     def getValue(self, name, default=None):
-        datapath = f'{self.component.namespace}.{name}'
+        datapath = f'{self.namespace}.{name}'
         utils.rget(self.app.data, datapath, default=default)
 
     def setValue(self, name, value):
-        datapath = f'{self.plugin.id}.{self.component.namespace}.{name}'
+        datapath = f'{self.namespace}.{name}'
         self.app.data.setValue(datapath, value)
-        # self.printValues()
     
     def printValues(self):
         for path, valuestr, vtype in utils.flattenDataTree(self.app.data):
