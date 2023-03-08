@@ -41,6 +41,9 @@ def deleteChildren(qobj):
 
 
 def flattenDataTree(root, path=''):
+    """ Given a nested data object, return a flat list of values
+        containing (path, value, type).
+    """
     if getattr(root, 'items', None) is None:
         return [(path, str(root), typeStr(root))]
     values = []
@@ -61,6 +64,7 @@ def flattenDataTree(root, path=''):
 
 
 def removeChildren(qobj):
+    """ Remove all children in the spcified QObject. """
     layout = qobj.layout()
     for i in reversed(range(layout.count())):
         widget = layout.itemAt(i).widget()

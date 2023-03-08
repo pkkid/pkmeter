@@ -5,7 +5,7 @@ import json5
 import os
 import pkgutil
 from functools import cached_property
-from pkm import APPNAME, CONFIG_STORAGE, PLUGIN_DIRECTORIES, VERSION
+from pkm import APPNAME, PLUGIN_DIRECTORIES, VERSION
 from pkm import base, log, utils
 from PySide6 import QtCore, QtGui, QtWidgets
 
@@ -26,7 +26,8 @@ class Plugin:
 
     @cached_property
     def id(self):
-        return ''.join(c for c in self.name.lower() if c.isalnum() or c == "_")
+        idstr = self.manifest['id'] if 'id' in self.manifest else self.name
+        return ''.join(c for c in idstr.lower() if c.isalnum() or c == "_")
     
     @cached_property
     def widgets(self):
@@ -56,14 +57,6 @@ class Plugin:
             components[component.id] = component
         return components
     
-    def getSetting(self, name, default=None):
-        location = f'{self.id}/{name}'
-        return CONFIG_STORAGE.value(location, default)
-    
-    def saveSetting(self, name, value):
-        location = f'{self.id}/{name}'
-        CONFIG_STORAGE.setValue(location, value)
-    
     def styles(self):
         pass
     
@@ -71,9 +64,10 @@ class Plugin:
 class Component:
 
     def __init__(self, plugin, manifest):
-        self.plugin = plugin                                    # Reference to Plugin object
-        self.manifest = manifest                                # Reference to the manifest
-        self.name = manifest['name']                            # Required: Plugin name
+        self.plugin = plugin                            # Reference to Plugin object
+        self.app = QtCore.QCoreApplication.instance()   # QtCore application
+        self.manifest = manifest                        # Reference to the manifest
+        self.name = manifest['name']                    # Required: Plugin name
 
     @cached_property
     def fullid(self):
@@ -81,7 +75,8 @@ class Component:
 
     @cached_property
     def id(self):
-        return ''.join(c for c in self.name.lower() if c.isalnum() or c == '_')
+        idstr = self.manifest['id'] if 'id' in self.manifest else self.name
+        return ''.join(c for c in idstr.lower() if c.isalnum() or c == "_")
 
     @cached_property
     def namespace(self):
@@ -106,12 +101,28 @@ class Component:
         return loadmodule(self.plugin.rootdir, clspath, self)
     
     def getSetting(self, name, default=None):
-        location = f"{self.plugin.id}/{self.id}.{name}"
-        return CONFIG_STORAGE.value(location, default)
-    
+        """ Get the specified settings value. """
+        location = f'{self.plugin.id}/{self.id}.{name}'
+        return self.app.storage.value(location, default)
+
+    def getValue(self, name, default=None):
+        """ Get the specified datastore value for this namespace. """
+        datapath = f'{self.namespace}.{name}'
+        return self.app.getValue(datapath, default)
+
     def saveSetting(self, name, value):
-        location = f"{self.plugin.id}/{self.id}.{name}"
-        CONFIG_STORAGE.setValue(location, value)
+        """ Save the specified settings value to disk. """
+        location = f'{self.plugin.id}/{self.id}.{name}'
+        self.app.saveSetting(location, value)
+        # Also update value in the datastore. This does NOT use the namespace
+        # override because settings values should be unrelated to the datasource.
+        datapath = location.replace('/', '.')
+        self.app.setValue(datapath, value)
+
+    def setValue(self, name, value):
+        """ Set the spcified datastore value for this namespace. """
+        datapath = f'{self.namespace}.{name}'
+        return self.app.setValue(datapath, value)
 
 
 def loadmodule(rootdir, modpath, component):

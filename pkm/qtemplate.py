@@ -253,7 +253,7 @@ class QTemplateWidget(QtWidgets.QWidget):
                     current.append(token.string)
                 elif len(current) >= 3 and current[0] == 'data':
                     token = ''.join(current)[5:]
-                    self.app.data._register(self, token, callback, expr, context)
+                    self.app.data.register(self, token, callback, expr, context)
                     current = []
         except Exception:
             log.error(f'Error registering tokens for expr {expr}', exc_info=True)

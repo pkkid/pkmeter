@@ -12,14 +12,20 @@ class DataStore(utils.Bunch):
         super(DataStore, self).__init__(*args, **kwargs)
         self._registry = defaultdict(list)  # Dict of {token: [Callbacks]}
     
-    def _register(self, qtmpl, token, callback, expr, context):
+    def register(self, qtmpl, token, callback, expr, context):
+        """ Register a new value to this DataStore. """
         log.debug(f'Registering {token} -> {callback.__self__.__class__.__name__}.{callback.__name__}()')
         self._registry[token].append(Sync(qtmpl, expr, context, callback))
 
     def listMetrics(self):
+        """ Retutns a flattened list containing (key, value, type) for
+            all values in this DataStore. """
         return utils.flattenDataTree(self)
 
     def setValue(self, item, value):
+        """ Update the specified value. This will additionally look up any registered
+            sync values, and execute its callback function with the new data in place.
+        """
         utils.rset(self, item, value)
         for token in sorted(k for k in self._registry.keys() if k.startswith(item)):
             for sync in self._registry[token]:

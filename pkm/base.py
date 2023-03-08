@@ -22,11 +22,17 @@ class DataSource:
     
     @cached_property
     def namespace(self):
+        """ Get the namespace for this DataSource. By default this is
+            {pluginid}.{componentid}, but can be overridden by specifying
+            self.NAMESPACE. You should only really override the namespace if
+            this datasource is more generally useful outside your plugin.
+        """
         if self.NAMESPACE:
             return f'{self.NAMESPACE}'
         return f'{self.plugin.id}.{self.component.namespace}'
 
     def start(self):
+        """ Start the update timer. """
         if self.timer is None:
             self.timer = QtCore.QTimer()
             self.timer.timeout.connect(self.update)
@@ -35,22 +41,12 @@ class DataSource:
         self.timer.start(self.interval)
 
     def stop(self):
+        """ Stop the update timer. """
         self.timer.stop()
 
     def update(self):
+        """ Update DataSource values. """
         log.warning(f'{self.plugin.id} timer running with no update() function.')
-    
-    def getValue(self, name, default=None):
-        datapath = f'{self.namespace}.{name}'
-        utils.rget(self.app.data, datapath, default=default)
-
-    def setValue(self, name, value):
-        datapath = f'{self.namespace}.{name}'
-        self.app.data.setValue(datapath, value)
-    
-    def printValues(self):
-        for path, valuestr, vtype in utils.flattenDataTree(self.app.data):
-            print(f'{path} = {valuestr} ({vtype})')
 
 
 class DesktopWidget(Draggable, QTemplateWidget):
@@ -61,33 +57,39 @@ class DesktopWidget(Draggable, QTemplateWidget):
     def __init__(self, component):
         QTemplateWidget.__init__(self)
         Draggable.__init__(self)
-        self.plugin = component.plugin
-        self.component = component
-        self.app = QtCore.QCoreApplication.instance()
+        self.plugin = component.plugin                  # Plugin
+        self.component = component                      # Plugin component
+        self.app = QtCore.QCoreApplication.instance()   # QtCore application
+        self._initWidget()                              # Set window properties
+        self._initRightclickMenu()                      # Create right click menu
+        
+    def _initWidget(self):
+        """ Initialize this DesktopWidget. Currently this makes sure the window
+            is frameless and set to have a tansparent background. It will also
+            position the widget to the last moved location.
+        """
+        # Set some object attributes
         self.setProperty('class', 'widget')
         self.setProperty('plugin', self.component.plugin.id)
         self.setProperty('component', self.component.id)
         self.setObjectName(self.component.id)
-        self._initWidget()
-        self._initRightclickMenu()
-
-    def _initWidget(self):
+        # Set the QT window flags
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
-        # Set the position
+        # Set the window position
         pos = [int(x) for x in self.component.getSetting('pos', '0,0').split(',')]
         self.move(pos[0], pos[1])
     
     def _initRightclickMenu(self):
+        """ All DesktopWidgets should have a right click context menu to open
+            settings or quit the app.
+        """
         self.addAction(QtGui.QAction('Preferences', self, triggered=self.app.settings.show))
         self.addAction(QtGui.QAction('Quit', self, triggered=self.app.quit))
         self.setContextMenuPolicy(Qt.ActionsContextMenu)
     
-    def show_settings(self):
-        self.app.settings.show()
-    
     def widgetMoved(self, pos):
-        log.info(f'Widget Moved: {pos=}')
+        """ Save the new location when the widget is moved. """
         self.component.saveSetting('pos', f'{pos.x()},{pos.y()}')
 
 
@@ -96,8 +98,9 @@ class SettingsWidget(QTemplateWidget):
     
     def __init__(self, component):
         super(SettingsWidget, self).__init__()
-        self.plugin = component.plugin
-        self.component = component
+        self.plugin = component.plugin                  # Plugin
+        self.component = component                      # Plugin component
+        self.app = QtCore.QCoreApplication.instance()   # QtCore application
 
 
 class QTemplateTag:

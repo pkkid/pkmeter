@@ -6,6 +6,7 @@
   commonwidgets: "widgets",
   namespace: "inkwell",
   components: [{
+    id: "settings",
     name: "General Settings",
     settings: "settings.SettingsWidget",
   },{

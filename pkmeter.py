@@ -6,9 +6,10 @@ import sys
 from argparse import ArgumentParser
 from os.path import dirname, normpath
 from PySide6 import QtGui, QtWidgets
+from PySide6.QtCore import QSettings
 
 sys.path.append(dirname(__file__))
-from pkm import APPNAME, CONFIG_STORAGE, ROOT
+from pkm import APPNAME, ROOT
 from pkm import log, logfile, plugins, utils
 from pkm.datastore import DataStore
 from pkm.settings import SettingsWindow
@@ -18,18 +19,20 @@ class PKMeter(QtWidgets.QApplication):
 
     def __init__(self, opts):
         super(PKMeter, self).__init__()
-        self.opts = opts                        # Command line options
-        self._initApplication()                 # Setup OS environment
-        self.data = DataStore()                 # Globally shared datastore
-        self.plugins = plugins.plugins()        # Find and load plugins
-        self.settings = SettingsWindow()        # Settings window
+        self.opts = opts                                    # Command line options
+        self.data = DataStore()                             # Shared datastore to auto-update widgets
+        self.storage = QSettings(QSettings.IniFormat,       # Settings ini storage
+            QSettings.UserScope, APPNAME, APPNAME.lower())
+        self.plugins = plugins.plugins()                    # Available plugins
+        self.settings = SettingsWindow()                    # Application settings
+        self._initApplication()                             # Setup OS environment
         self._showWidgets()
         # self.settings.show()
 
     def _initApplication(self):
         """ Setup the application environment. """
         log.info(f'Logging: {logfile}')
-        log.info(f'Settings: {normpath(CONFIG_STORAGE.fileName())}')
+        log.info(f'Settings: {normpath(self.storage.fileName())}')
         # Application fonts
         resources = normpath(f'{ROOT}/resources')
         for filename in os.listdir(resources):
@@ -50,6 +53,22 @@ class PKMeter(QtWidgets.QApplication):
                     component.datasource.start()
                 if component.widget:
                     component.widget.show()
+    
+    def getSetting(self, location, default=None):
+        """ Get the specified settings value. """
+        return self.storage.value(location, default)
+    
+    def getValue(self, datapath, default=None):
+        """ Get the specified datastore value. """
+        utils.rget(self.data, datapath, default=default)
+
+    def saveSetting(self, location, value):
+        """ Save the specified settings value to disk. """
+        self.storage.setValue(location, value)
+
+    def setValue(self, datapath, value):
+        """ Save the specified datastore value. """
+        self.data.setValue(datapath, value)
 
     @classmethod
     def start(cls, opts):

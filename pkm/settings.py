@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
-from pkm import CONFIG_STORAGE
 from pkm import log, utils  # noqa
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtWidgets
@@ -14,7 +13,6 @@ class SettingsWindow(QTemplateWidget):
         super(SettingsWindow, self).__init__()
         self.app = QtCore.QCoreApplication.instance()
         self.appsettings = self.ids.appsettings
-        self.storage = CONFIG_STORAGE
         self._initDataTable()
     
     def _initDataTable(self):

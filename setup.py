@@ -14,7 +14,7 @@ setup(
     author_email='',
     url='https://github.com/pkkid/pkmeter',
     packages=find_packages(),
-    scripts=['pkmeter'],
+    scripts=['pkmeter.py'],
     install_requires=requirements,
     long_description=open('README.txt').read()
 )

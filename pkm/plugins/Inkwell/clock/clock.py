@@ -5,11 +5,10 @@ from pkm import base
 
 
 class DataSource(base.DataSource):
-    NAMESPACE = 'clock'
     
     def update(self):
         now = datetime.datetime.now().replace(microsecond=0)
-        self.setValue('datetime', now)
+        self.component.setValue('datetime', now)
 
 
 class DesktopWidget(base.DesktopWidget):
