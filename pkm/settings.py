@@ -97,7 +97,6 @@ class SettingsWindow(QTemplateWidget):
         metrics = self.app.data.listMetrics()
         self.ids.datatable.setRowCount(len(metrics))
         for row in range(len(metrics)):
-            print(metrics[row])
             for col in range(3):
                 item = QtWidgets.QTableWidgetItem(metrics[row][col], 0)
                 self.ids.datatable.setItem(row, col, item)

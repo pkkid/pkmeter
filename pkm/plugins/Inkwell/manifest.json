@@ -1,22 +1,22 @@
 {
-  name: "Inkwell",
-  version: "1.0.0",
-  author: "Michael Shepanski",
-  description: "Default theme collection for PKMeter.",
-  commonwidgets: "widgets",
-  namespace: "inkwell",
+  name: 'Inkwell',
+  version: '1.0.0',
+  author: 'Michael Shepanski',
+  description: 'Default theme collection for PKMeter.',
+  commonwidgets: 'widgets',
   components: [{
-    id: "settings",
-    name: "General Settings",
-    settings: "settings.SettingsWidget",
+    id: 'settings',
+    name: 'General Settings',
+    settings: 'settings.SettingsWidget',
   },{
-    name: "Clock",
-    settings: "clock.clock.SettingsWidget",
-    widget: "clock.clock.DesktopWidget",
-    datasource: "clock.clock.DataSource",
+    name: 'Clock',
+    settings: 'clock.clock.SettingsWidget',
+    widget: 'clock.clock.DesktopWidget',
+    datasource: 'clock.clock.DataSource',
+    datanamespace: 'clock',
   },{
-    name: "CPU",
-    settings: "cpu.cpu.SettingsWidget",
-    widget: "cpu.cpu.DesktopWidget",
+    name: 'CPU',
+    settings: 'cpu.cpu.SettingsWidget',
+    widget: 'cpu.cpu.DesktopWidget',
   }]
 }

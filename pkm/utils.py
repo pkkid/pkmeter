@@ -54,13 +54,30 @@ def flattenDataTree(root, path=''):
         if isinstance(value, dict):
             values += flattenDataTree(value, subpath)
         elif isinstance(value, (tuple, list)):
-            valuestr = f'<{vtype}: {len(value)} items>'
-            values.append((subpath, valuestr, vtype))
+            # valuestr = f'<{vtype}: {len(value)} items>'
+            # values.append((subpath, valuestr, vtype))
+            if len(str(value)) <= 20:
+                values.append((subpath, str(value), vtype))
+                continue
             for i in range(len(value)):
                 values += flattenDataTree(value[i], f'{subpath}.{i}')
         else:
             values.append((subpath, str(value), vtype))
     return sorted(values, key=lambda x: x[0])
+
+
+def parseValue(value):
+    """ Takes a best guess converting to a value from a string. """
+    if isinstance(value, list):
+        return [parseValue(x) for x in value]
+    if value.lower() in ['true']: return True
+    if value.lower() in ['false']: return False
+    if value.lower() in ['none']: return None
+    if re.findall(r'^\d+$', value): return int(value)
+    if re.findall(r'^\d+\.\d+$', value): return float(value)
+    if re.findall(r'^\[.*?\]$', value):
+        return list(parseValue(x.strip()) for x in value.strip('[]').split(','))
+    return value
 
 
 def removeChildren(qobj):

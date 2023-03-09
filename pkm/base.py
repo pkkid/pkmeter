@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pkm import log, utils
+from pkm import log
 from pkm.mixins import Draggable
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui
@@ -9,7 +9,6 @@ from functools import cached_property
 
 class DataSource:
     """ Base Data Source used to update data in the DataStore object. """
-    NAMESPACE = None
     
     def __init__(self, component):
         super(DataSource, self).__init__()
@@ -19,17 +18,6 @@ class DataSource:
         self.interval = 1000                            # Interval to update the data
         self.timer = None                               # QTimer used to update the data
         self.watchers = []                              # Desktop widgets watching this datasource
-    
-    @cached_property
-    def namespace(self):
-        """ Get the namespace for this DataSource. By default this is
-            {pluginid}.{componentid}, but can be overridden by specifying
-            self.NAMESPACE. You should only really override the namespace if
-            this datasource is more generally useful outside your plugin.
-        """
-        if self.NAMESPACE:
-            return f'{self.NAMESPACE}'
-        return f'{self.plugin.id}.{self.component.namespace}'
 
     def start(self):
         """ Start the update timer. """
@@ -77,7 +65,7 @@ class DesktopWidget(Draggable, QTemplateWidget):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
         # Set the window position
-        pos = [int(x) for x in self.component.getSetting('pos', '0,0').split(',')]
+        pos = self.component.getSetting('pos', (0,0))
         self.move(pos[0], pos[1])
     
     def _initRightclickMenu(self):
@@ -90,7 +78,7 @@ class DesktopWidget(Draggable, QTemplateWidget):
     
     def widgetMoved(self, pos):
         """ Save the new location when the widget is moved. """
-        self.component.saveSetting('pos', f'{pos.x()},{pos.y()}')
+        self.component.saveSetting('pos', [pos.x(), pos.y()])
 
 
 class SettingsWidget(QTemplateWidget):

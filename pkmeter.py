@@ -9,7 +9,7 @@ from PySide6 import QtGui, QtWidgets
 from PySide6.QtCore import QSettings
 
 sys.path.append(dirname(__file__))
-from pkm import APPNAME, ROOT
+from pkm import APPNAME, CONFIG_LOCATION, ROOT
 from pkm import log, logfile, plugins, utils
 from pkm.datastore import DataStore
 from pkm.settings import SettingsWindow
@@ -21,13 +21,21 @@ class PKMeter(QtWidgets.QApplication):
         super(PKMeter, self).__init__()
         self.opts = opts                                    # Command line options
         self.data = DataStore()                             # Shared datastore to auto-update widgets
-        self.storage = QSettings(QSettings.IniFormat,       # Settings ini storage
-            QSettings.UserScope, APPNAME, APPNAME.lower())
+        self.storage = self._initStorage()                  # Setup settings storage
+        self._initApplication()                             # Setup OS environment
         self.plugins = plugins.plugins()                    # Available plugins
         self.settings = SettingsWindow()                    # Application settings
-        self._initApplication()                             # Setup OS environment
         self._showWidgets()
         # self.settings.show()
+
+    def _initStorage(self):
+        """ Create the storage object and read all current settings into the datastore. """
+        filepath = f'{CONFIG_LOCATION}/{APPNAME}/pkmeter.ini'
+        self.storage = QSettings(filepath, QSettings.IniFormat)
+        for location in self.storage.allKeys():
+            value = self.getSetting(location)
+            self.setValue(location.replace('/', '.'), value)
+        return self.storage
 
     def _initApplication(self):
         """ Setup the application environment. """
@@ -56,11 +64,12 @@ class PKMeter(QtWidgets.QApplication):
     
     def getSetting(self, location, default=None):
         """ Get the specified settings value. """
-        return self.storage.value(location, default)
+        value = self.storage.value(location, None)
+        return default if value is None else utils.parseValue(value)
     
     def getValue(self, datapath, default=None):
         """ Get the specified datastore value. """
-        utils.rget(self.data, datapath, default=default)
+        return utils.rget(self.data, datapath, default=default)
 
     def saveSetting(self, location, value):
         """ Save the specified settings value to disk. """

@@ -241,6 +241,8 @@ class QTemplateWidget(QtWidgets.QWidget):
                 self._registerTokens(expr, context, callback)
             return result
         except Exception:
+            if 'data.' in expr:
+                log.warning(f'Invalid expression? {expr=}', exc_info=1)
             return expr
     
     def _registerTokens(self, expr, context, callback=None):

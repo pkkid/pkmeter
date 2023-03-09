@@ -9,3 +9,7 @@ class SettingsWidget(base.SettingsWidget):
     def widthChanged(self, value):
         """ Save new monitor value. """
         self.component.saveSetting('width', value)
+    
+    def borderRadiusChanged(self, value):
+        """ Save new border-radius value. """
+        self.component.saveSetting('borderRadius', value)

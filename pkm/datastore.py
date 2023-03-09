@@ -21,6 +21,11 @@ class DataStore(utils.Bunch):
         """ Retutns a flattened list containing (key, value, type) for
             all values in this DataStore. """
         return utils.flattenDataTree(self)
+    
+    def printValues(self):
+        """ Pretty print the values to console. """
+        for row in self.listMetrics():
+            print(row)
 
     def setValue(self, item, value):
         """ Update the specified value. This will additionally look up any registered

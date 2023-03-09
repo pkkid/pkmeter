@@ -21,7 +21,6 @@ class Plugin:
         self.version = manifest['version']              # Required: Plugin version
         self.author = manifest.get('author')            # Optional: Plugin author
         self.description = manifest.get('description')  # Optional: Plugin description
-        self.namespace = manifest.get('namespace')      # Optional: Data namespace
         self.components = self._components()
 
     @cached_property
@@ -79,10 +78,6 @@ class Component:
         return ''.join(c for c in idstr.lower() if c.isalnum() or c == "_")
 
     @cached_property
-    def namespace(self):
-        return self.manifest.get('namespace', self.id)
-
-    @cached_property
     def datasource(self):
         clspath = self.manifest.get('datasource')
         if not clspath: return None
@@ -103,12 +98,14 @@ class Component:
     def getSetting(self, name, default=None):
         """ Get the specified settings value. """
         location = f'{self.plugin.id}/{self.id}.{name}'
-        return self.app.storage.value(location, default)
+        return self.app.getSetting(location, default)
 
     def getValue(self, name, default=None):
         """ Get the specified datastore value for this namespace. """
-        datapath = f'{self.namespace}.{name}'
-        return self.app.getValue(datapath, default)
+        namespace = self.manifest.get('datanamespace', self.fullid)
+        datapath = f'{namespace}.{name}'
+        result = self.app.getValue(datapath, default)
+        return result if result is not None else default
 
     def saveSetting(self, name, value):
         """ Save the specified settings value to disk. """
@@ -121,7 +118,8 @@ class Component:
 
     def setValue(self, name, value):
         """ Set the spcified datastore value for this namespace. """
-        datapath = f'{self.namespace}.{name}'
+        namespace = self.manifest.get('datanamespace', self.fullid)
+        datapath = f'{namespace}.{name}'
         return self.app.setValue(datapath, value)
 
 

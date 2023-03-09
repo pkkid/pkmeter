@@ -1,21 +1,20 @@
 
 <QWidget layout='QVBoxLayout()' spacing='20'>
 
-  <!-- Monitor -->
+  <!-- Widget Width -->
   <QWidget layout='QHBoxLayout()' padding='0' spacing='20' class='formfield'>
     <QLabel text='Widget Width'/>
     <NumSlider range='(100,300)' value='180'>
       <Connect valueChanged='widthChanged'/>
     </NumSlider>
   </QWidget>
-  
-  <!-- Position -->
-  <QWidget layout='QHBoxLayout()' padding='0' class='formfield'>
-    <QLabel text='Position'/>
-    <QComboBox>
-      <Item args='Left'/>
-      <Item args='Right'/>
-    </QComboBox>
+
+  <!-- Border Radius -->
+  <QWidget layout='QHBoxLayout()' padding='0' spacing='20' class='formfield'>
+    <QLabel text='Border Radius'/>
+    <NumSlider range='(0,50)' value='5'>
+      <Connect valueChanged='borderRadiusChanged'/>
+    </NumSlider>
   </QWidget>
 
   <Stretch/>
