@@ -4,7 +4,6 @@ from pkm.mixins import Draggable
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt
-from functools import cached_property
 
 
 class DataSource:

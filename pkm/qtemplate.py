@@ -46,12 +46,13 @@ If the value looks like a list, each item will also be parsed. The values will
 sent to the corresponding function as *args. PySide6.QtCore.Qt objects are also
 supported, and can be represented by the string such as "Qt.ApplicationModal".
 """
-import io
-import tokenize
+import re
 from os.path import abspath, basename
 from pkm import base, log, plugins, utils
 from PySide6 import QtCore, QtWidgets
 from xml.etree import ElementTree
+
+REGEX_DATATOKEN = re.compile(r'data\.([a-zA-Z0-9\.]+)')
 
 
 class QTemplateWidget(QtWidgets.QWidget):
@@ -160,6 +161,7 @@ class QTemplateWidget(QtWidgets.QWidget):
             if self._attrClass(qobj, elem, attr, expr, context, indent): continue       # class=primarybutton
             if self._attrPadding(qobj, elem, attr, expr, context, indent): continue     # padding=setContentsMargins
             if self._attrSpacing(qobj, elem, attr, expr, context, indent): continue     # spacing=layout().setSpacing
+            if self._attrStyle(qobj, elem, attr, expr, context, indent): continue       # style=properties
             if self._attrLayout(qobj, elem, attr, expr, context, indent): continue      # layout.<attr>='value'
             if self._attrSet(qobj, elem, attr, expr, context, indent): continue         # attr='value'
             raise Exception(f"Unknown attribute '{attr}' on element {elem.tag}.")
@@ -199,6 +201,12 @@ class QTemplateWidget(QtWidgets.QWidget):
         if attr.lower() == 'spacing':
             value = self._evaluate(expr, context)
             qobj.layout().setSpacing(value)
+            return True
+    
+    def _attrStyle(self, qobj, elem, attr, expr, context, indent=0):
+        """ Calls set<attr>(<value>) on the qbject. """
+        if attr.lower() == 'style':
+            self._apply(expr, context, qobj.setStyleSheet)
             return True
     
     def _attrLayout(self, qobj, elem, attr, expr, context, indent=0):
@@ -248,14 +256,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _registerTokens(self, expr, context, callback=None):
         """ Check we need to register any of the specified tokens in the datastore. """
         try:
-            current = []
-            readline = io.BytesIO(expr.encode('utf8')).readline
-            for token in tokenize.tokenize(readline):
-                if token.type == tokenize.NAME or (token.type == tokenize.OP and token.string == '.'):
-                    current.append(token.string)
-                elif len(current) >= 3 and current[0] == 'data':
-                    token = ''.join(current)[5:]
-                    self.app.data.register(self, token, callback, expr, context)
-                    current = []
+            for token in re.findall(REGEX_DATATOKEN, expr):
+                self.app.data.register(self, token, callback, expr, context)
         except Exception:
             log.error(f'Error registering tokens for expr {expr}', exc_info=True)
