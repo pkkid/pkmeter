@@ -68,7 +68,6 @@ class SettingsWindow(QTemplateWidget):
     
     def updateContent(self, componentid, pluginid=None):
         if self._loading: return
-        log.info(f'{pluginid=}  {componentid=}')
         # Remove Highlight on all sidepanel items
         utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
         utils.setPropertyAndRedraw(self.ids.datastorebtn, 'class', '')
