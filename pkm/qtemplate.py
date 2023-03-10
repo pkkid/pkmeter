@@ -78,8 +78,7 @@ class QTemplateWidget(QtWidgets.QWidget):
             log.debug(f'Reading template for {self.__class__.__name__}')
             root = ElementTree.fromstring(self.TMPLSTR)
             self.filepath = abspath(__file__)
-        context = dict(self=self)
-        self._walk(root, context=context)
+        self._walk(root, context=dict(self=self))
         self._loading = False
     
     def _walk(self, elem, parent=None, context=None, indent=0):

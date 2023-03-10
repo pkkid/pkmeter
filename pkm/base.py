@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pkm import log
+from pkm import log, utils
 from pkm.mixins import Draggable
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui
@@ -10,7 +10,6 @@ class DataSource:
     """ Base Data Source used to update data in the DataStore object. """
     
     def __init__(self, component):
-        super(DataSource, self).__init__()
         self.plugin = component.plugin                  # Plugin
         self.component = component                      # Plugin component
         self.app = QtCore.QCoreApplication.instance()   # QtCore application
@@ -42,11 +41,11 @@ class DesktopWidget(Draggable, QTemplateWidget):
     DEFAULT_LAYOUT_SPACING = 0
 
     def __init__(self, component):
-        QTemplateWidget.__init__(self)
-        Draggable.__init__(self)
         self.plugin = component.plugin                  # Plugin
         self.component = component                      # Plugin component
         self.app = QtCore.QCoreApplication.instance()   # QtCore application
+        QTemplateWidget.__init__(self)                  # Init QTemplate
+        Draggable.__init__(self)                        # Init Draggable
         self._initWidget()                              # Set window properties
         self._initRightclickMenu()                      # Create right click menu
         
@@ -68,13 +67,11 @@ class DesktopWidget(Draggable, QTemplateWidget):
         self.move(pos[0], pos[1])
     
     def _initRightclickMenu(self):
-        """ All DesktopWidgets should have a right click context menu to open
-            settings or quit the app.
-        """
+        """ Add right click context menu. """
         self.addAction(QtGui.QAction('Preferences', self, triggered=self.app.settings.show))
         self.addAction(QtGui.QAction('Quit', self, triggered=self.app.quit))
         self.setContextMenuPolicy(Qt.ActionsContextMenu)
-    
+
     def widgetMoved(self, pos):
         """ Save the new location when the widget is moved. """
         self.component.saveSetting('pos', [pos.x(), pos.y()])
@@ -84,10 +81,18 @@ class SettingsWidget(QTemplateWidget):
     """ Base Settings Widget used to display plugin or components settings. """
     
     def __init__(self, component):
-        super(SettingsWidget, self).__init__()
         self.plugin = component.plugin                  # Plugin
         self.component = component                      # Plugin component
         self.app = QtCore.QCoreApplication.instance()   # QtCore application
+        QTemplateWidget.__init__(self)                  # Init QTemplate
+        self.initSettings()                             # Init settings
+
+    def initSettings(self):
+        pass
+
+    def getSetting(self, name, default=None):
+        """ Return the specified setting value. """
+        return self.component.getSetting(name, default)
 
 
 class QTemplateTag:

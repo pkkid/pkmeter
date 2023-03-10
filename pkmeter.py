@@ -65,11 +65,14 @@ class PKMeter(QtWidgets.QApplication):
     def getSetting(self, location, default=None):
         """ Get the specified settings value. """
         value = self.storage.value(location, None)
+        log.debug(f'getSetting({location=}) = {value}')
         return default if value is None else utils.parseValue(value)
     
     def getValue(self, datapath, default=None):
         """ Get the specified datastore value. """
-        return utils.rget(self.data, datapath, default=default)
+        value = utils.rget(self.data, datapath, default=default)
+        log.debug(f'getValue({datapath=}) = {value}')
+        return default if value is None else value
 
     def saveSetting(self, location, value):
         """ Save the specified settings value to disk. """
