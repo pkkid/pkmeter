@@ -26,8 +26,8 @@ $dimtext: #888480;
 //-------------------------
 QWidget {
   color: $secondarytext;
-  font-family: 'Josefin Sans';
-  font-size: 14px;
+  font-family: 'Roboto Medium';
+  font-size: 13px;
   outline: 0;
 }
 
@@ -59,6 +59,13 @@ QComboBox {
 
 QLabel {
   background-color: rgba(0,0,0,0);
+}
+
+QLineEdit {
+  background-color: $secondary;
+  border-radius: 3px;
+  height: 20px;
+  padding: 7px 5px 0px 5px;
 }
 
 QListWidget {
@@ -107,10 +114,11 @@ QPushButton {
   padding: 5px 10px;
   text-transform: none;
   &[class=close] {
+    background-color: rgba(0,0,0,0);
     border: 0px solid #000;
     color: $secondarytext;
     font-size: 18px;
-    background-color: rgba(0,0,0,0);
+    padding: 0px;
   }
   &[class=colorbutton] {
     min-width: 30px;
@@ -119,13 +127,6 @@ QPushButton {
   &:hover {
     color: $primarytext;
   }
-}
-
-QLineEdit {
-  background-color: $secondary;
-  border-radius: 3px;
-  height: 20px;
-  padding: 7px 5px 0px 5px;
 }
 
 QSlider {
@@ -204,14 +205,20 @@ QTableWidget {
   }
 }
 
+//--------------------------
+// Application Window
+//--------------------------
+QWidget[class=appwindow] {
+  border-radius: 4px;
+  background-color: $secondarydark;
+  border: 1px solid $secondary;
+}
 
 
 //--------------------------
 // Settings Window
 //--------------------------
 #settings {
-  border-radius: 3px;
-  background-color: $secondarydark;
 
   // Sidepanel
   #sidepanelwrap {
@@ -220,14 +227,25 @@ QTableWidget {
     min-width: 200px;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
+    font-family: 'Josefin Sans';
 
-    #title { color:$primarytext; font-size:25px; padding:0px; }
-    #version { color:$highlighttext; padding-top:5px; }
+    #title {
+      color:$primarytext;
+      font-family: 'Josefin Sans';
+      font-size:25px;
+      padding:0px;
+    }
+    #version {
+      color:$highlighttext;
+      font-family: 'Josefin Sans';
+      padding-top:5px;
+    }
 
     QPushButton {
       background-color: rgba(0,0,0,0);
       border: 0px solid rgba(0,0,0,0);
       color: $secondarytext;
+      font-size: 14px;
       padding: 8px 0px;
       text-align: left;
       &:hover { color:$primarytext; }

@@ -27,6 +27,8 @@ class PKMeter(QtWidgets.QApplication):
         self.settings = SettingsWindow()                    # Application settings
         self._showWidgets()
         # self.settings.show()
+        self.picker = plugins.widgets()['ColorPicker']()
+        self.picker.show()
 
     def _initStorage(self):
         """ Create the storage object and read all current settings into the datastore. """
@@ -52,6 +54,15 @@ class PKMeter(QtWidgets.QApplication):
         # Application stylesheet
         filepath = 'resources/styles.sass'
         utils.setStyleSheet(self, filepath, None, self.opts.outline)
+        # Save a few custom fonts
+        # https://devdocs.io/qt/qfont#Weight-enum
+        # self.fontform = QtGui.QFontDatabase.font('Liberation Mono', 'regular', 11)
+        # self.fontform.setWeight(QtGui.QFont.Medium)
+        # self.fontform.setHintingPreference(QtGui.QFont.PreferFullHinting)
+        # self.setFont(self.fontform)
+        # self.fonttitle = QtGui.QFontDatabase.font('Josefin Sans', 'regular', 12)
+        # self.fonttitle.setWeight(QtGui.QFont.Medium)
+        # self.setFont(self.fonttitle)
 
     def _showWidgets(self):
         """ Display all enabled plugins. """

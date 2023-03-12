@@ -1,0 +1,29 @@
+<QWidget layout='QVBoxLayout()' geometry='(0,0,350,400)' padding='0'>
+  <StyleSheet args='../inkwell.sass'/>
+  <Set attribute='Qt.WA_TranslucentBackground'/>
+  <Set windowFlags='Qt.Dialog | Qt.FramelessWindowHint'/>
+  <Set windowTitle='APPNAME+" Settings"'/>
+  <QWidget id='colorpicker' class='appwindow' layout='QVBoxLayout()' padding='1' spacing='0'>
+    
+    <!-- TitleBar -->
+    <TitleBar args='self' layout='QHBoxLayout()' padding='(10,10,10,10)'>
+      <QLabel text='Color Picker'/>
+      <Stretch/>
+      <QPushButton text='󰅖' class='close'>
+        <Connect clicked='close'/>
+      </QPushButton>
+    </TitleBar>
+
+    <!--Current Color -->
+    <QWidget id='currentcolor'/>
+    
+    <!-- Selection Options -->
+    <QWidget id='options' layout='QHBoxLayout()'>
+      <QLineEdit id='hex' text='#ffffff'/>
+    </QWidget>
+
+    <Stretch/>
+
+  </QWidget>
+</QWidget>
+
