@@ -10,7 +10,7 @@ class NumSlider(QTemplateWidget):
         <QSlider id='slider' args='(Qt.Horizontal)'>
           <Connect valueChanged='_valueChanged'/>
         </QSlider>
-        <QSpinBox id='spinbox' range='(100,300)' value='180'>
+        <QSpinBox id='spinbox' range='(100,300)' value='180' fixedWidth='60'>
           <Connect valueChanged='_valueChanged'/>
         </QSpinBox>
       </QWidget>

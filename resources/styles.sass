@@ -23,12 +23,19 @@ $dimtext: #888480;
 
 //--------------------------
 // Core Elements
-//--------------------------
+//-------------------------
 QWidget {
   color: $secondarytext;
   font-family: 'Josefin Sans';
   font-size: 14px;
   outline: 0;
+}
+
+QColorDialog {
+  background-color: $secondary;
+  QColorLuminancePicker { background-color: rgba(0,0,0,0); }
+  QFrame { border: 0px solid #000; }
+  QWellArray { border: 1px solid #222; }
 }
 
 QComboBox {
@@ -75,11 +82,6 @@ QListWidget {
   &::indicator {
     width: 14px;
     height: 14px;
-    // &:checked,
-    // &:checked:selected,
-    // &:checked:focus {
-    //   image: url(resources/icons/checkbox-marked-outline.svg);
-    // }
   }
 }
 
@@ -98,18 +100,32 @@ QMenu {
 }
 
 QPushButton {
-  text-transform: none;
+  background-color: $secondary;
+  border-radius: 3px;
+  border: 0px solid #f00;
   font-weight: normal;
-  // Close button
+  padding: 5px 10px;
+  text-transform: none;
   &[class=close] {
-    border: rgba(0,0,0,0);
+    border: 0px solid #000;
     color: $secondarytext;
     font-size: 18px;
     background-color: rgba(0,0,0,0);
-    &:hover {
-      color: $primarytext;
-    }
   }
+  &[class=colorbutton] {
+    min-width: 30px;
+    max-width: 30px;
+  }
+  &:hover {
+    color: $primarytext;
+  }
+}
+
+QLineEdit {
+  background-color: $secondary;
+  border-radius: 3px;
+  height: 20px;
+  padding: 7px 5px 0px 5px;
 }
 
 QSlider {
@@ -128,9 +144,12 @@ QSlider {
 }
 
 QSpinBox {
-  padding: 5px 5px 0px 5px;;
-  background-color: $secondarydark;
+  padding: 7px 5px 0px 5px;
+  background-color: $secondary;
+  border-width: 0px;
+  border-radius: 3px;
 }
+
 
 QScrollBar:vertical {
   border: 0px;
@@ -165,25 +184,26 @@ QTableWidget {
     color: $secondarytext;
     &:selected { color:$primarytext; }
   }
-}
-QHeaderView {
-  background-color: $secondary;
-  border: 0px solid rgba(0,0,0,0);
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  text-align: left;
-  &::section {
-    border: 0px solid rgba(0,0,0,0);
+  QHeaderView {
     background-color: $secondary;
-    font-size: 11px;
-    border-right: 1px solid $secondarydark;
-    border-bottom: 1px solid $secondarydark;
-    padding: 0px 5px;
+    border: 0px solid rgba(0,0,0,0);
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    font-weight: normal;
+    text-align: left;
+    &::section {
+      border: 0px solid rgba(0,0,0,0);
+      background-color: $secondary;
+      font-size: 11px;
+      border-right: 1px solid $secondarydark;
+      border-bottom: 1px solid $secondarydark;
+      padding: 0px 5px;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      font-weight: normal;
+    }
   }
 }
+
 
 
 //--------------------------
@@ -234,7 +254,7 @@ QHeaderView {
     border-bottom-right-radius:3px;
     #contentheader { border-bottom:1px solid $secondary; padding:2px 0px; }
   
-    QWidget[class=formfield] QLabel {
+    QWidget[class=formfield] > QLabel {
       max-width: 120px;
       min-width: 120px;
     }

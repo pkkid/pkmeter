@@ -17,5 +17,14 @@
     </NumSlider>
   </QWidget>
 
+  <!-- Background Color -->
+  <QWidget layout='QHBoxLayout()' padding='0' spacing='20' class='formfield'>
+    <QLabel text='Background Color'/>
+    <ColorButton id='backgroundColor'>
+      <Connect colorChanged='backgroundColorChanged'/>
+    </ColorButton>
+    <Stretch/>
+  </QWidget>
+
   <Stretch/>
 </QWidget>

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pkm import log, utils
+from pkm import log
 from pkm.mixins import Draggable
 from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui
@@ -89,10 +89,22 @@ class SettingsWidget(QTemplateWidget):
 
     def initSettings(self):
         pass
-
+    
     def getSetting(self, name, default=None):
-        """ Return the specified setting value. """
+        """ Get the specified settings value. """
         return self.component.getSetting(name, default)
+
+    def getValue(self, name, default=None):
+        """ Get the specified datastore value for this namespace. """
+        return self.component.getValue(name, default)
+
+    def saveSetting(self, name, value):
+        """ Save the specified settings value to disk. """
+        return self.component.saveSetting(name, value)
+
+    def setValue(self, name, value):
+        """ Set the spcified datastore value for this namespace. """
+        return self.component.setValue(name, value)
 
 
 class QTemplateTag:

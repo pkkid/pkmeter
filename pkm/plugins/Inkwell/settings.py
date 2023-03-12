@@ -8,13 +8,18 @@ class SettingsWidget(base.SettingsWidget):
 
     def initSettings(self):
         """ Set all values in the settings Widget. """
-        self.ids.width.setValue(self.component.getValue('width', 180))
-        self.ids.borderRadius.setValue(self.component.getValue('borderRadius', 5))
+        self.ids.width.setValue(self.getValue('width', 180))
+        self.ids.borderRadius.setValue(self.getValue('borderRadius', 5))
+        self.ids.backgroundColor.setColor(self.getValue('backgroundColor', '#000000'))
 
     def widthChanged(self, value):
-        """ Save new monitor value. """
-        self.component.saveSetting('width', value)
+        """ Save new widget width. """
+        self.saveSetting('width', value)
     
+    def backgroundColorChanged(self, value):
+        """ Save new backgroundColor value. """
+        self.saveSetting('backgroundColor', value)
+        
     def borderRadiusChanged(self, value):
-        """ Save new border-radius value. """
-        self.component.saveSetting('borderRadius', value)
+        """ Save new borderRadius value. """
+        self.saveSetting('borderRadius', value)

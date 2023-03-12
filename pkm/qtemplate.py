@@ -108,6 +108,7 @@ class QTemplateWidget(QtWidgets.QWidget):
             if parent and parent.layout() is not None:
                 parent.layout().addWidget(qobj)
             for echild in elem:
+                context['parent'] = parent
                 self._walk(echild, qobj, context, indent+1)
             return True
     
@@ -159,6 +160,7 @@ class QTemplateWidget(QtWidgets.QWidget):
             if self._attrId(qobj, elem, attr, expr, context, indent): continue          # id='myobject'
             if self._attrClass(qobj, elem, attr, expr, context, indent): continue       # class=primarybutton
             if self._attrPadding(qobj, elem, attr, expr, context, indent): continue     # padding=setContentsMargins
+            if self._attrPos(qobj, elem, attr, expr, context, indent): continue         # pos=x,y,hanchor,vanchor
             if self._attrSpacing(qobj, elem, attr, expr, context, indent): continue     # spacing=layout().setSpacing
             if self._attrStyle(qobj, elem, attr, expr, context, indent): continue       # style=properties
             if self._attrLayout(qobj, elem, attr, expr, context, indent): continue      # layout.<attr>='value'
@@ -193,6 +195,21 @@ class QTemplateWidget(QtWidgets.QWidget):
             if isinstance(value, int): value = (value,) * 4
             elif len(value) == 2: value = value * 2
             qobj.layout().setContentsMargins(*value)
+            return True
+    
+    def _attrPos(self, qobj, elem, attr, expr, context, indent=0):
+        """ Set the position of this element. Arguments are x,y,hanchor,vanchor. """
+        if attr.lower() == 'pos':
+            value = self._evaluate(expr, context)
+            x, y = value[0:2]
+            hanchor = value[2] if len(value) >= 3 else 'top'
+            vanchor = value[3] if len(value) >= 4 else 'left'
+            if vanchor == 'center': y = y - self.height() / 2
+            if vanchor == 'bottom': y = y - self.height()
+            if hanchor == 'center': x = x - self.height() / 2
+            if hanchor == 'bottom': x = x - self.height()
+            log.info(f'MOVE {x},{y}')
+            qobj.move(x, y)
             return True
     
     def _attrSpacing(self, qobj, elem, attr, expr, context, indent=0):
@@ -230,7 +247,7 @@ class QTemplateWidget(QtWidgets.QWidget):
     def _apply(self, expr, context, callback):
         """ Apply the specified expr to callback. """
         value = self._evaluate(expr, context, callback)
-        if expr.startswith('(') or expr.startswith('['):
+        if isinstance(value, tuple):
             return callback(*value)
         return callback(value)
 

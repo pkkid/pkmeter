@@ -1,10 +1,13 @@
 
-<QWidget layout='QVBoxLayout()' padding='0' fixedWidth='data.inkwell.settings.width'>
+<QWidget id='clockwrap' layout='QVBoxLayout()' fixedWidth='data.inkwell.settings.width+20'>
   <StyleSheet args='../inkwell.sass'/>
-  <QWidget layout='QVBoxLayout()' class='inkwell'>
-    <Set style='f"border-radius:{data.inkwell.settings.borderRadius}px;"'/>
-    <DropShadow args='(0,5,20,128)'/>
-    <QLabel text='Clock Widget'/>
-    <QLabel text='data.clock.datetime.strftime("%Y-%m-%d %H:%M:%S")'/>
+  <QWidget id='clock' class='inkwell' layout='QVBoxLayout()' padding='10,15,10,10' spacing='5'>
+    <Set style='f"
+      border-radius:{data.inkwell.settings.borderRadius}px;
+      background-color:{data.inkwell.settings.backgroundColor};"'
+      fixedWidth='data.inkwell.settings.width'/>
+    <!-- <DropShadow args='(0,5,20,128)'/> -->
+    <QLabel class='date' text='data.clock.datetime.strftime("%A, %b %d")' alignment='Qt.AlignCenter'/>    
+    <QLabel class='time' text='data.clock.datetime.strftime("%H:%M")' alignment='Qt.AlignCenter'/>
   </QWidget>
 </QWidget>
