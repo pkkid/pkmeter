@@ -48,6 +48,7 @@ class ColorButton(QtWidgets.QPushButton):
         if not self._showButtons: dlg.setOption(QtWidgets.QColorDialog.NoButtons)
         if self._showAlpha: dlg.setOption(QtWidgets.QColorDialog.ShowAlphaChannel)
         dlg.setStyleSheet('QColorDialog { background-color: #222222; }')
+        dlg.currentColorChanged.connect(lambda c: self.setColor(dlg.currentColor().name()))
         if self._color:
             dlg.setCurrentColor(QtGui.QColor(self._color))
         if dlg.exec_():
