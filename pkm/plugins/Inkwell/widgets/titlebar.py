@@ -8,6 +8,7 @@ class TitleBar(QtWidgets.QWidget):
 
     def __init__(self, window, *args, **kwargs):
         super(TitleBar, self).__init__(*args, **kwargs)
+        self.setProperty('class', 'titlebar')
         self._dragMousePos = None
         self._dragWidgetPos = None
         self.window = window
