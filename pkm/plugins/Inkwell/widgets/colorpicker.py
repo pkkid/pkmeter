@@ -45,5 +45,3 @@ class ColorSlider(QTemplateWidget):
             self._value = value
             self.setValue(value)
             self.valueChanged.emit(value)
-
-
