@@ -18,7 +18,7 @@
     <QWidget id='currentcolor'/>
     
     <!-- Selection Options -->
-    <QWidget id='options' layout='QVBoxLayout()'>
+    <QWidget id='options' layout='QVBoxLayout()' padding='15,5,15,15'>
       <!-- Hex Color -->
       <QWidget layout='QHBoxLayout()' padding='0,10'>
         <QLineEdit id='hex' text='#ffffff'/>
@@ -37,8 +37,6 @@
         <Connect valueChanged='opacityChanged'/>
       </ColorSlider>
     </QWidget>
-   
-    <Spacing args='20'/>
   </QWidget>
 </QWidget>
 

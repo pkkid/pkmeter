@@ -12,6 +12,18 @@ class ColorPicker(QTemplateWidget):
         """ Show this settings window. """
         utils.centerWindow(self)
         super(ColorPicker, self).show()
+    
+    def hueChanged(self, value):
+        pass
+
+    def saturationChanged(self, value):
+        pass
+
+    def brightnessChanged(self, value):
+        pass
+
+    def opacityChanged(self, value):
+        pass
 
 
 class ColorSlider(QTemplateWidget):
