@@ -25,4 +25,4 @@ max-complexity = -1
 max-line-length = 125
 show-source = True
 per-file-ignores =
-  pkmeter.py:E402
+  app.py:E402

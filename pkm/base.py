@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from pkm import log
 from pkm.mixins import Draggable
-from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt
+from qtemplate import QTemplateWidget
 
 
 class DataSource:

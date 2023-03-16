@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-import sass
 from collections import OrderedDict
 from pkm import log
 from PySide6 import QtGui
@@ -26,18 +25,6 @@ def centerWindow(qobj):
     centerpos = screen.geometry().center()
     geometry.moveCenter(centerpos)
     qobj.move(geometry.topLeft())
-
-
-def deleteChildren(qobj):
-    """ Delete all children of the specified QObject. """
-    if hasattr(qobj, 'clear'):
-        return qobj.clear()
-    layout = qobj.layout()
-    while layout.count():
-        item = layout.takeAt(0)
-        widget = item.widget()
-        if widget: widget.deleteLater()
-        else: deleteChildren(item.layout())
 
 
 def flattenDataTree(root, path=''):
@@ -127,15 +114,6 @@ def setPropertyAndRedraw(qobj, name, value=None):
     qobj.style().unpolish(qobj)
     qobj.style().polish(qobj)
     qobj.update()
-
-
-def setStyleSheet(qobj, filepath, context=None, outline=False):
-    """ Load the specified stylesheet via libsass and add it to qobj. """
-    styles = open(filepath).read()
-    styles = sass.compile(string=styles)
-    if outline:
-        styles += 'QWidget { border:1px solid rgba(255,0,0,0.3) !important; }'
-    qobj.setStyleSheet(styles)
 
 
 def typeStr(value):

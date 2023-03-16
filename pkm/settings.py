@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, normpath
 from pkm import log, utils  # noqa
-from pkm.qtemplate import QTemplateWidget
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Qt
+from qtemplate import QTemplateWidget
 
 
 class SettingsWindow(QTemplateWidget):
@@ -93,7 +93,7 @@ class SettingsWindow(QTemplateWidget):
     
     def updateDataTable(self):
         if not self.ids.datastore.isVisible(): return
-        metrics = self.app.data.listMetrics()
+        metrics = self.app.data.listValues()
         self.ids.datatable.setRowCount(len(metrics))
         for row in range(len(metrics)):
             for col in range(3):

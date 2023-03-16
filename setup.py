@@ -4,7 +4,7 @@ from distutils.core import setup
 from pip.req import parse_requirements
 from setuptools import find_packages
 
-requirements = [str(line.req) for line in parse_requirements('requirements.pip')]
+requirements = [str(line.req) for line in parse_requirements('requirements.txt')]
 
 setup(
     name='pkmeter',

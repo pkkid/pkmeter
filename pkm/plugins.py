@@ -155,6 +155,7 @@ def plugins(plugindirs=PLUGIN_DIRECTORIES):
                     except Exception as err:
                         log.warning(f'Error loading plugin {dirname}')
                         log.debug(err, exc_info=1)
+    initGlobalContext(plugins)
     return plugins
 
 
@@ -174,3 +175,11 @@ def widgets():
         for pid, plugin in app.plugins.items():
             _WIDGETS.update(plugin.widgets)
     return _WIDGETS
+
+
+def initGlobalContext(plugins):
+    from qtemplate import QTemplateWidget  # noqa
+    app = QtCore.QCoreApplication.instance()
+    QTemplateWidget.globalcontext.update({'APPNAME':APPNAME, 'VERSION':VERSION, 'app':app, 'data':app.data})
+    for pid, plugin in plugins.items():
+        QTemplateWidget.globalcontext.update(plugin.widgets)

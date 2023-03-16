@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from pkm.qtemplate import QTemplateWidget
 from PySide6.QtCore import Signal
+from qtemplate import QTemplateWidget
 
 
 class NumSlider(QTemplateWidget):
@@ -19,7 +19,7 @@ class NumSlider(QTemplateWidget):
 
     def __init__(self, *args, **kwargs):
         super(NumSlider, self).__init__(*args, **kwargs)
-        self._value = None
+        self.value = None
     
     def setRange(self, minValue, maxValue):
         self.ids.slider.setMinimum(minValue)
@@ -29,9 +29,9 @@ class NumSlider(QTemplateWidget):
     def setValue(self, value):
         self.ids.slider.setValue(value)
         self.ids.spinbox.setValue(value)
-    
+
     def _valueChanged(self, value):
-        if value != self._value:
-            self._value = value
+        if value != self.value:
+            self.value = value
             self.setValue(value)
             self.valueChanged.emit(value)

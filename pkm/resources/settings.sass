@@ -1,0 +1,88 @@
+//--------------------------
+// Stylesheet-Reference
+//   https://devdocs.io/qt/stylesheet-reference
+//   https://sass-lang.com/guide
+//   https://github.com/morhetz/gruvbox
+//--------------------------
+
+$primary: #458588;
+$primarylight: #83a598;
+$secondary: #333333;
+$secondarylight: #555555;
+$secondarydark: #222222;
+$secondarydark2: #111111;
+$primarytext: #f8f2ec;
+$secondarytext: #c5c0ba;
+$highlighttext: #fabd2f;
+$dimtext: #888480;
+
+
+//--------------------------
+// Settings Window
+//--------------------------
+#settings {
+
+  // Sidepanel
+  #sidepanelwrap {
+    background-color: $secondary;
+    max-width: 200px;
+    min-width: 200px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    font-family: 'Josefin Sans';
+
+    #title {
+      color:$primarytext;
+      font-family: 'Josefin Sans';
+      font-size:25px;
+      padding:0px;
+    }
+    #version {
+      color:$highlighttext;
+      font-family: 'Josefin Sans';
+      padding-top:5px;
+    }
+
+    QPushButton {
+      background-color: rgba(0,0,0,0);
+      border: 0px solid rgba(0,0,0,0);
+      color: $secondarytext;
+      font-size: 14px;
+      padding: 8px 0px;
+      text-align: left;
+      &:hover { color:$primarytext; }
+      &[class=selected] { color:$highlighttext; }
+    }
+    QComboBox {
+      border: 0px solid rgba(0,0,0,0);
+      border-bottom: 2px solid $secondarydark;
+      color: $secondarytext;
+      padding: 5px 1px 3px 1px;
+      text-align: left;
+      // &[class=selected] { color:$highlighttext; }
+      &:hover {
+        border-bottom: 2px solid $secondarydark;
+        color: $primarytext;
+      }
+    }
+  }
+
+  // Content
+  #contentwrap {
+    background-color:$secondarydark2;
+    border-top-right-radius:3px;
+    border-bottom-right-radius:3px;
+    #contentheader { border-bottom:1px solid $secondary; padding:2px 0px; }
+  
+    QWidget[class=formfield] > QLabel {
+      max-width: 120px;
+      min-width: 120px;
+    }
+  }
+  
+  // Subtext
+  QLabel[class=subtext] {
+    font-size: 11px;
+    color: $dimtext;
+  }
+}
