@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from pkm import log
-from pkm.mixins import Draggable
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt
 from qtemplate import QTemplateWidget
+from qtemplate.helpers.draggable import DraggableMixin
 
 
 class DataSource:
@@ -35,7 +35,7 @@ class DataSource:
         log.warning(f'{self.plugin.id} timer running with no update() function.')
 
 
-class DesktopWidget(Draggable, QTemplateWidget):
+class DesktopWidget(DraggableMixin, QTemplateWidget):
     """ Base Desktop Widget used to display components on the Desktop. """
     DEFAULT_LAYOUT_MARGINS = (30,30,30,30)
     DEFAULT_LAYOUT_SPACING = 0
@@ -45,7 +45,7 @@ class DesktopWidget(Draggable, QTemplateWidget):
         self.component = component                      # Plugin component
         self.app = QtCore.QCoreApplication.instance()   # QtCore application
         QTemplateWidget.__init__(self)                  # Init QTemplate
-        Draggable.__init__(self)                        # Init Draggable
+        DraggableMixin.__init__(self)                   # Init Draggable
         self._initWidget()                              # Set window properties
         self._initRightclickMenu()                      # Create right click menu
         

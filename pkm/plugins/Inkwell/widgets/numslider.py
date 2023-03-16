@@ -4,7 +4,6 @@ from qtemplate import QTemplateWidget
 
 
 class NumSlider(QTemplateWidget):
-    """ Window titlebar with custom styles. """
     TMPLSTR = r"""
       <QWidget layout='QHBoxLayout()' padding='0' spacing='20'>
         <QSlider id='slider' args='(Qt.Horizontal)'>

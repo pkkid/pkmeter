@@ -12,14 +12,14 @@
     <QWidget id='sidepanelwrap' layout='QVBoxLayout()' padding='0'>
       <QWidget id='sidepanel' layout='QVBoxLayout()' padding='0' spacing='0'>
         <!-- Title -->
-        <TitleBar args='self' layout='QVBoxLayout()' padding='(15,15,15,0)' spacing='0'>
+        <Draggable args='self' layout='QVBoxLayout()' padding='(15,15,15,0)' spacing='0'>
           <QWidget layout='QHBoxLayout()' padding='0' spacing='3'>
             <QLabel id='title' text='APPNAME'/>
             <QLabel id='version' text='"v"+VERSION' styleSheet='width:40px;'/>
             <Stretch/>
           </QWidget>
           <QLabel text='github.com/pkkid/pkmeter' class='subtext'/>
-        </TitleBar>
+        </Draggable>
         <QWidget id='sidepanelcontent' layout='QVBoxLayout()' padding='15' spacing='2'>
           <!-- General Settings -->
           <QPushButton id='appsettingsbtn' class='selected' text='Application Settings'>
@@ -45,12 +45,12 @@
 
     <!-- Content Panel -->
     <QWidget id='contentwrap' layout='QVBoxLayout()' padding='0' spacing='0'>
-      <TitleBar args='self' layout='QHBoxLayout()' padding='(10,10,10,0)'>
+      <Draggable args='self' layout='QHBoxLayout()' padding='(10,10,10,0)'>
         <Stretch/>
         <QPushButton text='󰅖' class='close'>
           <Connect clicked='close'/>
         </QPushButton>
-      </TitleBar>
+      </Draggable>
       <!-- Content Header -->
       <QWidget id='content' layout='QVBoxLayout()' padding='(23,0)' spacing='0'>
         <QLabel id='contentheader' text='Application Settings'/>
