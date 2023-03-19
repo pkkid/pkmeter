@@ -7,9 +7,7 @@ import pkgutil
 from functools import cached_property
 from pkm import APPNAME, PLUGIN_DIRECTORIES, VERSION
 from pkm import base, log, utils
-from PySide6 import QtCore, QtGui, QtWidgets
-
-_WIDGETS = None
+from PySide6 import QtCore, QtWidgets
 
 
 class Plugin:
@@ -157,24 +155,6 @@ def plugins(plugindirs=PLUGIN_DIRECTORIES):
                         log.debug(err, exc_info=1)
     initGlobalContext(plugins)
     return plugins
-
-
-def widgets():
-    global _WIDGETS
-    if _WIDGETS is None:
-        # Add application constants
-        app = QtCore.QCoreApplication.instance()
-        _WIDGETS = {'APPNAME':APPNAME, 'VERSION':VERSION, 'app':app, 'data':app.data}
-        # Load widgets from the Qt libraries; This section should probably live in
-        # the qtemplate module, but I feel like keeping it together with the plugin
-        # widget loader makes more sense than spreading it around.
-        for module in (QtGui, QtWidgets):
-            members = dict(inspect.getmembers(module, inspect.isclass))
-            _WIDGETS.update({k:v for k,v in members.items()})
-        # Load widgets from the plugin directories
-        for pid, plugin in app.plugins.items():
-            _WIDGETS.update(plugin.widgets)
-    return _WIDGETS
 
 
 def initGlobalContext(plugins):

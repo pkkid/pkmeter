@@ -53,7 +53,7 @@ class SettingsWindow(QTemplateWidget):
         self.updateContent(componentid, pluginid)
 
     def updateComponentList(self, pluginid):
-        if self._loading: return
+        if self.loading: return
         self.ids.componentlist.clear()
         if str(pluginid) not in self.app.plugins:
             pluginid = self.ids.pluginlist.currentData()
@@ -67,7 +67,7 @@ class SettingsWindow(QTemplateWidget):
             self.ids.componentlist.addItem(item)
     
     def updateContent(self, componentid, pluginid=None):
-        if self._loading: return
+        if self.loading: return
         # Remove Highlight on all sidepanel items
         utils.setPropertyAndRedraw(self.ids.appsettingsbtn, 'class', '')
         utils.setPropertyAndRedraw(self.ids.datastorebtn, 'class', '')
